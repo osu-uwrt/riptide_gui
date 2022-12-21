@@ -1,0 +1,38 @@
+<library path="src">
+  <class name="Controllers" type="riptide_rqt_plugins2.controllers.ControllersPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A python GUI plugin to interact with Riptide controllers
+    </description>
+    <qtgui>
+      <group>
+        <label>OSU UWRT</label>
+        <statustip>Custom Plugins for OSU UWRT's Riptide software</statustip>
+        <icon type="theme">folder</icon>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Controller Actions</label>
+    </qtgui>
+  </class>
+  <class name="Autonomy" type="riptide_rqt_plugins2.autonomy.AutonomyPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A python GUI plugin to interact with Riptide autonomy actions
+    </description>
+    <qtgui>
+      <group>
+        <label>OSU UWRT</label>
+        <statustip>Custom Plugins for OSU UWRT's Riptide software</statustip>
+        <icon type="theme">folder</icon>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Autonomy Actions</label>
+    </qtgui>
+  </class>
+</library>

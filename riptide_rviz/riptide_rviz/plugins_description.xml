@@ -1,0 +1,27 @@
+<library path="riptide_rviz">
+    <class name="riptide_rviz/ControlPanel" type="riptide_rviz::ControlPanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for controlling Tempest Underwater
+        </description>
+    </class>
+    <class name="riptide_rviz/MissionPanel" type="riptide_rviz::MissionPanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for controlling riptide autonomy while underwater
+        </description>
+    </class>
+    <class name="riptide_rviz/Bringup" type="riptide_rviz::Bringup" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for starting up the riptide software package on remote targets
+        </description>
+    </class>
+    <class name="riptide_rviz/Actuators" type="riptide_rviz::Actuators" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for controlling the actuators on a riptide vehicle
+        </description>
+    </class>
+    <class name="riptide_rviz/DiagnosticOverlay" type="riptide_rviz::DiagnosticOverlay" base_class_type="rviz_common::Display">
+        <description>
+            RVIZ Plugin for rendering riptide vehicle diagnostics on the RVIZ display
+        </description>
+    </class>
+</library>
