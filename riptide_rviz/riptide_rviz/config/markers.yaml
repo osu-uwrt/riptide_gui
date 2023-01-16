@@ -1,0 +1,37 @@
+marker_publisher:
+  mesh_pkg: riptide_meshes
+  mesh_directory: meshes
+  marker_topic: markers
+  markers:
+    axe:
+      frame: axe_frame
+      mesh: axe
+    badge:
+      frame: badge_frame
+      mesh: badge
+    binBarrel:
+      frame: binBarrel_frame
+      mesh: binBarrel
+    binPhone:
+      frame: binPhone_frame
+      mesh: binPhone
+    bootlegger:
+      frame: bootlegger_frame
+      mesh: bootlegger
+    bootleggerTorpedo:
+      frame: bootleggerTorpedo_frame
+      mesh: bootleggerTorpedo
+    cash:
+      frame: cash_frame
+      mesh: cash
+    gman:
+      frame: gman_frame
+      mesh: gman
+    gmanTorpedo:
+      frame: gmanTorpedo_frame
+      mesh: gmanTorpedo
+    tommyGun:
+      frame: tommyGun_frame
+      mesh: tommyGun
+    
+    

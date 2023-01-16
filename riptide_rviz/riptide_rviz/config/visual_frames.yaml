@@ -1,0 +1,17 @@
+visual_frames:
+  gate_frame:
+    parent: gman_frame
+    x: 2 relative
+    y: 0 relative
+    z: 0 absolute
+    roll: 1.5707 relative
+    pitch: 0 absolute
+    yaw: 3.1415 relative
+  meme_frame:
+    parent: gate_frame
+    x: 0 absolute
+    y: 0 absolute
+    z: 1 absolute
+    roll: 0 absolute
+    pitch: 0 absolute
+    yaw: 0 absolute

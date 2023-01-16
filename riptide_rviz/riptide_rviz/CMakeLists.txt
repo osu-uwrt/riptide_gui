@@ -118,6 +118,13 @@ install(
   RUNTIME DESTINATION bin
 )
 
+install(PROGRAMS 
+  src/MarkerPublisher.py
+  src/VisualFramePublisher.py
+
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(
   DIRECTORY include/
   DESTINATION include/${PROJECT_NAME}
@@ -128,6 +135,11 @@ install(DIRECTORY launch
 
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/icons"
+  DESTINATION "share/${PROJECT_NAME}"
+)
+
+install(
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config"
   DESTINATION "share/${PROJECT_NAME}"
 )
 
