@@ -1,7 +1,7 @@
 marker_publisher:
   mesh_pkg: riptide_meshes
   mesh_directory: meshes
-  marker_topic: markers
+  marker_topic: mapping_markers
   markers:
     axe:
       frame: axe_frame
