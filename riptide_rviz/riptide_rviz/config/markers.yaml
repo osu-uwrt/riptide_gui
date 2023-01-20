@@ -6,32 +6,51 @@ marker_publisher:
     axe:
       frame: axe_frame
       mesh: axe
+      scale: 3
+      pose: [0, 0, 0, 0, 1.5707, 0]
     badge:
       frame: badge_frame
       mesh: badge
+      scale: 1
+      pose: [0, 0, 0, 0, 0, 1.5707]
     binBarrel:
       frame: binBarrel_frame
       mesh: binBarrel
+      pose: [0, 0, 0, 0, 0, 1.5707]
+      scale: 1
     binPhone:
       frame: binPhone_frame
       mesh: binPhone
+      pose: [0, 0, 0, 0, 0, 0]
+      scale: 1
     bootlegger:
       frame: bootlegger_frame
       mesh: bootlegger
+      pose: [0, 0, 0, 0, 0, 0]
+      scale: 0.25
     bootleggerTorpedo:
-      frame: bootleggerTorpedo_frame
+      frame: torpedoBootlegger_frame
       mesh: bootleggerTorpedo
+      scale: 4
+      pose: [0, 0, 0, 0, 0, -1.5707]
     cash:
       frame: cash_frame
       mesh: cash
+      scale: 1.5
+      pose: [0, 0, 0, 0, 1.5707, 0]
     gman:
       frame: gman_frame
       mesh: gman
+      scale: 0.25
+      pose: [0, 0, 0, 0, 0, 0]
     gmanTorpedo:
-      frame: gmanTorpedo_frame
+      frame: torpedoGman_frame
       mesh: gmanTorpedo
+      scale: 4
+      pose: [0, 0, 0, 0, 0, 1.5707]
     tommyGun:
-      frame: tommyGun_frame
+      frame: TommyGun_frame
       mesh: tommyGun
-    
+      scale: 1
+      pose: [0, 0, 0, -1.5707, 0, 0]
     

@@ -120,7 +120,6 @@ install(
 
 install(PROGRAMS 
   src/MarkerPublisher.py
-  src/VisualFramePublisher.py
 
   DESTINATION lib/${PROJECT_NAME}
 )
