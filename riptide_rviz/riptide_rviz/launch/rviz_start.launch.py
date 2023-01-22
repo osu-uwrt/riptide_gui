@@ -18,8 +18,8 @@ config = PathJoinSubstitution([
 # path to rviz config
 rviz_cfg_path = os.path.join(
     os.path.expanduser("~"),
-    "osu-uwrt", "riptide_software", "src",
-    "riptide_rviz" , "control_config.rviz")
+    "osu-uwrt", "development", "software", "src",
+    "riptide_gui", "riptide_rviz" , "control_config.rviz")
 
 def generate_launch_description():
     return LaunchDescription([
@@ -91,6 +91,13 @@ def generate_launch_description():
                         {"robot": robot},
                     ]
                 ),
+                
+                Node(
+                    package="riptide_rviz",
+                    executable="MarkerPublisher.py",
+                    name="marker_publisher",
+                    output="screen"
+                )
             ]
         )
     ])
