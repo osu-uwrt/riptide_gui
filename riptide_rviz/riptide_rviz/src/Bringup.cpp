@@ -79,7 +79,7 @@ namespace riptide_rviz
         // filter names down to launch nodes
         std::vector<std::string> launchNodes;
         auto filt = [](const auto &s)
-        { return s.find("launch_srv") != std::string::npos; };
+        { return s.find("_launch_manager") != std::string::npos; };
         std::copy_if(names.begin(), names.end(), std::back_inserter(launchNodes), filt);
 
         // make sure we have availiable nodes in the list, otherwise place a blank list entry
