@@ -119,7 +119,7 @@ install(
 )
 
 install(PROGRAMS 
-  src/MarkerPublisher.py
+  python/MarkerPublisher.py
 
   DESTINATION lib/${PROJECT_NAME}
 )
