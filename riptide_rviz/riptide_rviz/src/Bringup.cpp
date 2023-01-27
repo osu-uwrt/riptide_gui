@@ -41,8 +41,6 @@ namespace riptide_rviz
         connect(uiPanel->bringupStart, &QPushButton::clicked, [this](void)
                 { startBringup(); });
         connect(uiPanel->bringupHost, SIGNAL(currentIndexChanged(int)), SLOT(handleBringupHost(int)));
-        connect(uiPanel->bringupStop, &QPushButton::clicked, [this](void)
-                { stopBringup(); });
     }
 
     void Bringup::load(const rviz_common::Config &config)
@@ -139,7 +137,6 @@ namespace riptide_rviz
         {
             // disable the start button and enable the stop button
             uiPanel->bringupStart->setDisabled(true);
-            uiPanel->bringupStop->setDisabled(false);
             uiPanel->bringupRefresh->setDisabled(true);
 
             launch_msgs::srv::StartLaunch::Request::SharedPtr startReq = std::make_shared<launch_msgs::srv::StartLaunch::Request>();
@@ -174,7 +171,6 @@ namespace riptide_rviz
 
             // reset the buttons durig an error
             uiPanel->bringupStart->setDisabled(false);
-            uiPanel->bringupStop->setDisabled(true);
             uiPanel->bringupRefresh->setDisabled(false);
         }
     }
@@ -200,7 +196,6 @@ namespace riptide_rviz
                 if (launch.launch_id == bringupID && launch.status != launch.RUNNING)
                 {
                     uiPanel->bringupStart->setDisabled(false);
-                    uiPanel->bringupStop->setDisabled(true);
                     uiPanel->bringupRefresh->setDisabled(false);
 
                     bringupCheckTimer->stop();
@@ -225,7 +220,6 @@ namespace riptide_rviz
             {
                 // launch has died, reset buttons
                 uiPanel->bringupStart->setDisabled(false);
-                uiPanel->bringupStop->setDisabled(true);
                 uiPanel->bringupRefresh->setDisabled(false);
 
                 bringupCheckTimer->stop();

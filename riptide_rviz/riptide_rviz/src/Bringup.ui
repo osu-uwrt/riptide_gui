@@ -6,84 +6,132 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>115</height>
+    <width>477</width>
+    <height>417</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="bringup" native="true">
+  <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>371</width>
-     <height>105</height>
+     <width>471</width>
+     <height>411</height>
     </rect>
    </property>
-   <layout class="QFormLayout" name="formLayout">
-    <item row="1" column="1">
-     <widget class="QComboBox" name="bringupFile">
-      <property name="toolTip">
-       <string>Bringup file to run</string>
-      </property>
-      <item>
-       <property name="text">
-        <string>Bringup File</string>
-       </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="bringupRefresh">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Refresh</string>
+        </property>
+       </widget>
       </item>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QComboBox" name="bringupHost">
-      <property name="toolTip">
-       <string>Bringup Host Computer</string>
-      </property>
-      <item>
-       <property name="text">
-        <string>Bringup Host Computer</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="bringupStop">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton {color: white; background:red;}
-
-QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
-      </property>
-      <property name="text">
-       <string>Stop</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QPushButton" name="bringupStart">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton {color: white; background: green;}
+      <item row="1" column="1">
+       <widget class="QPushButton" name="bringupStart">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {color: white; background: green;}
 QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
-      </property>
-      <property name="text">
-       <string>Start</string>
-      </property>
-     </widget>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="bringupHost">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Bringup Host Computer</string>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="currentText">
+         <string>Bringup Host Computer</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>Bringup Host Computer</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="bringupFile">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Bringup file to run</string>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+        <property name="minimumContentsLength">
+         <number>0</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>Bringup File</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="bringupRefresh">
-      <property name="enabled">
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
        <bool>true</bool>
       </property>
-      <property name="text">
-       <string>Refresh</string>
-      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>467</width>
+         <height>343</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
