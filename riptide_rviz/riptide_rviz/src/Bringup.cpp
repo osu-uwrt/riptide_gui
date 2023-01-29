@@ -18,6 +18,11 @@ namespace riptide_rviz
 
         auto options = rclcpp::NodeOptions().arguments({});
         clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_bringup", options);
+
+        // Add Vertical Box layout to the Scroll area so we can actually add items to it
+        QWidget *scrollAreaLayout = new QWidget;
+        scrollAreaLayout->setLayout(new QVBoxLayout());
+        uiPanel->scrollArea->setWidget(scrollAreaLayout);
     }
 
     void Bringup::onInitialize()
