@@ -107,11 +107,11 @@ namespace riptide_rviz
         uiPanel->bringupFile->addItem("None Selected");
 
         // populate with new files
-        std::string bringupFilesDir = ament_index_cpp::get_package_share_directory(BRINGUP_PKG) + "/launch";
+        std::string bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
         for (const auto &entry : std::filesystem::directory_iterator(bringupFilesDir))
         {
             std::string file = std::string(entry.path());
-            if (file.find(".launch.py") != std::string::npos)
+            if (file.find(".xml") != std::string::npos)
             {
                 uiPanel->bringupFile->addItem(QString::fromStdString(file.substr(file.find_last_of('/') + 1)));
             }
