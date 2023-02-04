@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!-- The outer tag is to support the RVIZ gui loading a bunch of recipes -->
+<launches>
+
+    <!-- Recipes contain stages. Stages contain one or more launches. Each stage
+         has a required unique string id, one or more launches, and an optional
+         list of stages it depends on.
+
+         The stage id does not need to be a number. For example, this stage could
+         be named "hardware" or "ekf-launch" or "bestest-stage EV3R"
+
+         A launch recipe must contain at least one stage-->
+    <stage id="1">
+        <!-- This tag set is to support loading each launch, one by one
+             Note that each launch name must be unique within the recipe-->
+        <launch name="something.launch.py" package="abcdef">
+
+            <!-- Topic names are sent to launch_service_c. launch_service_c uses
+                 this information to ensure that each launch file is behaving
+                 correctly, otherwise launch_service_c will complain -->
+            <topic name="a" type="t1" qos="system_default"/>
+            <topic name="b" type="t2" qos="sensor_data"/>
+            <topic name="c" type="t3" qos="system_default"/>
+            <topic name="d" type="t4" qos="system_default"/>
+            <topic name="e" type="t5" qos="system_default"/>
+        </launch>
+    </stage>
+
+    <stage id="2">
+        <!-- Stages can have "dependencies", which are other stages that must have all of their launch files
+             in a running state before the stage with the dependency starts.
+
+             In this example, stage "2" depends on stage "1". Stage "1" has only one launch file, which is
+             "something.launch.py." So, once something.launch.py is running, stage "1" is considered complete.
+             Stage "2" in this example, would have no outstanding dependencies, and it would tell the launch_service_c
+             to start it's launches.
+             -->
+        <dependency id="1"/>
+
+        <launch name="dummy_robot_bringup.launch.py" package="dummy_robot_bringup">
+            <topic name="/joint_states" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
+        </launch>
+    </stage>
+</launches>
+
+<!--
+example test command:
+ros2 action send_goal /<machine>/bringup_start launch_msgs/action/BringupStart "{launch_file: 'dummy_robot_bringup.launch.py', launch_package: 'dummy_robot_bringup', topics:[{ name: '/joint_states', type_name: 'sensor_msgs/msg/JointState', qos_type: 0}]}"
+
+like this:
+ros2 action send_goal /coalman321_QEMU_Virtual_Machine/bringup_start launch_msgs/action/BringupStart "{launch_file: 'dummy_robot_bringup.launch.py', launch_package: 'dummy_robot_bringup', topics:[{ name: '/joint_states', type_name: 'sensor_msgs/msg/JointState', qos_type: 0}]}"
+-->
