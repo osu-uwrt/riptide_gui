@@ -58,6 +58,12 @@ add_library(${PROJECT_NAME} SHARED
             ${UI_HEADERS}
 )
 
+#
+# tinyxml2 library
+#
+add_library(tinyxml2 SHARED
+  3rdparty/tinyxml/tinyxml2.cpp)
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 # Causes the visibility macros to use dllexport rather than dllimport,
@@ -93,6 +99,7 @@ target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
   rviz_ogre_vendor::OgreMain
   rviz_ogre_vendor::OgreOverlay
+  tinyxml2
 )
 
 # Export old-style CMake variables
