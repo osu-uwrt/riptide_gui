@@ -5,6 +5,8 @@
 #include <string>
 #include <rviz_common/display_context.hpp>
 
+#include "riptide_rviz/bringup_recipe.hpp"
+
 using namespace std::chrono_literals;
 
 namespace riptide_rviz
