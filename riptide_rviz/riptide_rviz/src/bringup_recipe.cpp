@@ -104,9 +104,9 @@ namespace riptide_rviz
         err = doc.LoadFile(recipePath.c_str());
         if (err != XML_SUCCESS) {
             // Document did not load. Return with error
-            return (RecipeXMLError) {
-                .errorCode = static_cast<RecipeXMLErrorCode>(err),
-                .lineNumber = doc.ErrorLineNum()
+            return RecipeXMLError {
+                static_cast<RecipeXMLErrorCode>(err),
+                doc.ErrorLineNum()
             };
         }
 
@@ -115,18 +115,18 @@ namespace riptide_rviz
         // Check if the root tag is a "launches" tag
         if (strcmp(root->Name(),"launches") != 0) {
             // Root tag is not a "launches" tag. Return with error
-            return (RecipeXMLError) {
-                .errorCode = RecipeXMLErrorCode::NO_LAUNCHES_TAG,
-                .lineNumber = root->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::NO_LAUNCHES_TAG,
+                root->GetLineNum()
             };
         }
         
         // Check that there are launches
         if (root->FirstChildElement() == nullptr) {
             // No stages found. Return with error
-            return (RecipeXMLError) {
-                .errorCode = RecipeXMLErrorCode::EMPTY_RECIPE,
-                .lineNumber = root->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::EMPTY_RECIPE,
+                root->GetLineNum()
             };
         }
 
@@ -143,9 +143,9 @@ namespace riptide_rviz
             stages.emplace_back(stage);
         }
 
-        return (RecipeXMLError) {
-            .errorCode = RecipeXMLErrorCode::SUCCESS,
-            .lineNumber = -1
+        return RecipeXMLError {
+            RecipeXMLErrorCode::SUCCESS,
+            -1
         }; 
     }
 
@@ -154,26 +154,26 @@ namespace riptide_rviz
 
         // Check this tag is a stage tag
         if (strcmp(stageXML->Name(), "stage") != 0) {
-            return (RecipeXMLError) {
-                .errorCode = RecipeXMLErrorCode::NON_STAGE_TAG,
-                .lineNumber = stageXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::NON_STAGE_TAG,
+                stageXML->GetLineNum()
             };
         }
 
         // Check this stage an id
         const char * stageID = stageXML->Attribute("id");
         if (stageID == nullptr) {
-            return (RecipeXMLError) {
-                .errorCode = RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE,
-                .lineNumber = stageXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE,
+                stageXML->GetLineNum()
             };
         }
 
         // Check this id isn't used by other stages
         if (stageExists(stageID)) {
-            return (RecipeXMLError) {
-                .errorCode = RecipeXMLErrorCode::DUPLICATE_STAGE_IDS,
-                .lineNumber = stageXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::DUPLICATE_STAGE_IDS,
+                stageXML->GetLineNum()
             };
         }
 
@@ -194,9 +194,9 @@ namespace riptide_rviz
                 stage.launches.emplace_back(launch);
             } else {
                 // Tag is neither a dependency or a launch.
-                err = (RecipeXMLError){
-                    .errorCode = RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
-                    .lineNumber = tag->GetLineNum()
+                err = RecipeXMLError {
+                    RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
+                    tag->GetLineNum()
                 };
             }
 
@@ -208,15 +208,15 @@ namespace riptide_rviz
 
         if (stage.launches.size() == 0) {
             // There are no launches found in this stage. Return with error
-            return (RecipeXMLError){
-                .errorCode = RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH,
-                .lineNumber = stageXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH,
+                stageXML->GetLineNum()
             };
         }
 
-        return (RecipeXMLError){
-            .errorCode = RecipeXMLErrorCode::SUCCESS,
-            .lineNumber = -1
+        return RecipeXMLError {
+            RecipeXMLErrorCode::SUCCESS,
+            -1
         }; 
     }
 
@@ -225,17 +225,17 @@ namespace riptide_rviz
         const char * id = dependsXML->Attribute("id");
         if (id == nullptr) {
             // Dependency tag doesn't have an id. Return with error
-            return (RecipeXMLError){
-                .errorCode = RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE,
-                .lineNumber = dependsXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE,
+                dependsXML->GetLineNum()
             };
         }
 
         stage.outstandingDependencyIds.emplace_back(id);
 
-        return (RecipeXMLError){
-            .errorCode = RecipeXMLErrorCode::SUCCESS,
-            .lineNumber = -1
+        return RecipeXMLError {
+            RecipeXMLErrorCode::SUCCESS,
+            -1
         }; 
     }
 
@@ -256,9 +256,9 @@ namespace riptide_rviz
         const char *name = launchXML->Attribute("name");
         if (name == nullptr) {
             // launch does not have a name attribute. Return with error
-            return (RecipeXMLError){
-                .errorCode = RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
-                .lineNumber = launchXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+                launchXML->GetLineNum()
             };
         }
 
@@ -266,18 +266,18 @@ namespace riptide_rviz
         const char *package = launchXML->Attribute("package");
         if (package == nullptr) {
             // launch does not have a package attribute. Return with error
-            return (RecipeXMLError){
-                .errorCode = RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE,
-                .lineNumber = launchXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE,
+                launchXML->GetLineNum()
             };
         }
 
         // Check if this is a duplicate launch name
         if (launchExists(name)) {
             // There is already a launch with this name. Return with error.
-            return (RecipeXMLError){
-                .errorCode = RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
-                .lineNumber = launchXML->GetLineNum()
+            return RecipeXMLError {
+                RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
+                launchXML->GetLineNum()
             };
         }
 
@@ -290,26 +290,26 @@ namespace riptide_rviz
         for (const XMLElement *topicXML = launchXML->FirstChildElement(); topicXML != nullptr; topicXML = topicXML->NextSiblingElement()) {
             // Check this tag is a stage tag
             if (strcmp(topicXML->Name(), "topic") != 0) {
-                return (RecipeXMLError) {
-                    .errorCode = RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
-                    .lineNumber = topicXML->GetLineNum()
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
+                    topicXML->GetLineNum()
                 };
             }
 
             // Check this stage an id
             const char * topicName = topicXML->Attribute("name");
             if (topicName == nullptr) {
-                return (RecipeXMLError) {
-                    .errorCode = RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
-                    .lineNumber = topicXML->GetLineNum()
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+                    topicXML->GetLineNum()
                 };
             }
 
             // Check this id isn't used by other stages
             if (launch.topicExists(topicName)) {
-                return (RecipeXMLError) {
-                    .errorCode = RecipeXMLErrorCode::DUPLICATE_TOPIC,
-                    .lineNumber = topicXML->GetLineNum()
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::DUPLICATE_TOPIC,
+                    topicXML->GetLineNum()
                 };
             }
 
@@ -317,9 +317,9 @@ namespace riptide_rviz
             const char * topicType = topicXML->Attribute("type");
             if (topicName == nullptr) {
                 // No type info provided. Return with error.
-                return (RecipeXMLError) {
-                    .errorCode = RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
-                    .lineNumber = topicXML->GetLineNum()
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
+                    topicXML->GetLineNum()
                 };
             }
 
@@ -327,9 +327,9 @@ namespace riptide_rviz
             const char * topicQOS = topicXML->Attribute("qos");
             if (topicName == nullptr) {
                 // No QOS provided. Return with error
-                return (RecipeXMLError) {
-                    .errorCode = RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
-                    .lineNumber = topicXML->GetLineNum()
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
+                    topicXML->GetLineNum()
                 };
             }
 
@@ -342,18 +342,18 @@ namespace riptide_rviz
                 topic.qos_type = launch_msgs::msg::TopicData::QOS_SYSTEM_DEFAULT;
             } else {
                 // The qos is not a valid type. Retunr with error.
-                return (RecipeXMLError) {
-                    .errorCode = RecipeXMLErrorCode::INVALID_QOS_TYPE,
-                    .lineNumber = topicXML->GetLineNum()
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::INVALID_QOS_TYPE,
+                    topicXML->GetLineNum()
                 };
             }
 
             launch.topicList.emplace_back(topic);
         }
 
-        return (RecipeXMLError){
-            .errorCode = RecipeXMLErrorCode::SUCCESS,
-            .lineNumber = -1
+        return RecipeXMLError {
+            RecipeXMLErrorCode::SUCCESS,
+            -1
         };
     }
 
