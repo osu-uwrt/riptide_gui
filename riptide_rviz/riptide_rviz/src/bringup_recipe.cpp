@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
 #include "tinyxml2.h"
@@ -7,6 +9,91 @@
 
 namespace riptide_rviz
 {
+
+    std::string getRecipeXMLErrorMessage(RecipeXMLError err) {
+        std::ostringstream oss;
+        if (err.errorCode == RecipeXMLErrorCode::SUCCESS) {
+            return "No error has occurred";
+        }
+
+        if (err.lineNumber == 0) {
+            oss << "Recipe parsing error at unknown location: ";
+        } else {
+            oss << "Recipe parsing error at line " << err.lineNumber << " in the \".xml\": ";
+        }
+
+        switch(err.errorCode) {
+        case RecipeXMLErrorCode::XML_NO_ATTRIBUTE:                      [[fallthrough]];
+        case RecipeXMLErrorCode::XML_WRONG_ATTRIBUTE_TYPE:              [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_FILE_NOT_FOUND:              [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_FILE_COULD_NOT_BE_OPENED:    [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_FILE_READ_ERROR:             [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING_ELEMENT:             [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING_ATTRIBUTE:           [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING_TEXT:                [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING_CDATA:               [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING_COMMENT:             [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING_DECLARATION:         [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING_UNKNOWN:             [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_EMPTY_DOCUMENT:              [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_MISMATCHED_ELEMENT:          [[fallthrough]];
+        case RecipeXMLErrorCode::XML_ERROR_PARSING:                     [[fallthrough]];
+        case RecipeXMLErrorCode::XML_CAN_NOT_CONVERT_TEXT:              [[fallthrough]];
+        case RecipeXMLErrorCode::XML_NO_TEXT_NODE:                      [[fallthrough]];
+	    case RecipeXMLErrorCode::XML_ELEMENT_DEPTH_EXCEEDED:            [[fallthrough]];
+	    case RecipeXMLErrorCode::XML_ERROR_COUNT:
+            oss << "tinyxml2 could not parse the document. This recipe is malformed in some way";
+            break;
+
+        case RecipeXMLErrorCode::NO_LAUNCHES_TAG:
+            oss << "The recipe parser requires there exist a <launches> tag. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::NON_STAGE_TAG:
+            oss << "The parser only allows <stage> tags to be children of the <launches> tag.";
+            break;
+        case RecipeXMLErrorCode::UNKNOWN_TAG_TYPE:
+            oss << "The parser could not identify this tag type, or the tag you are using is not in the correct place. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE:
+            oss << "This tag is missing the 'id' attribute. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE:
+            oss << "This tag is missing the 'name' attribute. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE:
+            oss << "This tag is missing the 'package' attribute. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE:
+            oss << "This tag is missing the 'type' attribute. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE:
+            oss << "This tag is missing the 'qos' attribute. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::INVALID_QOS_TYPE:
+            oss << "This topic's QOS type is invalid. Note that the qos attribute can only be set to \"system_default\" or \"sensor_data\" (case-sensitive).";
+            break;
+        case RecipeXMLErrorCode::EMPTY_RECIPE:
+            oss << "This recipe is empty.";
+            break;
+        case RecipeXMLErrorCode::DUPLICATE_STAGE_IDS:
+            oss << "This stage's id is a duplicate of a previous stage. All stages must have unique id's";
+            break;
+        case RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES:
+            oss << "This launch's name is a duplicate of a previous launch. All launches must have unique id's";
+            break;
+        case RecipeXMLErrorCode::DUPLICATE_TOPIC:
+            oss << "This topic's name is a duplicate of a previous topic. All topics within a launch must have unique names";
+            break;
+        case RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH:
+            oss << "This stage contains no launches. All stages must have launches.";
+            break;
+        default:
+            oss << "Somehow an unknown error occurred. Please yell at Hunter and tell him to fix his flippin' parser.";
+            break;
+        }
+
+        return oss.str();
+    }
 
     /*
      * Initializes the current Recipe object from an XML file.

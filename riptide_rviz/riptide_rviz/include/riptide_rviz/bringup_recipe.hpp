@@ -87,6 +87,13 @@ namespace riptide_rviz
         int lineNumber;
     };
 
+    /*
+     * This function turns a RecipeXMLError into a printable message. The 
+     * printable message will include the line number and some information
+     * about the error stored within RecipeXMLError.errorCode.
+     */
+    std::string getRecipeXMLErrorMessage(RecipeXMLError);
+
     class Recipe {
     public:
         /*
