@@ -1,10 +1,6 @@
 #include <sstream>
-
-#include <ament_index_cpp/get_package_share_directory.hpp>
-#include <ament_index_cpp/get_package_prefix.hpp>
 #include "tinyxml2.h"
 
-#include "riptide_rviz/Bringup.hpp"
 #include "riptide_rviz/bringup_recipe.hpp"
 
 namespace riptide_rviz
@@ -98,16 +94,14 @@ namespace riptide_rviz
     /*
      * Initializes the current Recipe object from an XML file.
      */
-    RecipeXMLError Recipe::loadXml(std::string const& recipeFile) {
+    RecipeXMLError Recipe::loadXml(std::string const& recipePath) {
         using namespace tinyxml2;
-        
-        std::string recipeFilePath = ament_index_cpp::get_package_share_directory(RVIZ_PKG) 
-            + "/recipies/" + recipeFile;
+
         XMLDocument doc;
         XMLError err;
         
         // Open Recipe document
-        err = doc.LoadFile(recipeFilePath.c_str());
+        err = doc.LoadFile(recipePath.c_str());
         if (err != XML_SUCCESS) {
             // Document did not load. Return with error
             return (RecipeXMLError) {

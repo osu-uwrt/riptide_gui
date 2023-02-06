@@ -99,13 +99,7 @@ namespace riptide_rviz
         /*
          * Initializes the Recipe object from an XML file.
          * 
-         * Note that this function currently does not require that the
-         * recipeFile path be a full path to XML file. Instead, the path
-         * provided must be relative to the recipes directory.
-         * 
-         * Ex: If the full path to a recipe file is 
-         * "/home/hunter/osu-uwrt/. . ./riptide_rviz/recipies/example.xml", the
-         * caller only needs to pass "example.xml" to loadXML().
+         * "recipePath" must be a full path to the XML document.
          * 
          * On success: The current Recipe object will be initialized, with the
          * stages and launches vectors filled with relavent information. The
@@ -121,7 +115,7 @@ namespace riptide_rviz
          * NOTE: tinyxml2 may set the lineNumber to 0 if the XML error occurred
          * at an unknown location
          */
-        RecipeXMLError loadXml(std::string const& recipeFile);
+        RecipeXMLError loadXml(std::string const& recipePath);
         void setLaunchStatus(int64_t pid, RecipeLaunchStatus status);
 
         // Maybe change the parameter to the launch name?
