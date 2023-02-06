@@ -96,9 +96,12 @@ namespace riptide_rviz
             };
         }
 
+        // Iterate through each tag within the stage tag. Note these should only
+        // be either a "dependency" tag or a "launch" tag
         for (const XMLElement *tag = stageXML->FirstChildElement(); tag != nullptr; tag = tag->NextSiblingElement()) {
             RecipeXMLError err;
 
+            // Get tag name
             const char * tagName = tag->Name();
             if (strcmp(tagName, "dependency") == 0) {
                 // Parse dependency tag
@@ -109,6 +112,7 @@ namespace riptide_rviz
                 err = parseLaunchTag(tag, stageID, launch);
                 stage.launches.emplace_back(launch);
             } else {
+                // Tag is neither a dependency or a launch.
                 err = (RecipeXMLError){
                     .errorCode = RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
                     .lineNumber = tag->GetLineNum()
@@ -116,11 +120,13 @@ namespace riptide_rviz
             }
 
             if (err.errorCode != RecipeXMLErrorCode::SUCCESS) {
+                // Return with whatever error "err" was set to
                 return err;
             }
         }
 
         if (stage.launches.size() == 0) {
+            // There are no launches found in this stage. Return with error
             return (RecipeXMLError){
                 .errorCode = RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH,
                 .lineNumber = stageXML->GetLineNum()
@@ -134,8 +140,10 @@ namespace riptide_rviz
     }
 
     RecipeXMLError Recipe::parseDependencyTag(const tinyxml2::XMLElement *dependsXML, RecipeStage &stage) {
+        // Get dependency id
         const char * id = dependsXML->Attribute("id");
         if (id == nullptr) {
+            // Dependency tag doesn't have an id. Return with error
             return (RecipeXMLError){
                 .errorCode = RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE,
                 .lineNumber = dependsXML->GetLineNum()
@@ -163,23 +171,29 @@ namespace riptide_rviz
     RecipeXMLError Recipe::parseLaunchTag(const tinyxml2::XMLElement *launchXML, const char * stageID, RecipeLaunch &launch) {
         using namespace tinyxml2;
 
+        // Get launch name
         const char *name = launchXML->Attribute("name");
         if (name == nullptr) {
+            // launch does not have a name attribute. Return with error
             return (RecipeXMLError){
                 .errorCode = RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
                 .lineNumber = launchXML->GetLineNum()
             };
         }
 
+        // Get launch package
         const char *package = launchXML->Attribute("package");
         if (package == nullptr) {
+            // launch does not have a package attribute. Return with error
             return (RecipeXMLError){
                 .errorCode = RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE,
                 .lineNumber = launchXML->GetLineNum()
             };
         }
 
+        // Check if this is a duplicate launch name
         if (launchExists(name)) {
+            // There is already a launch with this name. Return with error.
             return (RecipeXMLError){
                 .errorCode = RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
                 .lineNumber = launchXML->GetLineNum()
@@ -218,16 +232,20 @@ namespace riptide_rviz
                 };
             }
 
+            // Get the type information
             const char * topicType = topicXML->Attribute("type");
             if (topicName == nullptr) {
+                // No type info provided. Return with error.
                 return (RecipeXMLError) {
                     .errorCode = RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
                     .lineNumber = topicXML->GetLineNum()
                 };
             }
 
+            // Get the topic quality of service
             const char * topicQOS = topicXML->Attribute("qos");
             if (topicName == nullptr) {
+                // No QOS provided. Return with error
                 return (RecipeXMLError) {
                     .errorCode = RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
                     .lineNumber = topicXML->GetLineNum()
@@ -242,6 +260,7 @@ namespace riptide_rviz
             } else if (strcmp(topicQOS, "sensor_data")){
                 topic.qos_type = launch_msgs::msg::TopicData::QOS_SYSTEM_DEFAULT;
             } else {
+                // The qos is not a valid type. Retunr with error.
                 return (RecipeXMLError) {
                     .errorCode = RecipeXMLErrorCode::INVALID_QOS_TYPE,
                     .lineNumber = topicXML->GetLineNum()
@@ -250,6 +269,11 @@ namespace riptide_rviz
 
             launch.topicList.emplace_back(topic);
         }
+
+        return (RecipeXMLError){
+            .errorCode = RecipeXMLErrorCode::SUCCESS,
+            .lineNumber = -1
+        };
     }
 
     bool RecipeLaunch::topicExists(const char *topicName) {
