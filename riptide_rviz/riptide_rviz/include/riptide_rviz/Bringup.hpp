@@ -1,8 +1,8 @@
 #pragma once
 #include <rclcpp/rclcpp.hpp>
-#include <launch_msgs/srv/start_launch.hpp>
-#include <launch_msgs/srv/list_launch.hpp>
-#include <launch_msgs/srv/stop_launch.hpp>
+#include <launch_msgs/action/bringup_start.hpp>
+#include <launch_msgs/action/bringup_end.hpp>
+#include <launch_msgs/msg/list_launch.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
@@ -10,6 +10,7 @@
 #include <rviz_common/config.hpp>
 
 #include "ui_Bringup.h"
+#include "ui_BringupListElement.h"
 #include <QTimer>
 
 #define BRINGUP_PKG "riptide_bringup2"
@@ -45,13 +46,6 @@ namespace riptide_rviz
 
         rclcpp::Node::SharedPtr clientNode;
         QTimer * spinTimer;
-
-        // Bringup clients
-        rclcpp::Client<launch_msgs::srv::StartLaunch>::SharedPtr bringupStartClient;
-        rclcpp::Client<launch_msgs::srv::ListLaunch>::SharedPtr bringupListClient;
-        rclcpp::Client<launch_msgs::srv::StopLaunch>::SharedPtr bringupStopClient;
-        QTimer * bringupCheckTimer;
-        int bringupID = -1;
     };
 
 } // namespace riptide_rviz
