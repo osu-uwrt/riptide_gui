@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tinyxml2_vendor REQUIRED)
 
 # find message deps
 find_package(nav_msgs REQUIRED)
@@ -58,11 +59,6 @@ add_library(${PROJECT_NAME} SHARED
             ${UI_HEADERS}
 )
 
-#
-# tinyxml2 library
-#
-add_library(tinyxml2 SHARED
-  3rdparty/tinyxml/tinyxml2.cpp)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
