@@ -59,6 +59,12 @@ add_library(${PROJECT_NAME} SHARED
             ${UI_HEADERS}
 )
 
+# TODO: Maybe make bringup_recipe it's own library?
+add_executable(recipe_parser_test tests/recipe_parser_tests.cpp src/bringup_recipe.cpp)
+
+target_include_directories(recipe_parser_test PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/riptide_rviz>
+  $<INSTALL_INTERFACE:include>)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
@@ -98,6 +104,14 @@ target_link_libraries(${PROJECT_NAME}
   tinyxml2
 )
 
+target_link_libraries(recipe_parser_test
+  tinyxml2
+)
+
+ament_target_dependencies(recipe_parser_test
+  ament_index_cpp
+)
+
 # Export old-style CMake variables
 ament_export_include_directories("include/${PROJECT_NAME}")
 
@@ -126,9 +140,13 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch recipies
+install(DIRECTORY launch recipies tests/recipies
   DESTINATION share/${PROJECT_NAME})
 
+install(TARGETS recipe_parser_test
+  DESTINATION lib/${PROJECT_NAME}
+)
+  
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/icons"
   DESTINATION "share/${PROJECT_NAME}"
