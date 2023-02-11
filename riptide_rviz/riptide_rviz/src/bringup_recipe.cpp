@@ -333,13 +333,13 @@ namespace riptide_rviz
                 };
             }
 
-            launch_msgs::msg::TopicData topic;
+            RecipeTopicData topic;
             topic.name = topicName;
             topic.type_name = topicType;
             if (strcmp(topicQOS, "system_default")) {
-                topic.qos_type = launch_msgs::msg::TopicData::QOS_SYSTEM_DEFAULT;
+                topic.qos_type = "system_default";
             } else if (strcmp(topicQOS, "sensor_data")){
-                topic.qos_type = launch_msgs::msg::TopicData::QOS_SYSTEM_DEFAULT;
+                topic.qos_type = "sensor_data";
             } else {
                 // The qos is not a valid type. Retunr with error.
                 return RecipeXMLError {

@@ -1,12 +1,16 @@
 #pragma once
 #include <vector>
 
-#include <launch_msgs/msg/topic_data.hpp>
-
 #include "tinyxml2.h"
 
 namespace riptide_rviz
 {
+
+    struct RecipeTopicData {
+        std::string name;
+        std::string type_name;
+        std::string qos_type;
+    };
 
     enum class RecipeLaunchStatus {
         NOT_STARTED,
@@ -25,7 +29,7 @@ namespace riptide_rviz
         std::string name = "";
         std::string package = "";
         std::string stageID = "";
-        std::vector<launch_msgs::msg::TopicData> topicList;
+        std::vector<RecipeTopicData> topicList;
         
         int64_t pid;
         RecipeLaunchStatus launchStatus;
