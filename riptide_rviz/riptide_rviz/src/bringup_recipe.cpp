@@ -336,10 +336,9 @@ namespace riptide_rviz
             RecipeTopicData topic;
             topic.name = topicName;
             topic.type_name = topicType;
-            if (strcmp(topicQOS, "system_default")) {
-                topic.qos_type = "system_default";
-            } else if (strcmp(topicQOS, "sensor_data")){
-                topic.qos_type = "sensor_data";
+            // Ensure topic qos is only 
+            if (strcmp(topicQOS, "system_default") == 0 || strcmp(topicQOS, "sensor_default") == 0) {
+                topic.qos_type = topicQOS;
             } else {
                 // The qos is not a valid type. Retunr with error.
                 return RecipeXMLError {
