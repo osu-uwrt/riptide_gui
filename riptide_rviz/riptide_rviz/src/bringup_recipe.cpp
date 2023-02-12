@@ -436,7 +436,7 @@ namespace riptide_rviz
             topic.name = topicName;
             topic.type_name = topicType;
             // Ensure topic qos is only 
-            if (strcmp(topicQOS, "system_default") == 0 || strcmp(topicQOS, "sensor_default") == 0) {
+            if (strcmp(topicQOS, "system_default") == 0 || strcmp(topicQOS, "sensor_data") == 0) {
                 topic.qos_type = topicQOS;
             } else {
                 // The qos is not a valid type. Retunr with error.

@@ -678,7 +678,7 @@ void test_good_example(const std::string &path) {
     expectedTopic = RecipeTopicData {
         "b",                // name
         "t2",               // topic_name
-        "system_default"    // qos_type
+        "sensor_data"       // qos_type
     };
     expectedLaunch.topicList.emplace_back(expectedTopic);
     
@@ -777,11 +777,11 @@ void test_good_deps(const std::string &path) {
 
     expectedLaunch.name = "something.launch.py";
     expectedLaunch.package = "abcdef";
-    expectedLaunch.stageID = "1";
+    expectedLaunch.stageID = "start";
     expectedLaunch.pid = -1;
     expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
 
-    expectedStage.id = "1";
+    expectedStage.id = "start";
     expectedStage.launches.emplace_back(expectedLaunch);
 
     expected.stages.emplace_back(expectedStage);
