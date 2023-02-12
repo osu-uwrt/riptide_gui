@@ -1,4 +1,6 @@
 #include <sstream>
+#include <set>
+
 #include "tinyxml2.h"
 
 #include "riptide_rviz/bringup_recipe.hpp"
@@ -275,6 +277,9 @@ namespace riptide_rviz
         }
 
         stage.id = stageID;
+        
+        // This is used to check if there are duplicate launches in the recipe
+        std::set<std::string> existingLaunches;
 
         // Iterate through each tag within the stage tag. Note these should only
         // be either a "dependency" tag or a "launch" tag
@@ -290,6 +295,18 @@ namespace riptide_rviz
                 // parse Launch Tag
                 RecipeLaunch launch;
                 err = parseLaunchTag(tag, stageID, launch);
+
+                // Check this tag doesn't exist
+                if (existingLaunches.find(launch.name) != existingLaunches.end()) {
+                    // This launch already exists
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
+                        tag->GetLineNum()
+                    };
+                }
+
+                existingLaunches.emplace(launch.name); 
+
                 stage.launches.emplace_back(launch);
             } else {
                 // Tag is neither a dependency or a launch.
@@ -367,15 +384,6 @@ namespace riptide_rviz
             // launch does not have a package attribute. Return with error
             return RecipeXMLError {
                 RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE,
-                launchXML->GetLineNum()
-            };
-        }
-
-        // Check if this is a duplicate launch name
-        if (launchExists(name)) {
-            // There is already a launch with this name. Return with error.
-            return RecipeXMLError {
-                RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
                 launchXML->GetLineNum()
             };
         }
