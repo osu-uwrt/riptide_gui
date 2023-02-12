@@ -414,7 +414,7 @@ namespace riptide_rviz
 
             // Get the type information
             const char * topicType = topicXML->Attribute("type");
-            if (topicName == nullptr) {
+            if (topicType == nullptr) {
                 // No type info provided. Return with error.
                 return RecipeXMLError {
                     RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
@@ -424,7 +424,7 @@ namespace riptide_rviz
 
             // Get the topic quality of service
             const char * topicQOS = topicXML->Attribute("qos");
-            if (topicName == nullptr) {
+            if (topicQOS == nullptr) {
                 // No QOS provided. Return with error
                 return RecipeXMLError {
                     RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
