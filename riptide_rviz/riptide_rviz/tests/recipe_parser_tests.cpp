@@ -138,7 +138,7 @@ std::string errEnumToStr(RecipeXMLErrorCode code) {
  * Side effect: This prints diagnostic information to the screen.
  */
 bool compareWithDiagnostics(std::string testName, TestResult expected, TestResult actual) {
-    std::cout << "* " << testName << " " << " ";
+    std::cout << "* " << testName << " ";
     if (expected.err.errorCode != actual.err.errorCode) {
         std::cout << "FAILED\n\texpected errorCode: " 
                   << errEnumToStr(expected.err.errorCode)
@@ -159,7 +159,7 @@ bool compareWithDiagnostics(std::string testName, TestResult expected, TestResul
     if (expected.err.errorCode != RecipeXMLErrorCode::SUCCESS) {
         // This test is a malformed input, so the internal state of the Recipe
         // doesn't matter
-        std::cout << "TEST SUCCEEDED\n";
+        std::cout << "PASSED\n";
         return true;
     } else {
         // This test is uses a well-formed input ensure the two recipe's are equal
@@ -177,11 +177,34 @@ bool compareWithDiagnostics(std::string testName, TestResult expected, TestResul
         }
     }
 
-    std::cout << " PASSED";
+    std::cout << "PASSED";
 
     return true;
 }
 
+void test_bad_xml(const std::string &path) {
+
+    std::string testName = "test_bad_xml.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::XML_ERROR_PARSING_TEXT,
+        1
+    };
+
+    TestResult expectedResult; 
+        expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
 
 void test_good_1(const std::string &path) {
 
@@ -239,7 +262,8 @@ int main() {
     std::string testsRoot = ament_index_cpp::get_package_share_directory(RVIZ_PACKAGE) + "/tests/recipies/";
     std::cout << "testsRoot: " << testsRoot << "\n";
 
+    test_bad_xml(testsRoot);
+
     test_good_1(testsRoot);
-    
 
 }
