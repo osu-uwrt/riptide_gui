@@ -10,6 +10,9 @@ namespace riptide_rviz
         std::string name;
         std::string type_name;
         std::string qos_type;
+
+        bool operator==(const RecipeTopicData&);
+        bool operator!=(const RecipeTopicData&);
     };
 
     enum class RecipeLaunchStatus {
@@ -35,6 +38,8 @@ namespace riptide_rviz
         RecipeLaunchStatus launchStatus;
 
         bool topicExists(const char *topicName);
+        bool operator==(const RecipeLaunch&);
+        bool operator!=(const RecipeLaunch&);
     };
 
     /*
@@ -46,6 +51,9 @@ namespace riptide_rviz
         std::vector<std::string> outstandingDependencyIds;
         // TODO: Maybe make this into a map for easier accesses?
         std::vector<RecipeLaunch> launches;
+
+        bool operator==(const RecipeStage&);
+        bool operator!=(const RecipeStage&);
     };
 
     enum class RecipeXMLErrorCode {
@@ -124,6 +132,11 @@ namespace riptide_rviz
 
         // Maybe change the parameter to the launch name?
         RecipeLaunch getLaunchInformation(int64_t pid);
+
+        bool operator==(const Recipe&);
+        bool operator!=(const Recipe&);
+
+        std::vector<RecipeStage> stages;
     private:
         // TODO: It may be cleaner if these parse functions were in there 
         // respective class definitions (i.e. "parseStageTag" was in the
@@ -133,8 +146,6 @@ namespace riptide_rviz
         RecipeXMLError parseLaunchTag(const tinyxml2::XMLElement *launchXML, const char * stageID, RecipeLaunch &launch);
         bool stageExists(const char * stageID);
         bool launchExists(const char * launchName);
-
-        std::vector<RecipeStage> stages;
     };
 
 } // namespace riptide_rviz

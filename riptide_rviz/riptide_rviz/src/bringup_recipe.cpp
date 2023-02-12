@@ -6,6 +6,86 @@
 namespace riptide_rviz
 {
 
+    bool RecipeTopicData::operator==(const RecipeTopicData& lhs) {
+        return name == lhs.name 
+            && type_name == lhs.type_name 
+            && qos_type == lhs.qos_type; 
+    }
+
+    bool RecipeTopicData::operator!=(const RecipeTopicData& lhs) {
+        return !(operator==(lhs));
+    }
+
+    bool RecipeLaunch::operator==(const RecipeLaunch& lhs) {
+        if (name != lhs.name) {
+            return false;
+        }
+
+        if (stageID != lhs.stageID) {
+            return false;
+        }
+
+        if (launchStatus != lhs.launchStatus) {
+            return false;
+        }
+
+        if (package != lhs.package) {
+            return false;
+        }
+
+        if (pid != lhs.pid) {
+            return false;
+        }
+
+        if (topicList.size() != lhs.topicList.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < topicList.size(); ++i) {
+            if (topicList[i] != lhs.topicList[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool RecipeLaunch::operator!=(const RecipeLaunch& lhs) {
+        return !(operator==(lhs));
+    }
+
+    bool RecipeStage::operator==(const RecipeStage& lhs) {
+        if (id != lhs.id) {
+            return false;
+        }
+
+        if (outstandingDependencyIds.size() != lhs.outstandingDependencyIds.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < outstandingDependencyIds.size(); ++i) {
+            if (outstandingDependencyIds[i] != lhs.outstandingDependencyIds[i]) {
+                return false;
+            }
+        }
+
+        if (launches.size() != lhs.launches.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < launches.size(); ++i) {
+            if (launches[i] != lhs.launches[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    bool RecipeStage::operator!=(const RecipeStage& lhs) {
+        return !(operator==(lhs));
+    }
+
     std::string getRecipeXMLErrorMessage(RecipeXMLError err) {
         std::ostringstream oss;
         if (err.errorCode == RecipeXMLErrorCode::SUCCESS) {
@@ -89,6 +169,23 @@ namespace riptide_rviz
         }
 
         return oss.str();
+    }
+
+    bool Recipe::operator==(const Recipe& lhs) {
+        if (stages.size() != lhs.stages.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < stages.size(); ++i) {
+            if (stages[i] != lhs.stages[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool Recipe::operator!=(const Recipe& lhs) {
+        return !(operator==(lhs));
     }
 
     /*
