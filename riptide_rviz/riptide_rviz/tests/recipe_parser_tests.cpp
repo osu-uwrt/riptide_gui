@@ -8,6 +8,23 @@
 
 #define RVIZ_PACKAGE "riptide_rviz"
 
+
+/*
+ * This may have been a bad idea, but this tester uses a homebrew testing
+ * "framework" which prints out tailored information for each test so it is
+ * easier to know what went wrong.
+ * 
+ * The compareWithDiagnostics function does the actual testing + tailored info
+ * and all of the test functions call it.
+ * 
+ * The test function call loadXml on an xml file that shares the same name with
+ * the function (E.g. test_good_example() opens test_good_example.xml).
+ * 
+ * TODO: Some of these functions might be worth factoring out to
+ * bringup_recipe.hpp. For example the errEnumToStr is actually useful to see
+ * what error is happening, as opposed to just an integer.
+ */
+
 using namespace riptide_rviz;
 
 struct TestResult {
@@ -590,9 +607,9 @@ void test_bad_topic_bad_qos(const std::string &path) {
     compareWithDiagnostics(testName, expectedResult, actualResult);
 }
 
-void test_good_1(const std::string &path) {
+void test_good_minimal(const std::string &path) {
 
-    std::string testName = "test_good_1.xml";
+    std::string testName = "test_good_minimal.xml";
     
     Recipe actual;
 
@@ -637,6 +654,217 @@ void test_good_1(const std::string &path) {
     compareWithDiagnostics(testName, expectedResult, actualResult);
 }
 
+void test_good_example(const std::string &path) {
+
+    std::string testName = "test_good_example.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    Recipe expected;
+    RecipeStage expectedStage;
+    RecipeLaunch expectedLaunch;
+
+    // Create information for stage 1
+    // something.launch.py's topic data
+    RecipeTopicData expectedTopic = RecipeTopicData {
+        "a",                // name
+        "t1",               // topic_name
+        "system_default"    // qos_type
+    };
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedTopic = RecipeTopicData {
+        "b",                // name
+        "t2",               // topic_name
+        "system_default"    // qos_type
+    };
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+    
+    expectedTopic = RecipeTopicData {
+        "c",                // name
+        "t3",               // topic_name
+        "system_default"    // qos_type
+    };
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedTopic = RecipeTopicData {
+        "d",                // name
+        "t4",               // topic_name
+        "system_default"    // qos_type
+    };
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedTopic = RecipeTopicData {
+        "e",                // name
+        "t5",               // topic_name
+        "system_default"    // qos_type
+    };
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedLaunch.name = "something.launch.py";
+    expectedLaunch.package = "abcdef";
+    expectedLaunch.stageID = "1";
+    expectedLaunch.pid = -1;
+    expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
+
+    expectedStage.id = "1";
+    expectedStage.launches.emplace_back(expectedLaunch);
+
+    expected.stages.emplace_back(expectedStage);
+
+    // Stage 2
+    expectedTopic = RecipeTopicData {
+        "/joint_states",                // name
+        "sensor_msgs/msg/JointState",   // topic_name
+        "sensor_data"                   // qos_type
+    };
+    expectedLaunch.topicList.clear();
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedLaunch.name = "dummy_robot_bringup.launch.py";
+    expectedLaunch.package = "dummy_robot_bringup";
+    expectedLaunch.stageID = "2";
+    expectedLaunch.pid = -1;
+    expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
+
+    expectedStage.id = "2";
+    expectedStage.outstandingDependencyIds.emplace_back("1");
+    expectedStage.launches.clear();
+    expectedStage.launches.emplace_back(expectedLaunch);
+
+    expected.stages.emplace_back(expectedStage);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::SUCCESS,
+        -1
+    };
+
+    TestResult expectedResult = TestResult {
+        expectedErr,
+        expected
+    };
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_good_deps(const std::string &path) {
+
+    std::string testName = "test_good_deps.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    Recipe expected;
+    RecipeStage expectedStage;
+    RecipeLaunch expectedLaunch;
+
+    // Create information for stage "start"
+    // something.launch.py's topic data
+    RecipeTopicData expectedTopic = RecipeTopicData {
+        "a",                // name
+        "t1",               // topic_name
+        "system_default"    // qos_type
+    };
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedLaunch.name = "something.launch.py";
+    expectedLaunch.package = "abcdef";
+    expectedLaunch.stageID = "1";
+    expectedLaunch.pid = -1;
+    expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
+
+    expectedStage.id = "1";
+    expectedStage.launches.emplace_back(expectedLaunch);
+
+    expected.stages.emplace_back(expectedStage);
+
+    // Stage 1
+    expectedTopic = RecipeTopicData {
+        "/joint_states",                // name
+        "sensor_msgs/msg/JointState",   // topic_name
+        "sensor_data"                   // qos_type
+    };
+    expectedLaunch.topicList.clear();
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedLaunch.name = "dummy_robot_bringup.launch.py";
+    expectedLaunch.package = "dummy_robot_bringup";
+    expectedLaunch.stageID = "1";
+
+    expectedStage.id = "1";
+    expectedStage.outstandingDependencyIds.emplace_back("start");
+    expectedStage.launches.clear();
+    expectedStage.launches.emplace_back(expectedLaunch);
+
+    expected.stages.emplace_back(expectedStage);
+
+    // Stage 2
+    expectedTopic = RecipeTopicData {
+        "name",         // name
+        "type",         // topic_name
+        "sensor_data"   // qos_type
+    };
+    expectedLaunch.topicList.clear();
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedLaunch.name = "blah";
+    expectedLaunch.package = "blah";
+    expectedLaunch.stageID = "2";
+
+    expectedStage.id = "2";
+    expectedStage.launches.clear();
+    expectedStage.launches.emplace_back(expectedLaunch);
+
+    expected.stages.emplace_back(expectedStage);
+
+    // Stage end
+    expectedTopic = RecipeTopicData {
+        "end_name",     // name
+        "end_type",     // topic_name
+        "sensor_data"   // qos_type
+    };
+    expectedLaunch.topicList.clear();
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedLaunch.name = "end.launch.py";
+    expectedLaunch.package = "package";
+    expectedLaunch.stageID = "end";
+
+    expectedStage.id = "end";
+    expectedStage.outstandingDependencyIds.clear();
+    expectedStage.outstandingDependencyIds.emplace_back("1");
+    expectedStage.outstandingDependencyIds.emplace_back("2");
+    expectedStage.launches.clear();
+    expectedStage.launches.emplace_back(expectedLaunch);
+
+    expected.stages.emplace_back(expectedStage);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::SUCCESS,
+        -1
+    };
+
+    TestResult expectedResult = TestResult {
+        expectedErr,
+        expected
+    };
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
 int main() {
 
     std::cout << "+--------------------+\n";
@@ -646,6 +874,7 @@ int main() {
     std::string testsRoot = ament_index_cpp::get_package_share_directory(RVIZ_PACKAGE) + "/tests/recipies/";
     std::cout << "testsRoot: " << testsRoot << "\n";
 
+    // Run malformed input tests
     test_bad_xml(testsRoot);
     test_bad_launches(testsRoot);
     test_bad_empty_recipe(testsRoot);
@@ -663,6 +892,10 @@ int main() {
     test_bad_topic_no_type(testsRoot);
     test_bad_topic_no_qos(testsRoot);
     test_bad_topic_bad_qos(testsRoot);
-    test_good_1(testsRoot);
+
+    // Run well formed input tests
+    test_good_minimal(testsRoot);
+    test_good_example(testsRoot);
+    test_good_deps(testsRoot);
 
 }
