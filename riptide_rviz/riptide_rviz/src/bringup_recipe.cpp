@@ -274,6 +274,8 @@ namespace riptide_rviz
             };
         }
 
+        stage.id = stageID;
+
         // Iterate through each tag within the stage tag. Note these should only
         // be either a "dependency" tag or a "launch" tag
         for (const XMLElement *tag = stageXML->FirstChildElement(); tag != nullptr; tag = tag->NextSiblingElement()) {
