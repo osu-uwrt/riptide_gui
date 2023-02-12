@@ -166,6 +166,9 @@ namespace riptide_rviz
         case RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH:
             oss << "This stage contains no launches. All stages must have launches.";
             break;
+        case RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY:
+            oss << "This stage has a dependency that doesn't exist.";
+            break;
         default:
             oss << "Somehow an unknown error occurred. Please yell at Hunter and tell him to fix his flippin' parser.";
             break;
