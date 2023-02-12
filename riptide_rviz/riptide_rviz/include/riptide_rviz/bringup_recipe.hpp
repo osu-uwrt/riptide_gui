@@ -92,6 +92,7 @@ namespace riptide_rviz
         DUPLICATE_LAUNCH_NAMES,
         DUPLICATE_TOPIC,
         STAGE_WITH_NO_LAUNCH,
+        NON_EXISTANT_DEPENDENCY
     };
 
     struct RecipeXMLError {
@@ -145,7 +146,6 @@ namespace riptide_rviz
         RecipeXMLError parseDependencyTag(const tinyxml2::XMLElement *dependsXML, RecipeStage &stage);
         RecipeXMLError parseLaunchTag(const tinyxml2::XMLElement *launchXML, const char * stageID, RecipeLaunch &launch);
         bool stageExists(const char * stageID);
-        bool launchExists(const char * launchName);
     };
 
 } // namespace riptide_rviz

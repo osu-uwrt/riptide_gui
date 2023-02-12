@@ -1,5 +1,6 @@
 #include <sstream>
 #include <set>
+#include <unordered_map>
 
 #include "tinyxml2.h"
 
@@ -229,6 +230,10 @@ namespace riptide_rviz
             };
         }
 
+        // Map that contains a dependency name and the line number of the stage
+        // that has that dependency
+        std::unordered_map<std::string, int> depLineNums;
+
         for (const XMLElement *stageXML = root->FirstChildElement(); stageXML != nullptr; stageXML = stageXML->NextSiblingElement()) {
             RecipeStage stage;
 
@@ -240,6 +245,18 @@ namespace riptide_rviz
             }
 
             stages.emplace_back(stage);
+            for (auto dep : stage.outstandingDependencyIds) {
+                depLineNums[dep] = stageXML->GetLineNum();
+            }
+        }
+
+        for (auto pair : depLineNums) {
+            if (!stageExists(pair.first.c_str())) {
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY,
+                    pair.second // Line number for the stage
+                };
+            }
         }
 
         return RecipeXMLError {
@@ -467,18 +484,6 @@ namespace riptide_rviz
         for (auto i : topicList) {
             if (i.name == topicName) {
                 return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool Recipe::launchExists(const char * launchName) {
-        for (auto stage : stages) {
-            for (auto launch : stage.launches) {
-                if (launch.name == launchName) {
-                    return true;
-                }
             }
         }
 

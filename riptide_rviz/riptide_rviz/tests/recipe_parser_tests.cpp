@@ -74,75 +74,42 @@ std::string errEnumToStr(RecipeXMLErrorCode code) {
     case RecipeXMLErrorCode::SUCCESS:
         return "SUCCESS";
 
-    case RecipeXMLErrorCode::XML_NO_ATTRIBUTE:
-        return "XML_NO_ATTRIBUTE";
-    case RecipeXMLErrorCode::XML_WRONG_ATTRIBUTE_TYPE:
-        return "XML_WRONG_ATTRIBUTE_TYPE";
-    case RecipeXMLErrorCode::XML_ERROR_FILE_NOT_FOUND:
-        return "XML_ERROR_FILE_NOT_FOUND";
-    case RecipeXMLErrorCode::XML_ERROR_FILE_COULD_NOT_BE_OPENED:
-        return "XML_ERROR_FILE_COULD_NOT_BE_OPENED";
-    case RecipeXMLErrorCode::XML_ERROR_FILE_READ_ERROR:
-        return "XML_ERROR_FILE_READ_ERROR";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING_ELEMENT:
-        return "XML_ERROR_PARSING_ELEMENT";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING_ATTRIBUTE:
-        return "XML_ERROR_PARSING_ATTRIBUTE";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING_TEXT:
-        return "XML_ERROR_PARSING_TEXT";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING_CDATA:
-        return "XML_ERROR_PARSING_CDATA";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING_COMMENT:
-        return "XML_ERROR_PARSING_COMMENT";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING_DECLARATION:
-        return "XML_ERROR_PARSING_DECLARATION";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING_UNKNOWN:
-        return "XML_ERROR_PARSING_UNKNOWN";
-    case RecipeXMLErrorCode::XML_ERROR_EMPTY_DOCUMENT:
-        return "XML_ERROR_EMPTY_DOCUMENT";
-    case RecipeXMLErrorCode::XML_ERROR_MISMATCHED_ELEMENT:
-        return "XML_ERROR_MISMATCHED_ELEMENT";
-    case RecipeXMLErrorCode::XML_ERROR_PARSING:
-        return "XML_ERROR_PARSING";
-    case RecipeXMLErrorCode::XML_CAN_NOT_CONVERT_TEXT:
-        return "XML_CAN_NOT_CONVERT_TEXT";
-    case RecipeXMLErrorCode::XML_NO_TEXT_NODE:
-        return "XML_NO_TEXT_NODE";
-    case RecipeXMLErrorCode::XML_ELEMENT_DEPTH_EXCEEDED:
-        return "XML_ELEMENT_DEPTH_EXCEEDED";
-    case RecipeXMLErrorCode::XML_ERROR_COUNT:
-        return "XML_ERROR_COUNT";
+    case RecipeXMLErrorCode::XML_NO_ATTRIBUTE: return "XML_NO_ATTRIBUTE";
+    case RecipeXMLErrorCode::XML_WRONG_ATTRIBUTE_TYPE: return "XML_WRONG_ATTRIBUTE_TYPE";
+    case RecipeXMLErrorCode::XML_ERROR_FILE_NOT_FOUND: return "XML_ERROR_FILE_NOT_FOUND";
+    case RecipeXMLErrorCode::XML_ERROR_FILE_COULD_NOT_BE_OPENED: return "XML_ERROR_FILE_COULD_NOT_BE_OPENED";
+    case RecipeXMLErrorCode::XML_ERROR_FILE_READ_ERROR: return "XML_ERROR_FILE_READ_ERROR";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING_ELEMENT: return "XML_ERROR_PARSING_ELEMENT";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING_ATTRIBUTE: return "XML_ERROR_PARSING_ATTRIBUTE";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING_TEXT: return "XML_ERROR_PARSING_TEXT";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING_CDATA: return "XML_ERROR_PARSING_CDATA";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING_COMMENT: return "XML_ERROR_PARSING_COMMENT";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING_DECLARATION: return "XML_ERROR_PARSING_DECLARATION";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING_UNKNOWN: return "XML_ERROR_PARSING_UNKNOWN";
+    case RecipeXMLErrorCode::XML_ERROR_EMPTY_DOCUMENT: return "XML_ERROR_EMPTY_DOCUMENT";
+    case RecipeXMLErrorCode::XML_ERROR_MISMATCHED_ELEMENT: return "XML_ERROR_MISMATCHED_ELEMENT";
+    case RecipeXMLErrorCode::XML_ERROR_PARSING: return "XML_ERROR_PARSING";
+    case RecipeXMLErrorCode::XML_CAN_NOT_CONVERT_TEXT: return "XML_CAN_NOT_CONVERT_TEXT";
+    case RecipeXMLErrorCode::XML_NO_TEXT_NODE: return "XML_NO_TEXT_NODE";
+    case RecipeXMLErrorCode::XML_ELEMENT_DEPTH_EXCEEDED: return "XML_ELEMENT_DEPTH_EXCEEDED";
+    case RecipeXMLErrorCode::XML_ERROR_COUNT: return "XML_ERROR_COUNT";
 
-    case RecipeXMLErrorCode::NO_LAUNCHES_TAG:
-        return "NO_LAUNCHES_TAG";
-    case RecipeXMLErrorCode::NON_STAGE_TAG:
-        return "NON_STAGE_TAG";
-    case RecipeXMLErrorCode::UNKNOWN_TAG_TYPE:
-        return "UNKNOWN_TAG_TYPE";
-    case RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE:
-        return "MISSING_ID_ATTRIBUTE";
-    case RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE:
-        return "MISSING_NAME_ATTRIBUTE";
-    case RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE:
-        return "MISSING_PACKAGE_ATTRIBUTE";
-    case RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE:
-        return "MISSING_TYPE_ATTRIBUTE";
-    case RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE:
-        return "MISSING_QOS_ATTRIBUTE";
-    case RecipeXMLErrorCode::INVALID_QOS_TYPE:
-        return "INVALID_QOS_TYPE";
-    case RecipeXMLErrorCode::EMPTY_RECIPE:
-        return "EMPTY_RECIPE";
-    case RecipeXMLErrorCode::DUPLICATE_STAGE_IDS:
-        return "DUPLICATE_STAGE_IDS";
-    case RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES:
-        return "DUPLICATE_LAUNCH_NAMES";
-    case RecipeXMLErrorCode::DUPLICATE_TOPIC:
-        return "DUPLICATE_TOPIC";
-    case RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH:
-        return "STAGE_WITH_NO_LAUNCH";
-    default:
-        return "unknown recipe xml error";
+    case RecipeXMLErrorCode::NO_LAUNCHES_TAG: return "NO_LAUNCHES_TAG";
+    case RecipeXMLErrorCode::NON_STAGE_TAG: return "NON_STAGE_TAG";
+    case RecipeXMLErrorCode::UNKNOWN_TAG_TYPE: return "UNKNOWN_TAG_TYPE";
+    case RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE: return "MISSING_ID_ATTRIBUTE";
+    case RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE: return "MISSING_NAME_ATTRIBUTE";
+    case RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE: return "MISSING_PACKAGE_ATTRIBUTE";
+    case RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE: return "MISSING_TYPE_ATTRIBUTE";
+    case RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE: return "MISSING_QOS_ATTRIBUTE";
+    case RecipeXMLErrorCode::INVALID_QOS_TYPE: return "INVALID_QOS_TYPE";
+    case RecipeXMLErrorCode::EMPTY_RECIPE: return "EMPTY_RECIPE";
+    case RecipeXMLErrorCode::DUPLICATE_STAGE_IDS: return "DUPLICATE_STAGE_IDS";
+    case RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES: return "DUPLICATE_LAUNCH_NAMES";
+    case RecipeXMLErrorCode::DUPLICATE_TOPIC: return "DUPLICATE_TOPIC";
+    case RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH: return "STAGE_WITH_NO_LAUNCH";
+    case RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY: return "NON_EXISTANT_DEPENDENCY";
+    default: return "unknown recipe xml error";
     }
 }
 
@@ -654,6 +621,30 @@ void test_good_minimal(const std::string &path) {
     compareWithDiagnostics(testName, expectedResult, actualResult);
 }
 
+void test_bad_stage_bad_dep(const std::string &path) {
+
+    std::string testName = "test_bad_stage_bad_dep.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY,
+        4
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
 void test_good_example(const std::string &path) {
 
     std::string testName = "test_good_example.xml";
@@ -892,6 +883,7 @@ int main() {
     test_bad_topic_no_type(testsRoot);
     test_bad_topic_no_qos(testsRoot);
     test_bad_topic_bad_qos(testsRoot);
+    test_bad_stage_bad_dep(testsRoot);
 
     // Run well formed input tests
     test_good_minimal(testsRoot);
