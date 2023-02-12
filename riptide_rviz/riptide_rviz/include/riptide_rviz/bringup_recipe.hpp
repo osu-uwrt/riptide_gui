@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
 
 #include "tinyxml2.h"
 
@@ -137,7 +138,7 @@ namespace riptide_rviz
         bool operator==(const Recipe&);
         bool operator!=(const Recipe&);
 
-        std::vector<RecipeStage> stages;
+        std::unordered_map<std::string, RecipeStage> stages;
     private:
         // TODO: It may be cleaner if these parse functions were in there 
         // respective class definitions (i.e. "parseStageTag" was in the

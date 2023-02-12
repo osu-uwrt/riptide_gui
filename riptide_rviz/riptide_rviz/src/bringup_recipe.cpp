@@ -182,11 +182,16 @@ namespace riptide_rviz
             return false;
         }
 
-        for (int i = 0; i < stages.size(); ++i) {
-            if (stages[i] != lhs.stages[i]) {
+        for (auto i : stages) {
+            if (lhs.stages.find(i.first) == lhs.stages.end()) {
+                return false;
+            }
+
+            if (i.second != lhs.stages.at(i.first)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -247,7 +252,7 @@ namespace riptide_rviz
                 return err;
             }
 
-            stages.emplace_back(stage);
+            stages[stage.id] = stage;
             for (auto dep : stage.outstandingDependencyIds) {
                 depLineNums[dep] = stageXML->GetLineNum();
             }
@@ -377,7 +382,7 @@ namespace riptide_rviz
 
     bool Recipe::stageExists(const char * stageID) {
         for (auto i : stages) {
-            if (i.id == stageID) {
+            if (i.second.id == stageID) {
                 return true;
             }
         }
