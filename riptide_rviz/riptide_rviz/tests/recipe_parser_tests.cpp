@@ -206,6 +206,390 @@ void test_bad_xml(const std::string &path) {
     compareWithDiagnostics(testName, expectedResult, actualResult);
 }
 
+void test_bad_launches(const std::string &path) {
+
+    std::string testName = "test_bad_launches.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::NO_LAUNCHES_TAG,
+        3
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_empty_recipe(const std::string &path) {
+
+    std::string testName = "test_bad_empty_recipe.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::EMPTY_RECIPE,
+        3
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_non_stage(const std::string &path) {
+
+    std::string testName = "test_bad_non_stage.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::NON_STAGE_TAG,
+        4
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_stage_missing_id(const std::string &path) {
+
+    std::string testName = "test_bad_stage_missing_id.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE,
+        4
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_stage_duplicate(const std::string &path) {
+
+    std::string testName = "test_bad_stage_duplicate.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::DUPLICATE_STAGE_IDS,
+        10
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_stage_child_tag(const std::string &path) {
+
+    std::string testName = "test_bad_stage_child_tag.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
+        5
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_stage_no_launch(const std::string &path) {
+
+    std::string testName = "test_bad_stage_no_launch.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH,
+        4
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_dep_missing_id(const std::string &path) {
+
+    std::string testName = "test_bad_dep_missing_id.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE,
+        5
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_launch_name(const std::string &path) {
+
+    std::string testName = "test_bad_launch_name.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+        5
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_launch_package(const std::string &path) {
+
+    std::string testName = "test_bad_launch_package.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE,
+        5
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_launch_duplicate(const std::string &path) {
+
+    std::string testName = "test_bad_launch_duplicate.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
+        9
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_launch_unknown_tag(const std::string &path) {
+
+    std::string testName = "test_bad_launch_unknown_tag.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
+        6
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_topic_no_name(const std::string &path) {
+
+    std::string testName = "test_bad_topic_no_name.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+        6
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_topic_no_type(const std::string &path) {
+
+    std::string testName = "test_bad_topic_no_type.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
+        6
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_topic_no_qos(const std::string &path) {
+
+    std::string testName = "test_bad_topic_no_qos.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
+        6
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_topic_bad_qos(const std::string &path) {
+
+    std::string testName = "test_bad_topic_bad_qos.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::INVALID_QOS_TYPE,
+        6
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
 void test_good_1(const std::string &path) {
 
     std::string testName = "test_good_1.xml";
@@ -263,6 +647,22 @@ int main() {
     std::cout << "testsRoot: " << testsRoot << "\n";
 
     test_bad_xml(testsRoot);
+    test_bad_launches(testsRoot);
+    test_bad_empty_recipe(testsRoot);
+    test_bad_non_stage(testsRoot);
+    test_bad_stage_missing_id(testsRoot);
+    test_bad_stage_duplicate(testsRoot);
+    test_bad_stage_child_tag(testsRoot);
+    test_bad_stage_no_launch(testsRoot);
+    test_bad_dep_missing_id(testsRoot);
+    test_bad_launch_name(testsRoot);
+    test_bad_launch_package(testsRoot);
+    test_bad_launch_duplicate(testsRoot);
+    test_bad_launch_unknown_tag(testsRoot);
+    test_bad_topic_no_name(testsRoot);
+    test_bad_topic_no_type(testsRoot);
+    test_bad_topic_no_qos(testsRoot);
+    test_bad_topic_bad_qos(testsRoot);
     test_good_1(testsRoot);
 
 }

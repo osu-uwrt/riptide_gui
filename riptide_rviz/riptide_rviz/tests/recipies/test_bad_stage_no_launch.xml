@@ -1,0 +1,6 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!-- This tests a stage with no launches. This recipe is malformed-->
+<launches>
+    <stage id="1">
+    </stage>
+</launches>
