@@ -140,8 +140,11 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch recipies tests/recipies
+install(DIRECTORY launch recipies
   DESTINATION share/${PROJECT_NAME})
+
+install(DIRECTORY tests/recipies
+  DESTINATION share/${PROJECT_NAME}/tests)
 
 install(TARGETS recipe_parser_test
   DESTINATION lib/${PROJECT_NAME}
