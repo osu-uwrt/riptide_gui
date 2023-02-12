@@ -177,7 +177,7 @@ bool compareWithDiagnostics(std::string testName, TestResult expected, TestResul
         }
     }
 
-    std::cout << "PASSED";
+    std::cout << "PASSED\n";
 
     return true;
 }
@@ -263,7 +263,6 @@ int main() {
     std::cout << "testsRoot: " << testsRoot << "\n";
 
     test_bad_xml(testsRoot);
-
     test_good_1(testsRoot);
 
 }
