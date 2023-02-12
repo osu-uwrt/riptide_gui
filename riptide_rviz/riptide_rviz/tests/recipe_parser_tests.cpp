@@ -25,7 +25,7 @@ std::string tabs(int num) {
 
 void printRecipe(const Recipe recipe, int tabSize) {
     for (auto stage : recipe.stages) {
-        std::cout << tabs(tabSize) << stage.id << ":\n";
+        std::cout << tabs(tabSize) << "id: " << stage.id << "\n";
         std::cout << tabs(tabSize) << "dependencies:\n";
 
         for (auto dep : stage.outstandingDependencyIds) {
@@ -137,9 +137,10 @@ std::string errEnumToStr(RecipeXMLErrorCode code) {
  * 
  * Side effect: This prints diagnostic information to the screen.
  */
-bool compareWithDiagnostics(TestResult expected, TestResult actual) {
+bool compareWithDiagnostics(std::string testName, TestResult expected, TestResult actual) {
+    std::cout << "* " << testName << " " << " ";
     if (expected.err.errorCode != actual.err.errorCode) {
-        std::cout << "\t- FAILED: expected errorCode: " 
+        std::cout << "FAILED\n\texpected errorCode: " 
                   << errEnumToStr(expected.err.errorCode)
                   << "\tactual errorCode: " 
                   << errEnumToStr(actual.err.errorCode) << "\n";
@@ -147,7 +148,7 @@ bool compareWithDiagnostics(TestResult expected, TestResult actual) {
     }
 
     if (expected.err.lineNumber != actual.err.lineNumber) {
-        std::cout << "\t- FAILED: expected lineNumber: " 
+        std::cout << "FAILED\n\texpected lineNumber: " 
                   << expected.err.lineNumber
                   << "\tactual lineNumber: "
                   << actual.err.lineNumber << "\n";
@@ -167,33 +168,28 @@ bool compareWithDiagnostics(TestResult expected, TestResult actual) {
         auto actualStages = actual.recipe;
 
         if (expected.recipe != actual.recipe) {
-            std::cout << "\t- FAILED: Expected recipe: \n";
+            std::cout << "FAILED\n\tExpected recipe: \n";
             printRecipe(expectedStages, 2);
-            std::cout << "\tActual Recipe: \n\n"; 
+            std::cout << "\tActual Recipe: \n"; 
             printRecipe(actualStages, 2);
 
             return false;
         }
     }
 
-    std::cout << "\t- PASSED";
+    std::cout << " PASSED";
 
     return true;
 }
 
 
-int main() {
+void test_good_1(const std::string &path) {
 
-    std::cout << "+--------------------+\n";
-    std::cout << "|RECIPE PARSER TESTER|\n";
-    std::cout << "+--------------------+\n\n";
-
-    std::string testsRoot = ament_index_cpp::get_package_share_directory(RVIZ_PACKAGE) + "/tests/recipies/";
-    std::cout << "testsRoot: " << testsRoot << "\n";
-
+    std::string testName = "test_good_1.xml";
+    
     Recipe actual;
 
-    RecipeXMLError actualErr = actual.loadXml(testsRoot + "test_good_1.xml");
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
 
     Recipe expected;
     RecipeTopicData expectedTopic = RecipeTopicData {
@@ -231,9 +227,19 @@ int main() {
         actual
     };
 
-    std::cout << "* test_good_1.xml\n";
-    compareWithDiagnostics(expectedResult, actualResult);
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
 
+int main() {
+
+    std::cout << "+--------------------+\n";
+    std::cout << "|RECIPE PARSER TESTER|\n";
+    std::cout << "+--------------------+\n\n";
+
+    std::string testsRoot = ament_index_cpp::get_package_share_directory(RVIZ_PACKAGE) + "/tests/recipies/";
+    std::cout << "testsRoot: " << testsRoot << "\n";
+
+    test_good_1(testsRoot);
     
 
 }
