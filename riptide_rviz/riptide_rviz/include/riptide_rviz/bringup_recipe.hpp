@@ -150,6 +150,12 @@ namespace riptide_rviz
         RecipeXMLError parseDependencyTag(const tinyxml2::XMLElement *dependsXML, RecipeStage &stage);
         RecipeXMLError parseLaunchTag(const tinyxml2::XMLElement *launchXML, const char * stageID, RecipeLaunch &launch);
         bool stageExists(const char * stageID);
+        /**
+         * Walks through the dependency tree of a certain stage id
+         * 
+         * This function fills out the dependencyWalkResults with all the dependencies a stage
+         * relies, either indirectly. This is used to check for dependency cycles.
+         */
         void walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults);
     };
 

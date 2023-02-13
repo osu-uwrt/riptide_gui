@@ -272,11 +272,12 @@ namespace riptide_rviz
             }
         }
 
+        // Walk through the dependencies of each stage and check for dependency cycles
         std::set<std::string> dependencyWalkResults;
-
         for (auto pair : stages) {
             walkDependencyTree(pair.first, dependencyWalkResults);
 
+            // If the dependency results contain the current stage id, fail
             if (dependencyWalkResults.find(pair.first) != dependencyWalkResults.end()) {
                 return RecipeXMLError {
                     RecipeXMLErrorCode::DEPENDENCY_CYCLE,
