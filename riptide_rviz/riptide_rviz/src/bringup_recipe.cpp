@@ -169,6 +169,9 @@ namespace riptide_rviz
         case RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY:
             oss << "This stage has a dependency that doesn't exist.";
             break;
+        case RecipeXMLErrorCode::DEPENDENCY_CYCLE:
+            oss << "This stage is contained within a dependency cycle (i.e. the stage, either directly or indirectly, depends on itself).";
+            break;
         default:
             oss << "Somehow an unknown error occurred. Please yell at Hunter and tell him to fix his flippin' parser.";
             break;
@@ -238,9 +241,9 @@ namespace riptide_rviz
             };
         }
 
-        // Map that contains a dependency name and the line number of the stage
-        // that has that dependency
+        // Maps that contain the XML line numbers for different elements.
         std::unordered_map<std::string, int> depLineNums;
+        std::unordered_map<std::string, int> stageLineNums;
 
         for (const XMLElement *stageXML = root->FirstChildElement(); stageXML != nullptr; stageXML = stageXML->NextSiblingElement()) {
             RecipeStage stage;
@@ -256,6 +259,8 @@ namespace riptide_rviz
             for (auto dep : stage.outstandingDependencyIds) {
                 depLineNums[dep] = stageXML->GetLineNum();
             }
+
+            stageLineNums[stage.id] = stageXML->GetLineNum();
         }
 
         for (auto pair : depLineNums) {
@@ -265,6 +270,21 @@ namespace riptide_rviz
                     pair.second // Line number for the stage
                 };
             }
+        }
+
+        std::set<std::string> dependencyWalkResults;
+
+        for (auto pair : stages) {
+            walkDependencyTree(pair.first, dependencyWalkResults);
+
+            if (dependencyWalkResults.find(pair.first) != dependencyWalkResults.end()) {
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::DEPENDENCY_CYCLE,
+                    stageLineNums[pair.first]
+                }; 
+            }
+
+            dependencyWalkResults.clear();
         }
 
         return RecipeXMLError {
@@ -496,6 +516,25 @@ namespace riptide_rviz
         }
 
         return false;
+    }
+
+    void Recipe::walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults) {
+        RecipeStage stage = stages[stageID];
+
+        if (stage.outstandingDependencyIds.size() == 0) {
+            return;
+        }
+
+        for (auto i : stage.outstandingDependencyIds) {
+            if (dependencyWalkResults.find(i) != dependencyWalkResults.end()) {
+                return;
+            }
+
+            dependencyWalkResults.emplace(i);
+            walkDependencyTree(i, dependencyWalkResults);
+        }
+
+
     }
 
     void Recipe::setLaunchStatus(int64_t pid, RecipeLaunchStatus status) {

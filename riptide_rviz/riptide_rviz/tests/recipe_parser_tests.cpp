@@ -110,6 +110,7 @@ std::string errEnumToStr(RecipeXMLErrorCode code) {
     case RecipeXMLErrorCode::DUPLICATE_TOPIC: return "DUPLICATE_TOPIC";
     case RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH: return "STAGE_WITH_NO_LAUNCH";
     case RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY: return "NON_EXISTANT_DEPENDENCY";
+    case RecipeXMLErrorCode::DEPENDENCY_CYCLE: return "DEPENDENCY_CYCLE";
     default: return "unknown recipe xml error";
     }
 }
@@ -646,6 +647,78 @@ void test_bad_stage_bad_dep(const std::string &path) {
     compareWithDiagnostics(testName, expectedResult, actualResult);
 }
 
+void test_bad_self_dep(const std::string &path) {
+
+    std::string testName = "test_bad_self_dep.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::DEPENDENCY_CYCLE,
+        4
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_dep_cycle_1(const std::string &path) {
+
+    std::string testName = "test_bad_dep_cycle_1.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::DEPENDENCY_CYCLE,
+        11
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_dep_cycle_2(const std::string &path) {
+
+    std::string testName = "test_bad_dep_cycle_2.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::DEPENDENCY_CYCLE,
+        26
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
 void test_good_example(const std::string &path) {
 
     std::string testName = "test_good_example.xml";
@@ -885,6 +958,9 @@ int main() {
     test_bad_topic_no_qos(testsRoot);
     test_bad_topic_bad_qos(testsRoot);
     test_bad_stage_bad_dep(testsRoot);
+    test_bad_self_dep(testsRoot);
+    test_bad_dep_cycle_1(testsRoot);
+    test_bad_dep_cycle_2(testsRoot);
 
     // Run well formed input tests
     test_good_minimal(testsRoot);

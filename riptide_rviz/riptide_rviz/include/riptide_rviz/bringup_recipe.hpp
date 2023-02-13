@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <set>
 
 #include "tinyxml2.h"
 
@@ -93,7 +94,9 @@ namespace riptide_rviz
         DUPLICATE_LAUNCH_NAMES,
         DUPLICATE_TOPIC,
         STAGE_WITH_NO_LAUNCH,
-        NON_EXISTANT_DEPENDENCY
+        NON_EXISTANT_DEPENDENCY,
+
+        DEPENDENCY_CYCLE
     };
 
     struct RecipeXMLError {
@@ -147,6 +150,7 @@ namespace riptide_rviz
         RecipeXMLError parseDependencyTag(const tinyxml2::XMLElement *dependsXML, RecipeStage &stage);
         RecipeXMLError parseLaunchTag(const tinyxml2::XMLElement *launchXML, const char * stageID, RecipeLaunch &launch);
         bool stageExists(const char * stageID);
+        void walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults);
     };
 
 } // namespace riptide_rviz
