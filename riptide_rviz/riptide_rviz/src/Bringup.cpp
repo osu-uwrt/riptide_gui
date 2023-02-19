@@ -4,9 +4,10 @@
 #include <chrono>
 #include <string>
 #include <rviz_common/display_context.hpp>
-#include <QLabel>
+#include <QVBoxLayout>
 
 #include "riptide_rviz/bringup_recipe.hpp"
+#include "riptide_rviz/BringupClient.hpp"
 
 using namespace std::chrono_literals;
 
@@ -139,11 +140,8 @@ namespace riptide_rviz
         // make sure that the bringup file is selected
         std::string targetFile = uiPanel->bringupFile->currentText().toStdString();
 
-
-        QWidget *element = new QWidget();
-        Ui_BringupListElement *temp = new Ui_BringupListElement();
-        temp->setupUi(element);
-        vbox->addWidget(element);
+        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient("hostname", clientNode, nullptr, vbox);
+        clientList.push_back(launchClient);
 
         // validate selection
         if (targetFile != "None" && targetFile != "None Selected")
