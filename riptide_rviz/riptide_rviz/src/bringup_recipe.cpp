@@ -354,7 +354,7 @@ namespace riptide_rviz
 
                 existingLaunches.emplace(launch.name); 
 
-                stage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(launch)));
+                stage.launches.push_back(std::make_shared<RecipeLaunch>(launch));
             } else {
                 // Tag is neither a dependency or a launch.
                 err = RecipeXMLError {
