@@ -41,8 +41,7 @@ std::string tabs(int num) {
 }
 
 void printRecipe(const Recipe recipe, int tabSize) {
-    for (auto pair : recipe.stages) {
-        RecipeStage stage = pair.second;
+    for (auto stage : recipe.stages) {
         std::cout << tabs(tabSize) << "id: " << stage.id << "\n";
         std::cout << tabs(tabSize) << "dependencies:\n";
 
@@ -603,7 +602,7 @@ void test_good_minimal(const std::string &path) {
     expectedStage.id = "1";
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
 
-    expected.stages[expectedStage.id] = expectedStage;
+    expected.stages.push_back(expectedStage);
 
     RecipeXMLError expectedErr = RecipeXMLError {
         RecipeXMLErrorCode::SUCCESS,
@@ -681,7 +680,7 @@ void test_bad_dep_cycle_1(const std::string &path) {
 
     RecipeXMLError expectedErr = RecipeXMLError {
         RecipeXMLErrorCode::DEPENDENCY_CYCLE,
-        11
+        4
     };
 
     TestResult expectedResult; 
@@ -705,7 +704,7 @@ void test_bad_dep_cycle_2(const std::string &path) {
 
     RecipeXMLError expectedErr = RecipeXMLError {
         RecipeXMLErrorCode::DEPENDENCY_CYCLE,
-        26
+        11
     };
 
     TestResult expectedResult; 
@@ -777,7 +776,7 @@ void test_good_example(const std::string &path) {
     expectedStage.id = "1";
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
 
-    expected.stages[expectedStage.id] = expectedStage;
+    expected.stages.push_back(expectedStage);
 
     // Stage 2
     expectedTopic = RecipeTopicData {
@@ -799,7 +798,7 @@ void test_good_example(const std::string &path) {
     expectedStage.launches.clear();
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
 
-    expected.stages[expectedStage.id] = expectedStage;
+    expected.stages.push_back(expectedStage);
 
     RecipeXMLError expectedErr = RecipeXMLError {
         RecipeXMLErrorCode::SUCCESS,
@@ -849,7 +848,7 @@ void test_good_deps(const std::string &path) {
     expectedStage.id = "start";
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
 
-    expected.stages[expectedStage.id] = expectedStage;
+    expected.stages.push_back(expectedStage);
 
     // Stage 1
     expectedTopic = RecipeTopicData {
@@ -869,7 +868,7 @@ void test_good_deps(const std::string &path) {
     expectedStage.launches.clear();
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
 
-    expected.stages[expectedStage.id] = expectedStage;
+    expected.stages.push_back(expectedStage);
 
     // Stage 2
     expectedTopic = RecipeTopicData {
@@ -888,7 +887,7 @@ void test_good_deps(const std::string &path) {
     expectedStage.launches.clear();
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
 
-    expected.stages[expectedStage.id] = expectedStage;
+    expected.stages.push_back(expectedStage);
 
     // Stage end
     expectedTopic = RecipeTopicData {
@@ -910,7 +909,7 @@ void test_good_deps(const std::string &path) {
     expectedStage.launches.clear();
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
 
-    expected.stages[expectedStage.id] = expectedStage;
+    expected.stages.push_back(expectedStage);
 
     RecipeXMLError expectedErr = RecipeXMLError {
         RecipeXMLErrorCode::SUCCESS,

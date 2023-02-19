@@ -186,12 +186,9 @@ namespace riptide_rviz
             return false;
         }
 
-        for (auto i : stages) {
-            if (lhs.stages.find(i.first) == lhs.stages.end()) {
-                return false;
-            }
-
-            if (i.second != lhs.stages.at(i.first)) {
+        
+        for (size_t i = 0; i < stages.size(); ++i) {
+            if (stages[i] != lhs.stages[i]) {
                 return false;
             }
         }
@@ -256,7 +253,7 @@ namespace riptide_rviz
                 return err;
             }
 
-            stages[stage.id] = stage;
+            stages.push_back(stage);
             for (auto dep : stage.outstandingDependencyIds) {
                 depLineNums[dep] = stageXML->GetLineNum();
             }
@@ -275,14 +272,14 @@ namespace riptide_rviz
 
         // Walk through the dependencies of each stage and check for dependency cycles
         std::set<std::string> dependencyWalkResults;
-        for (auto pair : stages) {
-            walkDependencyTree(pair.first, dependencyWalkResults);
+        for (auto stage : stages) {
+            walkDependencyTree(stage.id, dependencyWalkResults);
 
             // If the dependency results contain the current stage id, fail
-            if (dependencyWalkResults.find(pair.first) != dependencyWalkResults.end()) {
+            if (dependencyWalkResults.find(stage.id) != dependencyWalkResults.end()) {
                 return RecipeXMLError {
                     RecipeXMLErrorCode::DEPENDENCY_CYCLE,
-                    stageLineNums[pair.first]
+                    stageLineNums[stage.id]
                 }; 
             }
 
@@ -404,7 +401,7 @@ namespace riptide_rviz
 
     bool Recipe::stageExists(const char * stageID) {
         for (auto i : stages) {
-            if (i.second.id == stageID) {
+            if (i.id == stageID) {
                 return true;
             }
         }
@@ -521,7 +518,12 @@ namespace riptide_rviz
     }
 
     void Recipe::walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults) {
-        RecipeStage stage = stages[stageID];
+        RecipeStage stage;
+        for (size_t i = 0; i < stages.size(); ++i) {
+            if (stages[i].id == stageID) {
+                stage = stages[i];
+            }
+        }
 
         if (stage.outstandingDependencyIds.size() == 0) {
             return;
@@ -539,34 +541,11 @@ namespace riptide_rviz
 
     }
 
-    void Recipe::updateStageDependencies() {
-        for (auto stage : stages) {
-            auto it = stage.second.outstandingDependencyIds.begin();
-
-            while (it != stage.second.outstandingDependencyIds.end()) {
-                RecipeStage dep = stages[*it];
-                
-                bool depFinished = true;
-                for (auto launch : dep.launches) {
-                    if (launch->launchStatus != RecipeLaunchStatus::RUNNING) {
-                        depFinished = false;
-                    }
-                }
-
-                if (depFinished) {
-                    it = stage.second.outstandingDependencyIds.erase(it);
-                } else {
-                    it++;
-                }
-            }
-        }
-    }
-
     std::vector<std::shared_ptr<RecipeLaunch>> Recipe::updateAbortedLaunches(std::vector<int32_t> const& livePIDs) {
         std::vector<std::shared_ptr<RecipeLaunch>> retLaunches;
 
         for (auto stage : stages) {
-            for (auto launch : stage.second.launches) {
+            for (auto launch : stage.launches) {
                 bool launchRunning = false;
                 for (size_t i = 0; i < livePIDs.size(); ++i) {
                     if (livePIDs[i] == launch->pid) {
@@ -586,7 +565,7 @@ namespace riptide_rviz
 
     void Recipe::setLaunchStarting(std::string const& name) {
         for (auto stage : stages) {
-            for (auto launch : stage.second.launches) {
+            for (auto launch : stage.launches) {
                 if (launch->name == name) {
                     launch->launchStatus = RecipeLaunchStatus::STARTING;
                 }
@@ -596,7 +575,7 @@ namespace riptide_rviz
 
     void Recipe::setLaunchRunning(std::string const& name, int32_t pid) {
         for (auto stage : stages) {
-            for (auto launch : stage.second.launches) {
+            for (auto launch : stage.launches) {
                 if (launch->name == name) {
                     launch->launchStatus = RecipeLaunchStatus::RUNNING;
                     launch->pid = pid;
@@ -607,7 +586,7 @@ namespace riptide_rviz
 
     void Recipe::setLaunchStopped(std::string const& name) {
         for (auto stage : stages) {
-            for (auto launch : stage.second.launches) {
+            for (auto launch : stage.launches) {
                 if (launch->name == name) {
                     launch->launchStatus = RecipeLaunchStatus::STOPPED;
                 }
@@ -618,8 +597,7 @@ namespace riptide_rviz
     std::vector<std::shared_ptr<RecipeLaunch>> Recipe::getReadyLaunches() {
         std::vector<std::shared_ptr<RecipeLaunch>> retLaunches;
         
-        for (auto pair : stages) {
-            RecipeStage stage = pair.second;
+        for (auto stage : stages) {
             if (stage.outstandingDependencyIds.size() == 0) {
                 retLaunches.resize(stage.launches.size());
                 for (auto launch : stage.launches) {
@@ -632,8 +610,8 @@ namespace riptide_rviz
     }
 
     std::shared_ptr<RecipeLaunch> Recipe::getLaunchInformation(int32_t pid) {
-        for (auto pair : stages) {
-            for (auto launch : pair.second.launches) {
+        for (auto stage : stages) {
+            for (auto launch : stage.launches) {
                 if (launch->pid == pid) {
                     return launch;
                 }

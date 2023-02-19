@@ -145,8 +145,6 @@ namespace riptide_rviz
          */
         std::vector<std::shared_ptr<RecipeLaunch>> updateAbortedLaunches(std::vector<int32_t> const& livePIDs);
 
-        void updateStageDependencies();
-
         /*
          * Returns a list of launches that are in stages with no oustanding
          * dependencies (i.e., it returns a list of launches ready to be
@@ -168,7 +166,7 @@ namespace riptide_rviz
         /*
          * This is public for testing purposes
          */
-        std::unordered_map<std::string, RecipeStage> stages;
+        std::vector<RecipeStage> stages;
     private:
         // TODO: It may be cleaner if these parse functions were in there 
         // respective class definitions (i.e. "parseStageTag" was in the
