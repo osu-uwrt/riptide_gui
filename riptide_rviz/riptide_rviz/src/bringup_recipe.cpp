@@ -630,7 +630,7 @@ namespace riptide_rviz
         return retLaunches;
     }
 
-    RecipeLaunch Recipe::getLaunchInformation(int64_t pid) {
+    RecipeLaunch Recipe::getLaunchInformation(int32_t pid) {
         for (auto pair : stages) {
             for (auto launch : pair.second.launches) {
                 if (launch.pid == pid) {

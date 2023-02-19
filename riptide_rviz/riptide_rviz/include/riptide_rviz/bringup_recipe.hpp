@@ -36,7 +36,7 @@ namespace riptide_rviz
         std::string stageID = "";
         std::vector<RecipeTopicData> topicList;
         
-        int64_t pid;
+        int32_t pid;
         RecipeLaunchStatus launchStatus;
 
         bool topicExists(const char *topicName);
@@ -158,7 +158,7 @@ namespace riptide_rviz
 
         void setLaunchStopped(std::string const& name);
         // Maybe change the parameter to the launch name?
-        RecipeLaunch getLaunchInformation(int64_t pid);
+        RecipeLaunch getLaunchInformation(int32_t pid);
 
         bool operator==(const Recipe&);
         bool operator!=(const Recipe&);
