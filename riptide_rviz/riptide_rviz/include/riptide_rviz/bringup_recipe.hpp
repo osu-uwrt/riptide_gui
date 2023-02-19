@@ -133,14 +133,39 @@ namespace riptide_rviz
          * at an unknown location
          */
         RecipeXMLError loadXml(std::string const& recipePath);
-        void setLaunchStatus(int64_t pid, RecipeLaunchStatus status);
 
+        /*
+         * Updates the status for each launch object associated with the pid's
+         * listed in livePID's
+         * 
+         * This returns the launches that were not present in the livePIDs
+         * vector (i.e., this returns the launches that have unexpectedly  died)
+         */
+        std::vector<RecipeLaunch> updateAbortedLaunches(std::vector<int32_t> const& livePIDs);
+
+        void updateStageDependencies();
+
+        /*
+         * Returns a list of launches that are in stages with no oustanding
+         * dependencies (i.e., it returns a list of launches ready to be
+         * launched)
+         */
+        std::vector<RecipeLaunch> getReadyLaunches();
+
+        void setLaunchStarting(std::string const& name);
+
+        void setLaunchRunning(std::string const& name, int32_t pid);
+
+        void setLaunchStopped(std::string const& name);
         // Maybe change the parameter to the launch name?
         RecipeLaunch getLaunchInformation(int64_t pid);
 
         bool operator==(const Recipe&);
         bool operator!=(const Recipe&);
 
+        /*
+         * This is public for testing purposes
+         */
         std::unordered_map<std::string, RecipeStage> stages;
     private:
         // TODO: It may be cleaner if these parse functions were in there 

@@ -538,11 +538,105 @@ namespace riptide_rviz
 
     }
 
-    void Recipe::setLaunchStatus(int64_t pid, RecipeLaunchStatus status) {
+    void Recipe::updateStageDependencies() {
+        for (auto stage : stages) {
+            auto it = stage.second.outstandingDependencyIds.begin();
+
+            while (it != stage.second.outstandingDependencyIds.end()) {
+                RecipeStage dep = stages[*it];
+                
+                bool depFinished = true;
+                for (auto launch : dep.launches) {
+                    if (launch.launchStatus != RecipeLaunchStatus::RUNNING) {
+                        depFinished = false;
+                    }
+                }
+
+                if (depFinished) {
+                    it = stage.second.outstandingDependencyIds.erase(it);
+                } else {
+                    it++;
+                }
+            }
+        }
+    }
+
+    std::vector<RecipeLaunch> Recipe::updateAbortedLaunches(std::vector<int32_t> const& livePIDs) {
+        std::vector<RecipeLaunch> retLaunches;
+
+        for (auto stage : stages) {
+            for (auto launch : stage.second.launches) {
+                bool launchRunning = false;
+                for (int i = 0; i < livePIDs.size(); ++i) {
+                    if (livePIDs[i] == launch.pid) {
+                        launchRunning = true;
+                    }
+
+                    if (!launchRunning) {
+                        launch.launchStatus = RecipeLaunchStatus::ABORTED;
+                        retLaunches.emplace_back(launch);
+                    }
+                }
+            }
+        }
+
+        return retLaunches;
+    }
+
+    void Recipe::setLaunchStarting(std::string const& name) {
+        for (auto stage : stages) {
+            for (auto launch : stage.second.launches) {
+                if (launch.name == name) {
+                    launch.launchStatus = RecipeLaunchStatus::STARTING;
+                }
+            }
+        }
+    }
+
+    void Recipe::setLaunchRunning(std::string const& name, int32_t pid) {
+        for (auto stage : stages) {
+            for (auto launch : stage.second.launches) {
+                if (launch.name == name) {
+                    launch.launchStatus = RecipeLaunchStatus::RUNNING;
+                    launch.pid = pid;
+                }
+            }
+        }
+    }
+
+    void Recipe::setLaunchStopped(std::string const& name) {
+        for (auto stage : stages) {
+            for (auto launch : stage.second.launches) {
+                if (launch.name == name) {
+                    launch.launchStatus = RecipeLaunchStatus::STOPPED;
+                }
+            }
+        }
+    }
+
+    std::vector<RecipeLaunch> Recipe::getReadyLaunches() {
+        std::vector<RecipeLaunch> retLaunches;
         
+        for (auto pair : stages) {
+            RecipeStage stage = pair.second;
+            if (stage.outstandingDependencyIds.size() == 0) {
+                retLaunches.resize(stage.launches.size());
+                for (auto launch : stage.launches) {
+                    retLaunches.emplace_back(launch);
+                }
+            }
+        }
+
+        return retLaunches;
     }
 
     RecipeLaunch Recipe::getLaunchInformation(int64_t pid) {
-        return RecipeLaunch();
+        for (auto pair : stages) {
+            for (auto launch : pair.second.launches) {
+                if (launch.pid == pid) {
+                    return launch;
+                }
+            }
+        }
     }
 } // namespace riptide_rviz
