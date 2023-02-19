@@ -19,14 +19,6 @@ namespace riptide_rviz
         bool operator!=(const RecipeTopicData&);
     };
 
-    enum class RecipeLaunchStatus {
-        NOT_STARTED,
-        STARTING,
-        RUNNING,
-        ABORTED,
-        STOPPED
-    };
-
     /*
      *  Structure representing the <launch> tag in a recipe. This should share
      *  many similarities with the BringupStart action
@@ -37,9 +29,6 @@ namespace riptide_rviz
         std::string package = "";
         std::string stageID = "";
         std::vector<RecipeTopicData> topicList;
-        
-        int32_t pid;
-        RecipeLaunchStatus launchStatus;
 
         bool topicExists(const char *topicName);
         bool operator==(const RecipeLaunch&);
@@ -135,30 +124,6 @@ namespace riptide_rviz
          * at an unknown location
          */
         RecipeXMLError loadXml(std::string const& recipePath);
-
-        /*
-         * Updates the status for each launch object associated with the pid's
-         * listed in livePID's
-         * 
-         * This returns the launches that were not present in the livePIDs
-         * vector (i.e., this returns the launches that have unexpectedly  died)
-         */
-        std::vector<std::shared_ptr<RecipeLaunch>> updateAbortedLaunches(std::vector<int32_t> const& livePIDs);
-
-        /*
-         * Returns a list of launches that are in stages with no oustanding
-         * dependencies (i.e., it returns a list of launches ready to be
-         * launched)
-         */
-        std::vector<std::shared_ptr<RecipeLaunch>> getReadyLaunches();
-
-        void setLaunchStarting(std::string const& name);
-
-        void setLaunchRunning(std::string const& name, int32_t pid);
-
-        void setLaunchStopped(std::string const& name);
-        // Maybe change the parameter to the launch name?
-        std::shared_ptr<RecipeLaunch> getLaunchInformation(int32_t pid);
 
         bool operator==(const Recipe&);
         bool operator!=(const Recipe&);

@@ -53,8 +53,6 @@ void printRecipe(const Recipe recipe, int tabSize) {
         for (auto launch : stage.launches) {
             std::cout << tabs(tabSize + 1) << "* name: " << launch->name << "\n";
             std::cout << tabs(tabSize + 1) << "* package: " << launch->package << "\n";
-            std::cout << tabs(tabSize + 1) << "* pid: " << launch->pid << "\n";
-            std::cout << tabs(tabSize + 1) << "* launchStatus: " << (int) launch->launchStatus << "\n";
             std::cout << tabs(tabSize + 1) << "* topics:\n";
 
             for (auto topic : launch->topicList) {
@@ -595,8 +593,6 @@ void test_good_minimal(const std::string &path) {
     expectedLaunch.package = "abcdef";
     expectedLaunch.stageID = "1";
     expectedLaunch.topicList.emplace_back(expectedTopic);
-    expectedLaunch.pid = -1;
-    expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
 
     RecipeStage expectedStage;
     expectedStage.id = "1";
@@ -770,8 +766,6 @@ void test_good_example(const std::string &path) {
     expectedLaunch.name = "something.launch.py";
     expectedLaunch.package = "abcdef";
     expectedLaunch.stageID = "1";
-    expectedLaunch.pid = -1;
-    expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
 
     expectedStage.id = "1";
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
@@ -790,8 +784,6 @@ void test_good_example(const std::string &path) {
     expectedLaunch.name = "dummy_robot_bringup.launch.py";
     expectedLaunch.package = "dummy_robot_bringup";
     expectedLaunch.stageID = "2";
-    expectedLaunch.pid = -1;
-    expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
 
     expectedStage.id = "2";
     expectedStage.outstandingDependencyIds.emplace_back("1");
@@ -842,8 +834,6 @@ void test_good_deps(const std::string &path) {
     expectedLaunch.name = "something.launch.py";
     expectedLaunch.package = "abcdef";
     expectedLaunch.stageID = "start";
-    expectedLaunch.pid = -1;
-    expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
 
     expectedStage.id = "start";
     expectedStage.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
