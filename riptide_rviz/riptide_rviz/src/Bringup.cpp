@@ -74,6 +74,12 @@ namespace riptide_rviz
 
         // remove the timers
         delete spinTimer;
+
+        // free all BringupClients
+        for (auto element : clientList)
+        {
+            delete element;
+        }
     }
 
     void Bringup::bringupListRefresh()

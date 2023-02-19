@@ -7,6 +7,15 @@ namespace riptide_rviz
         listElement = new Ui_BringupListElement();
         listElement->setupUi(this);
         parent->addWidget(this);
+
+        //Create two action clients one for bringup start, one for bringup stop
+
+        //Create two callbacks for start and stop buttons
+    }
+
+    BringupClient::~BringupClient()
+    {
+        delete listElement;
     }
 
     void BringupClient::checkPids(launch_msgs::msg::ListLaunch launchMsgs)
