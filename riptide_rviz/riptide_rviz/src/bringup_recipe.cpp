@@ -45,7 +45,7 @@ namespace riptide_rviz
             return false;
         }
 
-        for (int i = 0; i < topicList.size(); ++i) {
+        for (size_t i = 0; i < topicList.size(); ++i) {
             if (topicList[i] != lhs.topicList[i]) {
                 return false;
             }
@@ -67,7 +67,7 @@ namespace riptide_rviz
             return false;
         }
 
-        for (int i = 0; i < outstandingDependencyIds.size(); ++i) {
+        for (size_t i = 0; i < outstandingDependencyIds.size(); ++i) {
             if (outstandingDependencyIds[i] != lhs.outstandingDependencyIds[i]) {
                 return false;
             }
@@ -77,7 +77,7 @@ namespace riptide_rviz
             return false;
         }
 
-        for (int i = 0; i < launches.size(); ++i) {
+        for (size_t i = 0; i < launches.size(); ++i) {
             if (*(launches[i]) != *(lhs.launches[i])) {
                 return false;
             }
@@ -568,7 +568,7 @@ namespace riptide_rviz
         for (auto stage : stages) {
             for (auto launch : stage.second.launches) {
                 bool launchRunning = false;
-                for (int i = 0; i < livePIDs.size(); ++i) {
+                for (size_t i = 0; i < livePIDs.size(); ++i) {
                     if (livePIDs[i] == launch->pid) {
                         launchRunning = true;
                     }
