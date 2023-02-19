@@ -52,13 +52,13 @@ void printRecipe(const Recipe recipe, int tabSize) {
 
         std::cout << tabs(tabSize) << "launches:\n";
         for (auto launch : stage.launches) {
-            std::cout << tabs(tabSize + 1) << "* name: " << launch.name << "\n";
-            std::cout << tabs(tabSize + 1) << "* package: " << launch.package << "\n";
-            std::cout << tabs(tabSize + 1) << "* pid: " << launch.pid << "\n";
-            std::cout << tabs(tabSize + 1) << "* launchStatus: " << (int) launch.launchStatus << "\n";
+            std::cout << tabs(tabSize + 1) << "* name: " << launch->name << "\n";
+            std::cout << tabs(tabSize + 1) << "* package: " << launch->package << "\n";
+            std::cout << tabs(tabSize + 1) << "* pid: " << launch->pid << "\n";
+            std::cout << tabs(tabSize + 1) << "* launchStatus: " << (int) launch->launchStatus << "\n";
             std::cout << tabs(tabSize + 1) << "* topics:\n";
 
-            for (auto topic : launch.topicList) {
+            for (auto topic : launch->topicList) {
                 std::cout << tabs(tabSize + 2) 
                           << topic.name << " | " 
                           << topic.type_name << " | "
@@ -601,7 +601,7 @@ void test_good_minimal(const std::string &path) {
 
     RecipeStage expectedStage;
     expectedStage.id = "1";
-    expectedStage.launches.emplace_back(expectedLaunch);
+    expectedStage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(expectedLaunch)));
 
     expected.stages[expectedStage.id] = expectedStage;
 
@@ -775,7 +775,7 @@ void test_good_example(const std::string &path) {
     expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
 
     expectedStage.id = "1";
-    expectedStage.launches.emplace_back(expectedLaunch);
+    expectedStage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(expectedLaunch)));
 
     expected.stages[expectedStage.id] = expectedStage;
 
@@ -797,7 +797,7 @@ void test_good_example(const std::string &path) {
     expectedStage.id = "2";
     expectedStage.outstandingDependencyIds.emplace_back("1");
     expectedStage.launches.clear();
-    expectedStage.launches.emplace_back(expectedLaunch);
+    expectedStage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(expectedLaunch)));
 
     expected.stages[expectedStage.id] = expectedStage;
 
@@ -847,7 +847,7 @@ void test_good_deps(const std::string &path) {
     expectedLaunch.launchStatus = RecipeLaunchStatus::NOT_STARTED;
 
     expectedStage.id = "start";
-    expectedStage.launches.emplace_back(expectedLaunch);
+    expectedStage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(expectedLaunch)));
 
     expected.stages[expectedStage.id] = expectedStage;
 
@@ -867,7 +867,7 @@ void test_good_deps(const std::string &path) {
     expectedStage.id = "1";
     expectedStage.outstandingDependencyIds.emplace_back("start");
     expectedStage.launches.clear();
-    expectedStage.launches.emplace_back(expectedLaunch);
+    expectedStage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(expectedLaunch)));
 
     expected.stages[expectedStage.id] = expectedStage;
 
@@ -886,7 +886,7 @@ void test_good_deps(const std::string &path) {
 
     expectedStage.id = "2";
     expectedStage.launches.clear();
-    expectedStage.launches.emplace_back(expectedLaunch);
+    expectedStage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(expectedLaunch)));
 
     expected.stages[expectedStage.id] = expectedStage;
 
@@ -908,7 +908,7 @@ void test_good_deps(const std::string &path) {
     expectedStage.outstandingDependencyIds.emplace_back("1");
     expectedStage.outstandingDependencyIds.emplace_back("2");
     expectedStage.launches.clear();
-    expectedStage.launches.emplace_back(expectedLaunch);
+    expectedStage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(expectedLaunch)));
 
     expected.stages[expectedStage.id] = expectedStage;
 

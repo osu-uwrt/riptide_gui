@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <memory>
 #include <set>
 #include <string>
 
@@ -53,7 +54,7 @@ namespace riptide_rviz
         std::string id = "";
         std::vector<std::string> outstandingDependencyIds;
         // TODO: Maybe make this into a map for easier accesses?
-        std::vector<RecipeLaunch> launches;
+        std::vector<std::shared_ptr<RecipeLaunch>> launches;
 
         bool operator==(const RecipeStage&);
         bool operator!=(const RecipeStage&);
@@ -142,7 +143,7 @@ namespace riptide_rviz
          * This returns the launches that were not present in the livePIDs
          * vector (i.e., this returns the launches that have unexpectedly  died)
          */
-        std::vector<RecipeLaunch> updateAbortedLaunches(std::vector<int32_t> const& livePIDs);
+        std::vector<std::shared_ptr<RecipeLaunch>> updateAbortedLaunches(std::vector<int32_t> const& livePIDs);
 
         void updateStageDependencies();
 
@@ -151,7 +152,7 @@ namespace riptide_rviz
          * dependencies (i.e., it returns a list of launches ready to be
          * launched)
          */
-        std::vector<RecipeLaunch> getReadyLaunches();
+        std::vector<std::shared_ptr<RecipeLaunch>> getReadyLaunches();
 
         void setLaunchStarting(std::string const& name);
 
@@ -159,7 +160,7 @@ namespace riptide_rviz
 
         void setLaunchStopped(std::string const& name);
         // Maybe change the parameter to the launch name?
-        RecipeLaunch getLaunchInformation(int32_t pid);
+        std::shared_ptr<RecipeLaunch> getLaunchInformation(int32_t pid);
 
         bool operator==(const Recipe&);
         bool operator!=(const Recipe&);

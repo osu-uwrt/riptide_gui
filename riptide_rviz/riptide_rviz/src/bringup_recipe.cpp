@@ -1,5 +1,6 @@
 #include <sstream>
 #include <set>
+#include <memory>
 #include <unordered_map>
 
 #include "tinyxml2.h"
@@ -77,7 +78,7 @@ namespace riptide_rviz
         }
 
         for (int i = 0; i < launches.size(); ++i) {
-            if (launches[i] != lhs.launches[i]) {
+            if (*(launches[i]) != *(lhs.launches[i])) {
                 return false;
             }
         }
@@ -353,7 +354,7 @@ namespace riptide_rviz
 
                 existingLaunches.emplace(launch.name); 
 
-                stage.launches.emplace_back(launch);
+                stage.launches.push_back(std::shared_ptr<RecipeLaunch>(new RecipeLaunch(launch)));
             } else {
                 // Tag is neither a dependency or a launch.
                 err = RecipeXMLError {
@@ -547,7 +548,7 @@ namespace riptide_rviz
                 
                 bool depFinished = true;
                 for (auto launch : dep.launches) {
-                    if (launch.launchStatus != RecipeLaunchStatus::RUNNING) {
+                    if (launch->launchStatus != RecipeLaunchStatus::RUNNING) {
                         depFinished = false;
                     }
                 }
@@ -561,19 +562,19 @@ namespace riptide_rviz
         }
     }
 
-    std::vector<RecipeLaunch> Recipe::updateAbortedLaunches(std::vector<int32_t> const& livePIDs) {
-        std::vector<RecipeLaunch> retLaunches;
+    std::vector<std::shared_ptr<RecipeLaunch>> Recipe::updateAbortedLaunches(std::vector<int32_t> const& livePIDs) {
+        std::vector<std::shared_ptr<RecipeLaunch>> retLaunches;
 
         for (auto stage : stages) {
             for (auto launch : stage.second.launches) {
                 bool launchRunning = false;
                 for (int i = 0; i < livePIDs.size(); ++i) {
-                    if (livePIDs[i] == launch.pid) {
+                    if (livePIDs[i] == launch->pid) {
                         launchRunning = true;
                     }
 
                     if (!launchRunning) {
-                        launch.launchStatus = RecipeLaunchStatus::ABORTED;
+                        launch->launchStatus = RecipeLaunchStatus::ABORTED;
                         retLaunches.emplace_back(launch);
                     }
                 }
@@ -586,8 +587,8 @@ namespace riptide_rviz
     void Recipe::setLaunchStarting(std::string const& name) {
         for (auto stage : stages) {
             for (auto launch : stage.second.launches) {
-                if (launch.name == name) {
-                    launch.launchStatus = RecipeLaunchStatus::STARTING;
+                if (launch->name == name) {
+                    launch->launchStatus = RecipeLaunchStatus::STARTING;
                 }
             }
         }
@@ -596,9 +597,9 @@ namespace riptide_rviz
     void Recipe::setLaunchRunning(std::string const& name, int32_t pid) {
         for (auto stage : stages) {
             for (auto launch : stage.second.launches) {
-                if (launch.name == name) {
-                    launch.launchStatus = RecipeLaunchStatus::RUNNING;
-                    launch.pid = pid;
+                if (launch->name == name) {
+                    launch->launchStatus = RecipeLaunchStatus::RUNNING;
+                    launch->pid = pid;
                 }
             }
         }
@@ -607,15 +608,15 @@ namespace riptide_rviz
     void Recipe::setLaunchStopped(std::string const& name) {
         for (auto stage : stages) {
             for (auto launch : stage.second.launches) {
-                if (launch.name == name) {
-                    launch.launchStatus = RecipeLaunchStatus::STOPPED;
+                if (launch->name == name) {
+                    launch->launchStatus = RecipeLaunchStatus::STOPPED;
                 }
             }
         }
     }
 
-    std::vector<RecipeLaunch> Recipe::getReadyLaunches() {
-        std::vector<RecipeLaunch> retLaunches;
+    std::vector<std::shared_ptr<RecipeLaunch>> Recipe::getReadyLaunches() {
+        std::vector<std::shared_ptr<RecipeLaunch>> retLaunches;
         
         for (auto pair : stages) {
             RecipeStage stage = pair.second;
@@ -630,10 +631,10 @@ namespace riptide_rviz
         return retLaunches;
     }
 
-    RecipeLaunch Recipe::getLaunchInformation(int32_t pid) {
+    std::shared_ptr<RecipeLaunch> Recipe::getLaunchInformation(int32_t pid) {
         for (auto pair : stages) {
             for (auto launch : pair.second.launches) {
-                if (launch.pid == pid) {
+                if (launch->pid == pid) {
                     return launch;
                 }
             }
