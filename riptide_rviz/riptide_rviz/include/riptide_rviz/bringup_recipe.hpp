@@ -29,6 +29,7 @@ namespace riptide_rviz
         std::string package = "";
         std::string stageID = "";
         std::vector<RecipeTopicData> topicList;
+        std::map<std::string, std::string> arguments;
 
         bool topicExists(const char *topicName);
         bool operator==(const RecipeLaunch&);
@@ -75,6 +76,7 @@ namespace riptide_rviz
         UNKNOWN_TAG_TYPE,
         MISSING_ID_ATTRIBUTE,
         MISSING_NAME_ATTRIBUTE,
+        MISSING_VALUE_ATTRIBUTE,
         MISSING_PACKAGE_ATTRIBUTE,
         MISSING_TYPE_ATTRIBUTE,
         MISSING_QOS_ATTRIBUTE,

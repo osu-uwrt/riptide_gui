@@ -132,6 +132,9 @@ namespace riptide_rviz
         case RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE:
             oss << "This tag is missing the 'name' attribute. Please see the example in the recipies directory.";
             break;
+        case RecipeXMLErrorCode::MISSING_VALUE_ATTRIBUTE:
+            oss << "This tag is missing the 'value' attribute. Please see the example in the recipies directory.";
+            break;
         case RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE:
             oss << "This tag is missing the 'package' attribute. Please see the example in the recipies directory.";
             break;
@@ -438,67 +441,85 @@ namespace riptide_rviz
         launch.package = package;
         launch.stageID = stageID;
         
-        for (const XMLElement *topicXML = launchXML->FirstChildElement(); topicXML != nullptr; topicXML = topicXML->NextSiblingElement()) {
-            // Check this tag is a stage tag
-            if (strcmp(topicXML->Name(), "topic") != 0) {
+        for (const XMLElement *tag = launchXML->FirstChildElement(); tag != nullptr; tag = tag->NextSiblingElement()) {
+            if (strcmp(tag->Name(), "topic") == 0) {
+                // Check this stage has an id
+                const char * topicName = tag->Attribute("name");
+                if (topicName == nullptr) {
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+                        tag->GetLineNum()
+                    };
+                }
+
+                // Check this id isn't used by other stages
+                if (launch.topicExists(topicName)) {
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::DUPLICATE_TOPIC,
+                        tag->GetLineNum()
+                    };
+                }
+
+                // Get the type information
+                const char * topicType = tag->Attribute("type");
+                if (topicType == nullptr) {
+                    // No type info provided. Return with error.
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
+                        tag->GetLineNum()
+                    };
+                }
+
+                // Get the topic quality of service
+                const char * topicQOS = tag->Attribute("qos");
+                if (topicQOS == nullptr) {
+                    // No QOS provided. Return with error
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
+                        tag->GetLineNum()
+                    };
+                }
+
+                RecipeTopicData topic;
+                topic.name = topicName;
+                topic.type_name = topicType;
+                // Ensure topic qos is only 
+                if (strcmp(topicQOS, "system_default") == 0 || strcmp(topicQOS, "sensor_data") == 0) {
+                    topic.qos_type = topicQOS;
+                } else {
+                    // The qos is not a valid type. Retunr with error.
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::INVALID_QOS_TYPE,
+                        tag->GetLineNum()
+                    };
+                }
+
+                launch.topicList.emplace_back(topic);
+            } else if (strcmp(tag->Name(), "arg") == 0) {
+                // Check this stage has an id
+                const char * argName = tag->Attribute("name");
+                if (argName == nullptr) {
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+                        tag->GetLineNum()
+                    };
+                }
+
+                const char * argValue = tag->Attribute("value");
+                if (argValue == nullptr) {
+                    return RecipeXMLError {
+                        RecipeXMLErrorCode::MISSING_VALUE_ATTRIBUTE,
+                        tag->GetLineNum()
+                    };
+                }
+
+                launch.arguments[argName] = argValue;
+            } else {
                 return RecipeXMLError {
                     RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
-                    topicXML->GetLineNum()
+                    tag->GetLineNum()
                 };
             }
-
-            // Check this stage an id
-            const char * topicName = topicXML->Attribute("name");
-            if (topicName == nullptr) {
-                return RecipeXMLError {
-                    RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
-                    topicXML->GetLineNum()
-                };
-            }
-
-            // Check this id isn't used by other stages
-            if (launch.topicExists(topicName)) {
-                return RecipeXMLError {
-                    RecipeXMLErrorCode::DUPLICATE_TOPIC,
-                    topicXML->GetLineNum()
-                };
-            }
-
-            // Get the type information
-            const char * topicType = topicXML->Attribute("type");
-            if (topicType == nullptr) {
-                // No type info provided. Return with error.
-                return RecipeXMLError {
-                    RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
-                    topicXML->GetLineNum()
-                };
-            }
-
-            // Get the topic quality of service
-            const char * topicQOS = topicXML->Attribute("qos");
-            if (topicQOS == nullptr) {
-                // No QOS provided. Return with error
-                return RecipeXMLError {
-                    RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
-                    topicXML->GetLineNum()
-                };
-            }
-
-            RecipeTopicData topic;
-            topic.name = topicName;
-            topic.type_name = topicType;
-            // Ensure topic qos is only 
-            if (strcmp(topicQOS, "system_default") == 0 || strcmp(topicQOS, "sensor_data") == 0) {
-                topic.qos_type = topicQOS;
-            } else {
-                // The qos is not a valid type. Retunr with error.
-                return RecipeXMLError {
-                    RecipeXMLErrorCode::INVALID_QOS_TYPE,
-                    topicXML->GetLineNum()
-                };
-            }
-
-            launch.topicList.emplace_back(topic);
         }
 
         return RecipeXMLError {

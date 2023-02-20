@@ -14,6 +14,8 @@
         <!-- This tag set is to support loading each launch, one by one
              Note that each launch name must be unique within the recipe-->
         <launch name="something.launch.py" package="abcdef">
+            <!-- You can pass optional arguments to the launch file like thus -->
+            <arg name="robot" value="talos">
 
             <!-- Topic names are sent to launch_service_c. launch_service_c uses
                  this information to ensure that each launch file is behaving

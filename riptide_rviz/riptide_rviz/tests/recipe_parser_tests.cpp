@@ -55,6 +55,13 @@ void printRecipe(const Recipe recipe, int tabSize) {
                         << topic.qos_type << " \n";
         }
 
+        std::cout << tabs(tabSize + 2) << "* arguments:\n";
+
+        for (auto pair : launch->arguments) {
+            std::cout << tabs(tabSize + 3) 
+                        << "\"" << pair.first << "\" "  << ":" 
+                        << " \"" <<  pair.second << "\"\n" ;
+        }
     }
 
     std::cout << tabs(tabSize) << "Stages: \n";
