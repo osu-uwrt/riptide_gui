@@ -10,12 +10,12 @@
 #include <rviz_common/config.hpp>
 
 #include "ui_Bringup.h"
-#include "ui_BringupListElement.h"
 #include <QTimer>
+#include <vector>
+#include "riptide_rviz/BringupClient.hpp"
 
 #define BRINGUP_PKG "riptide_bringup2"
 #define RVIZ_PKG "riptide_rviz"
-#define BRINGUP_POLLING_RATE 1s
 
 namespace riptide_rviz
 {
@@ -46,6 +46,8 @@ namespace riptide_rviz
 
         rclcpp::Node::SharedPtr clientNode;
         QTimer * spinTimer;
+
+        std::vector<riptide_rviz::BringupClient*> clientList;
     };
 
 } // namespace riptide_rviz
