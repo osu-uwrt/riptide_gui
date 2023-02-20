@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
+#include <map>
 #include <memory>
 #include <set>
 #include <string>
@@ -41,9 +41,8 @@ namespace riptide_rviz
     class RecipeStage {
     public:
         std::string id = "";
-        std::vector<std::string> outstandingDependencyIds;
-        // TODO: Maybe make this into a map for easier accesses?
-        std::vector<std::shared_ptr<RecipeLaunch>> launches;
+        std::vector<std::string> dependencies;
+        std::vector<int> launchIndicies;
 
         bool operator==(const RecipeStage&);
         bool operator!=(const RecipeStage&);
@@ -125,13 +124,17 @@ namespace riptide_rviz
          */
         RecipeXMLError loadXml(std::string const& recipePath);
 
+        std::vector<std::shared_ptr<RecipeLaunch>> getAllLaunches();
+        std::vector<std::vector<int>> getLaunchOrder();
+
         bool operator==(const Recipe&);
         bool operator!=(const Recipe&);
 
         /*
          * This is public for testing purposes
          */
-        std::vector<RecipeStage> stages;
+        std::map<std::string, RecipeStage> stages;
+        std::vector<std::shared_ptr<RecipeLaunch>> launches;
     private:
         // TODO: It may be cleaner if these parse functions were in there 
         // respective class definitions (i.e. "parseStageTag" was in the
@@ -147,6 +150,8 @@ namespace riptide_rviz
          * relies, either indirectly. This is used to check for dependency cycles.
          */
         void walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults);
+
+        int getLaunchIndex(std::string launchName);
     };
 
 } // namespace riptide_rviz

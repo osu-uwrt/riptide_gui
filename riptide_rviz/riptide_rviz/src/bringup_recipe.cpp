@@ -55,22 +55,22 @@ namespace riptide_rviz
             return false;
         }
 
-        if (outstandingDependencyIds.size() != lhs.outstandingDependencyIds.size()) {
+        if (dependencies.size() != lhs.dependencies.size()) {
             return false;
         }
 
-        for (size_t i = 0; i < outstandingDependencyIds.size(); ++i) {
-            if (outstandingDependencyIds[i] != lhs.outstandingDependencyIds[i]) {
+        for (size_t i = 0; i < dependencies.size(); ++i) {
+            if (dependencies[i] != lhs.dependencies[i]) {
                 return false;
             }
         }
 
-        if (launches.size() != lhs.launches.size()) {
+        if (launchIndicies.size() != lhs.launchIndicies.size()) {
             return false;
         }
 
-        for (size_t i = 0; i < launches.size(); ++i) {
-            if (*(launches[i]) != *(lhs.launches[i])) {
+        for (size_t i = 0; i < launchIndicies.size(); ++i) {
+            if (launchIndicies[i] != lhs.launchIndicies[i]) {
                 return false;
             }
         }
@@ -178,9 +178,18 @@ namespace riptide_rviz
             return false;
         }
 
-        
-        for (size_t i = 0; i < stages.size(); ++i) {
-            if (stages[i] != lhs.stages[i]) {
+        for (auto i : stages) {
+            if (lhs.stages.find(i.first) == lhs.stages.end()) {
+                return false;
+            }
+
+            if (i.second != lhs.stages.at(i.first)) {
+                return false;
+            }
+        }
+
+        for (size_t i = 0; i < launches.size(); ++i) {
+            if (*(launches[i]) != *(lhs.launches[i])) {
                 return false;
             }
         }
@@ -245,8 +254,8 @@ namespace riptide_rviz
                 return err;
             }
 
-            stages.push_back(stage);
-            for (auto dep : stage.outstandingDependencyIds) {
+            stages[stage.id] = stage;
+            for (auto dep : stage.dependencies) {
                 depLineNums[dep] = stageXML->GetLineNum();
             }
 
@@ -264,14 +273,14 @@ namespace riptide_rviz
 
         // Walk through the dependencies of each stage and check for dependency cycles
         std::set<std::string> dependencyWalkResults;
-        for (auto stage : stages) {
-            walkDependencyTree(stage.id, dependencyWalkResults);
+        for (auto pair : stages) {
+            walkDependencyTree(pair.first, dependencyWalkResults);
 
             // If the dependency results contain the current stage id, fail
-            if (dependencyWalkResults.find(stage.id) != dependencyWalkResults.end()) {
+            if (dependencyWalkResults.find(pair.first) != dependencyWalkResults.end()) {
                 return RecipeXMLError {
                     RecipeXMLErrorCode::DEPENDENCY_CYCLE,
-                    stageLineNums[stage.id]
+                    stageLineNums[pair.first]
                 }; 
             }
 
@@ -343,7 +352,8 @@ namespace riptide_rviz
 
                 existingLaunches.emplace(launch.name); 
 
-                stage.launches.push_back(std::make_shared<RecipeLaunch>(launch));
+                launches.push_back(std::make_shared<RecipeLaunch>(launch));
+                stage.launchIndicies.push_back(launches.size() - 1);
             } else {
                 // Tag is neither a dependency or a launch.
                 err = RecipeXMLError {
@@ -358,7 +368,7 @@ namespace riptide_rviz
             }
         }
 
-        if (stage.launches.size() == 0) {
+        if (stage.launchIndicies.size() == 0) {
             // There are no launches found in this stage. Return with error
             return RecipeXMLError {
                 RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH,
@@ -383,7 +393,7 @@ namespace riptide_rviz
             };
         }
 
-        stage.outstandingDependencyIds.emplace_back(id);
+        stage.dependencies.emplace_back(id);
 
         return RecipeXMLError {
             RecipeXMLErrorCode::SUCCESS,
@@ -392,8 +402,8 @@ namespace riptide_rviz
     }
 
     bool Recipe::stageExists(const char * stageID) {
-        for (auto i : stages) {
-            if (i.id == stageID) {
+        for (auto pair : stages) {
+            if (pair.first == stageID) {
                 return true;
             }
         }
@@ -508,18 +518,13 @@ namespace riptide_rviz
     }
 
     void Recipe::walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults) {
-        RecipeStage stage;
-        for (size_t i = 0; i < stages.size(); ++i) {
-            if (stages[i].id == stageID) {
-                stage = stages[i];
-            }
-        }
+        RecipeStage stage = stages[stageID];
 
-        if (stage.outstandingDependencyIds.size() == 0) {
+        if (stage.dependencies.size() == 0) {
             return;
         }
 
-        for (auto i : stage.outstandingDependencyIds) {
+        for (auto i : stage.dependencies) {
             if (dependencyWalkResults.find(i) != dependencyWalkResults.end()) {
                 return;
             }
@@ -527,7 +532,14 @@ namespace riptide_rviz
             dependencyWalkResults.emplace(i);
             walkDependencyTree(i, dependencyWalkResults);
         }
-
-
     }
+
+    std::vector<std::shared_ptr<RecipeLaunch>> Recipe::getAllLaunches() {
+        return launches;
+    }
+
+    std::vector<std::vector<int>> Recipe::getLaunchOrder() {
+        return std::vector<std::vector<int>>();
+    }
+
 } // namespace riptide_rviz
