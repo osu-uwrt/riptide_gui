@@ -43,6 +43,20 @@ namespace riptide_rviz
             }
         }
 
+        if (arguments.size() != lhs.arguments.size()) {
+            return false;
+        }
+
+        for (auto i : arguments) {
+            if (lhs.arguments.find(i.first) == lhs.arguments.end()) {
+                return false;
+            }
+
+            if (i.second != lhs.arguments.at(i.first)) {
+                return false;
+            }
+        }
+
         return true;
     }
 

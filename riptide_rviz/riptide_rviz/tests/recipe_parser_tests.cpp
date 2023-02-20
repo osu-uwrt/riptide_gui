@@ -591,6 +591,54 @@ void test_bad_topic_bad_qos(const std::string &path) {
     compareWithDiagnostics(testName, expectedResult, actualResult);
 }
 
+void test_bad_arg_no_name(const std::string &path) {
+
+    std::string testName = "test_bad_arg_no_name.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+        7
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
+void test_bad_arg_no_value(const std::string &path) {
+
+    std::string testName = "test_bad_arg_no_value.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::MISSING_VALUE_ATTRIBUTE,
+        7
+    };
+
+    TestResult expectedResult; 
+    expectedResult.err = expectedErr;
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
 void test_good_minimal(const std::string &path) {
 
     std::string testName = "test_good_minimal.xml";
@@ -944,6 +992,55 @@ void test_good_deps(const std::string &path) {
     compareWithDiagnostics(testName, expectedResult, actualResult);
 }
 
+void test_good_args(const std::string &path) {
+
+    std::string testName = "test_good_args.xml";
+    
+    Recipe actual;
+
+    RecipeXMLError actualErr = actual.loadXml(path + testName);
+
+    Recipe expected;
+    RecipeTopicData expectedTopic = RecipeTopicData {
+        "a",                // name
+        "t1",               // topic_name
+        "system_default"    // qos_type
+    };
+
+    RecipeLaunch expectedLaunch;
+    expectedLaunch.name = "something.launch.py";
+    expectedLaunch.package = "abcdef";
+    expectedLaunch.stageID = "1";
+    expectedLaunch.topicList.emplace_back(expectedTopic);
+
+    expectedLaunch.arguments["n1"] = "v1";
+    expectedLaunch.arguments["n2"] = "v2";
+
+    RecipeStage expectedStage;
+    expectedStage.id = "1";
+    expected.launches.push_back(std::make_shared<RecipeLaunch>(expectedLaunch));
+    expectedStage.launchIndicies.push_back(expected.launches.size() - 1);
+
+    expected.stages[expectedStage.id] = expectedStage;
+
+    RecipeXMLError expectedErr = RecipeXMLError {
+        RecipeXMLErrorCode::SUCCESS,
+        -1
+    };
+
+    TestResult expectedResult = TestResult {
+        expectedErr,
+        expected
+    };
+
+    TestResult actualResult = TestResult {
+        actualErr,
+        actual
+    };
+
+    compareWithDiagnostics(testName, expectedResult, actualResult);
+}
+
 int main() {
 
     std::cout << "+--------------------+\n";
@@ -971,6 +1068,8 @@ int main() {
     test_bad_topic_no_type(testsRoot);
     test_bad_topic_no_qos(testsRoot);
     test_bad_topic_bad_qos(testsRoot);
+    test_bad_arg_no_name(testsRoot);
+    test_bad_arg_no_value(testsRoot);
     test_bad_stage_bad_dep(testsRoot);
     test_bad_self_dep(testsRoot);
     test_bad_dep_cycle_1(testsRoot);
@@ -980,5 +1079,6 @@ int main() {
     test_good_minimal(testsRoot);
     test_good_example(testsRoot);
     test_good_deps(testsRoot);
+    test_good_args(testsRoot);
 
 }
