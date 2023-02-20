@@ -539,7 +539,53 @@ namespace riptide_rviz
     }
 
     std::vector<std::vector<int>> Recipe::getLaunchOrder() {
-        return std::vector<std::vector<int>>();
+        std::vector<std::vector<int>> launchOrder;
+
+        std::set<std::string> handledStages;
+
+        while (handledStages.size() < stages.size()) {
+            // This is a group of launches that can all be launched at the same time
+            // This is different than a stage, in that it can contain launches from
+            // multiple stages
+            //
+            // Ex: if A recipe has a bunch of stages with no dependencies, all of the
+            // launches in those stages would be a part of the same group, since they
+            // are all launched at the same time.
+            std::vector<int> launchGroup;
+            std::vector<std::string> handledStagesThisIteration;
+
+            for (auto pair : stages) {
+                // if this stage was handled, skip it
+                if (handledStages.find(pair.first) != handledStages.end()) {
+                    continue;
+                } 
+
+                bool dependenciesHandled = true;
+                for (auto dep : pair.second.dependencies) {
+                    // if this dependency hasn't been handled, set a flag
+                    if (handledStages.find(dep) == handledStages.end()) {
+                        dependenciesHandled = false;
+                    }
+                }
+
+                // If all of the dependencies have been inserted into the launchOrder
+                // vector, then
+                if (dependenciesHandled) {
+                    handledStagesThisIteration.push_back(pair.first);
+                    launchGroup.reserve(launchGroup.size() + pair.second.launchIndicies.size());
+                    for (auto i : pair.second.launchIndicies) {
+                        launchGroup.push_back(i);
+                    }
+                }
+            }
+
+            for (auto stage : handledStagesThisIteration) {
+                handledStages.emplace(stage);
+            }
+            launchOrder.push_back(launchGroup);
+        }
+        
+        return launchOrder;
     }
 
 } // namespace riptide_rviz

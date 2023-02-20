@@ -150,8 +150,6 @@ namespace riptide_rviz
          * relies, either indirectly. This is used to check for dependency cycles.
          */
         void walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults);
-
-        int getLaunchIndex(std::string launchName);
     };
 
 } // namespace riptide_rviz
