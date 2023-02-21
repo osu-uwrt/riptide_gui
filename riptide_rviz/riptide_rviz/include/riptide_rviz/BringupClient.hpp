@@ -1,15 +1,24 @@
 #pragma once
 #include <memory>
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/logger.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
 #include "riptide_rviz/bringup_recipe.hpp"
 #include <QVBoxLayout>
 #include <string>
 #include <QWidget>
-#include "launch_msgs/msg/list_launch.hpp"
 #include "ui_BringupListElement.h"
+
+// Message headers
+#include <launch_msgs/action/bringup_end.hpp>
+#include <launch_msgs/msg/list_launch.hpp>
+#include <launch_msgs/action/bringup_start.hpp>
 
 namespace riptide_rviz
 {
+    using BringupStart = launch_msgs::action::BringupStart;
+    using GHBringupStart = rclcpp_action::ClientGoalHandle<BringupStart>;
+
     class BringupClient : public QWidget
     {
         public:
@@ -19,5 +28,11 @@ namespace riptide_rviz
 
         private:
             Ui_BringupListElement *listElement;
+            rclcpp::Node::SharedPtr clientNode;
+            rclcpp_action::Client<BringupStart>::SharedPtr bringupStart;
+            void BU_start_goal_response_cb(const GHBringupStart::SharedPtr & goal_handle);
+            void BU_start_feedback_cb(GHBringupStart::SharedPtr, const std::shared_ptr<const BringupStart::Feedback> feedback);
+            void BU_start_result_cb(const GHBringupStart::WrappedResult & result);
+
     };
 }

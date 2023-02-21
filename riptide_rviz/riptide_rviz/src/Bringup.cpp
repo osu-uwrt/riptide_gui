@@ -146,7 +146,18 @@ namespace riptide_rviz
         // make sure that the bringup file is selected
         std::string targetFile = uiPanel->bringupFile->currentText().toStdString();
 
-        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient("hostname", clientNode, nullptr, vbox);
+        std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch = std::make_shared<riptide_rviz::RecipeLaunch>();
+
+        RecipeTopicData t1;
+        t1.name = "/joint_states";
+        t1.type_name = "sensor_msgs/msg/JointState";
+        t1.qos_type = "sensor_data";
+
+        recipeLaunch->name = "dummy_robot_bringup.launch.py";
+        recipeLaunch->package = "dummy_robot_bringup";
+        recipeLaunch->topicList.push_back(t1);
+
+        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient("hostname", clientNode, recipeLaunch, vbox);
         clientList.push_back(launchClient);
 
         // validate selection
