@@ -157,9 +157,14 @@ namespace riptide_rviz
         recipeLaunch->package = "dummy_robot_bringup";
         recipeLaunch->topicList.push_back(t1);
 
-        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient("hostname", clientNode, recipeLaunch, vbox);
-        clientList.push_back(launchClient);
 
+        std::string hostName = uiPanel->bringupHost->currentText().toStdString();
+        if(hostName != "None Selected")
+        {
+            riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, recipeLaunch, vbox);
+            clientList.push_back(launchClient);
+        }
+        
         // validate selection
         if (targetFile != "None" && targetFile != "None Selected")
         {

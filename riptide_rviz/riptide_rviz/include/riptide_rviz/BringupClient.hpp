@@ -30,9 +30,11 @@ namespace riptide_rviz
             Ui_BringupListElement *listElement;
             rclcpp::Node::SharedPtr clientNode;
             rclcpp_action::Client<BringupStart>::SharedPtr bringupStart;
+            std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunchData;
             void BU_start_goal_response_cb(const GHBringupStart::SharedPtr & goal_handle);
             void BU_start_feedback_cb(GHBringupStart::SharedPtr, const std::shared_ptr<const BringupStart::Feedback> feedback);
             void BU_start_result_cb(const GHBringupStart::WrappedResult & result);
+            void startButtonCallback();
 
     };
 }
