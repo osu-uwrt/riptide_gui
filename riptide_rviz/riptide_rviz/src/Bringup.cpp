@@ -19,6 +19,7 @@ namespace riptide_rviz
     Bringup::Bringup(QWidget *parent) : rviz_common::Panel(parent)
     {
         setFocusPolicy(Qt::ClickFocus);
+        mainParent = parent;
 
         uiPanel = new Ui_Bringup();
         uiPanel->setupUi(this);
@@ -26,13 +27,7 @@ namespace riptide_rviz
         auto options = rclcpp::NodeOptions().arguments({});
         clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_bringup", options);
 
-        // Add Vertical Box layout to the Scroll area so we can actually add items to it
-        QWidget *scrollAreaLayout = new QWidget(parent);
-        vbox = new QVBoxLayout(scrollAreaLayout);
-        vbox->setAlignment(Qt::AlignTop);
-        vbox->setSpacing(0);
-        scrollAreaLayout->setLayout(vbox);
-        uiPanel->scrollArea->setWidget(scrollAreaLayout);
+        createScrollArea();
     }
 
     void Bringup::onInitialize()
@@ -84,6 +79,23 @@ namespace riptide_rviz
         }
     }
 
+    void Bringup::createScrollArea()
+    {
+        // Add Vertical Box layout to the Scroll area so we can actually add items to it
+        scrollAreaLayout = new QWidget(mainParent);
+        vbox = new QVBoxLayout(scrollAreaLayout);
+        vbox->setAlignment(Qt::AlignTop);
+        vbox->setSpacing(0);
+        scrollAreaLayout->setLayout(vbox);
+        uiPanel->scrollArea->setWidget(scrollAreaLayout);
+    }
+
+    void Bringup::clearScrollArea()
+    {
+        delete scrollAreaLayout;
+        createScrollArea();
+    }
+
     void Bringup::bringupListRefresh()
     {
         // get the list of nodes available
@@ -133,6 +145,7 @@ namespace riptide_rviz
 
     void Bringup::bringupFileChanged(const QString &text)
     {
+        clearScrollArea();
         const std::string stdStrFile = text.toStdString();
         if(stdStrFile != "None Selected")
         {

@@ -50,6 +50,10 @@ namespace riptide_rviz
 
         std::vector<riptide_rviz::BringupClient*> clientList;
         std::string bringupFilesDir;
+        QWidget *mainParent;
+        QWidget *scrollAreaLayout;
+        void createScrollArea();
+        void clearScrollArea();
     };
 
 } // namespace riptide_rviz

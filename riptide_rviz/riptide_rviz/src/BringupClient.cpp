@@ -24,6 +24,9 @@ namespace riptide_rviz
         QString launchFileName = QString::fromStdString(nameCopy);
         listElement->launchFileLabel->setText(launchFileName);
 
+        QString fullFileName = QString::fromStdString(recipeLaunch->name);
+        listElement->launchFileLabel->setToolTip(fullFileName);
+
         //Change format of progress bar
         auto topicCount = recipeLaunch->topicList.size();
         maxTopics = static_cast<int>(topicCount);
