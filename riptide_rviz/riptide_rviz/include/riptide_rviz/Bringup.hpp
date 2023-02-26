@@ -49,11 +49,14 @@ namespace riptide_rviz
         QTimer * spinTimer;
 
         std::vector<riptide_rviz::BringupClient*> clientList;
+        rclcpp::Subscription<launch_msgs::msg::ListLaunch>::SharedPtr listLaunchSub;
         std::string bringupFilesDir;
         QWidget *mainParent;
         QWidget *scrollAreaLayout;
         void createScrollArea();
         void clearScrollArea();
+        void listLaunchCallback(const launch_msgs::msg::ListLaunch &msg);
+
     };
 
 } // namespace riptide_rviz

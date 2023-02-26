@@ -11,6 +11,7 @@
 #include "riptide_rviz/BringupClient.hpp"
 
 using namespace std::chrono_literals;
+using namespace std::placeholders;
 
 QVBoxLayout *vbox;
 
@@ -40,6 +41,8 @@ namespace riptide_rviz
         connect(spinTimer, &QTimer::timeout, [this](void)
                 { rclcpp::spin_some(clientNode); });
         spinTimer->start(50);
+
+        uiPanel->bringupStart->setDisabled(true);
 
         // Connect UI signals for bringup
         connect(uiPanel->bringupRefresh, &QPushButton::clicked, [this](void)
@@ -182,7 +185,17 @@ namespace riptide_rviz
         if (targetNode != "None Selected")
         {
             //Selected host is valid, now create action server clients (?)
-            
+            listLaunchSub = clientNode->create_subscription<launch_msgs::msg::ListLaunch>(
+                targetNode + "/launch_status", rclcpp::SystemDefaultsQoS(), std::bind(&Bringup::listLaunchCallback, this, _1)
+            );
+        }
+    }
+
+    void Bringup::listLaunchCallback(const launch_msgs::msg::ListLaunch &msg)
+    {
+        for(auto client : clientList)
+        {
+            client->checkPids(msg);
         }
     }
 
@@ -258,6 +271,10 @@ namespace riptide_rviz
     {
         //Modify to check if bringups are still alive
         //Callback function for a subscriber subscribed to pid alive topic ListLaunch
+        // for (auto client : clientList)
+        // {    
+        //     client->checkPids();
+        // }
     }
 
     void Bringup::stopBringup()

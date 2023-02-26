@@ -7,6 +7,7 @@ namespace riptide_rviz
 
     BringupClient::BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent)
     {
+        started = false;
         listElement = new Ui_BringupListElement();
         listElement->setupUi(this);
         parent->addWidget(this);
@@ -45,6 +46,7 @@ namespace riptide_rviz
 
     void BringupClient::stopButtonCallback()
     {
+        started = false;
         listElement->stopButton->setDisabled(true);
         auto goal_msg = BringupEnd::Goal();
         goal_msg.pid = pid;
@@ -97,6 +99,7 @@ namespace riptide_rviz
         RVIZ_COMMON_LOG_INFO("BU_start_result_cb: pid to look for is " + pid);
         listElement->stopButton->setEnabled(true);
         listElement->startButton->setDisabled(true);
+        started = true;
     }
 
     //Create two callbacks for start and stop buttons
@@ -105,6 +108,8 @@ namespace riptide_rviz
     {
         RVIZ_COMMON_LOG_DEBUG("startButtonCallback: Launch file start button pressed");
         listElement->progressBar->setValue(0);
+        listElement->progressBar->setStyleSheet("");
+        listElement->progressBar->setFormat("%v/%m");
 
         auto goal_msg = BringupStart::Goal();
         goal_msg.launch_file = recipeLaunchData->name;
@@ -143,6 +148,22 @@ namespace riptide_rviz
 
     void BringupClient::checkPids(launch_msgs::msg::ListLaunch launchMsgs)
     {
-
+        if(started)
+        {
+            bool seen = false;
+            for (auto runningPid : launchMsgs.pids)
+            {
+                if(pid == runningPid) seen = true;
+            }
+            
+            if(!seen)
+            {
+                listElement->progressBar->setValue(0);
+                listElement->progressBar->setStyleSheet("QProgressBar {color: white; background: rgb(140, 100, 100);}");
+                listElement->progressBar->setFormat("ERROR");
+                listElement->startButton->setEnabled(true);
+                listElement->stopButton->setDisabled(true);
+            }
+        }
     }
 }
