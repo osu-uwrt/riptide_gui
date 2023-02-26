@@ -36,6 +36,7 @@ namespace riptide_rviz
         void startBringup();
         void checkBringupStatus();
         void stopBringup();
+        void bringupFileChanged(const QString &text);
 
     protected:
         bool event(QEvent *event);
@@ -48,6 +49,7 @@ namespace riptide_rviz
         QTimer * spinTimer;
 
         std::vector<riptide_rviz::BringupClient*> clientList;
+        std::string bringupFilesDir;
     };
 
 } // namespace riptide_rviz

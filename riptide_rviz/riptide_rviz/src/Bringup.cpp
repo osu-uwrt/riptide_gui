@@ -5,6 +5,7 @@
 #include <string>
 #include <rviz_common/display_context.hpp>
 #include <QVBoxLayout>
+#include <rviz_common/logging.hpp>
 
 #include "riptide_rviz/bringup_recipe.hpp"
 #include "riptide_rviz/BringupClient.hpp"
@@ -51,6 +52,7 @@ namespace riptide_rviz
         connect(uiPanel->bringupStart, &QPushButton::clicked, [this](void)
                 { startBringup(); });
         connect(uiPanel->bringupHost, SIGNAL(currentIndexChanged(int)), SLOT(handleBringupHost(int)));
+        connect(uiPanel->bringupFile, SIGNAL(currentTextChanged(const QString &)), SLOT(bringupFileChanged(const QString &)));
     }
 
     void Bringup::load(const rviz_common::Config &config)
@@ -118,13 +120,43 @@ namespace riptide_rviz
         uiPanel->bringupFile->addItem("None Selected");
 
         // populate with new files
-        std::string bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
+        bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
         for (const auto &entry : std::filesystem::directory_iterator(bringupFilesDir))
         {
             std::string file = std::string(entry.path());
             if (file.find(".xml") != std::string::npos)
             {
                 uiPanel->bringupFile->addItem(QString::fromStdString(file.substr(file.find_last_of('/') + 1)));
+            }
+        }
+    }
+
+    void Bringup::bringupFileChanged(const QString &text)
+    {
+        const std::string stdStrFile = text.toStdString();
+        if(stdStrFile != "None Selected")
+        {
+            RVIZ_COMMON_LOG_INFO("Bringup file changed to: " + stdStrFile);
+            Recipe recipe;
+            auto recipeError = recipe.loadXml(bringupFilesDir + "/" + stdStrFile);
+            if (recipeError.errorCode == RecipeXMLErrorCode::SUCCESS)
+            {
+                auto launchList = recipe.getAllLaunches();
+                std::string hostName = uiPanel->bringupHost->currentText().toStdString();
+                if(hostName != "None Selected")
+                {
+                    for(auto launch : launchList)
+                    {
+                        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, launch, vbox);
+                        clientList.push_back(launchClient);
+                    }
+                    RVIZ_COMMON_LOG_INFO("Loaded XML Successfully");
+                }
+            }
+            else
+            {
+                RVIZ_COMMON_LOG_ERROR("Failed to load XML into Recipe");
+                RVIZ_COMMON_LOG_ERROR(getRecipeXMLErrorMessage(recipeError));
             }
         }
     }
@@ -146,24 +178,24 @@ namespace riptide_rviz
         // make sure that the bringup file is selected
         std::string targetFile = uiPanel->bringupFile->currentText().toStdString();
 
-        std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch = std::make_shared<riptide_rviz::RecipeLaunch>();
+        // std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch = std::make_shared<riptide_rviz::RecipeLaunch>();
 
-        RecipeTopicData t1;
-        t1.name = "/joint_states";
-        t1.type_name = "sensor_msgs/msg/JointState";
-        t1.qos_type = "sensor_data";
+        // RecipeTopicData t1;
+        // t1.name = "/joint_states";
+        // t1.type_name = "sensor_msgs/msg/JointState";
+        // t1.qos_type = "sensor_data";
 
-        recipeLaunch->name = "dummy_robot_bringup.launch.py";
-        recipeLaunch->package = "dummy_robot_bringup";
-        recipeLaunch->topicList.push_back(t1);
+        // recipeLaunch->name = "dummy_robot_bringup.launch.py";
+        // recipeLaunch->package = "dummy_robot_bringup";
+        // recipeLaunch->topicList.push_back(t1);
 
 
-        std::string hostName = uiPanel->bringupHost->currentText().toStdString();
-        if(hostName != "None Selected")
-        {
-            riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, recipeLaunch, vbox);
-            clientList.push_back(launchClient);
-        }
+        // std::string hostName = uiPanel->bringupHost->currentText().toStdString();
+        // if(hostName != "None Selected")
+        // {
+        //     riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, recipeLaunch, vbox);
+        //     clientList.push_back(launchClient);
+        // }
         
         // validate selection
         if (targetFile != "None" && targetFile != "None Selected")

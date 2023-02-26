@@ -26,8 +26,8 @@ namespace riptide_rviz
 
         //Change format of progress bar
         auto topicCount = recipeLaunch->topicList.size();
-        int topicCountInt = static_cast<int>(topicCount);
-        listElement->progressBar->setMaximum(topicCountInt);
+        maxTopics = static_cast<int>(topicCount);
+        listElement->progressBar->setMaximum(maxTopics);
         listElement->progressBar->setFormat("%v/%m");
 
         //Create two action clients one for bringup start, one for bringup stop
@@ -43,7 +43,6 @@ namespace riptide_rviz
     void BringupClient::stopButtonCallback()
     {
         listElement->stopButton->setDisabled(true);
-        listElement->progressBar->setValue(0);
         auto goal_msg = BringupEnd::Goal();
         goal_msg.pid = pid;
         auto send_goal_options = rclcpp_action::Client<BringupEnd>::SendGoalOptions();
@@ -64,13 +63,14 @@ namespace riptide_rviz
     {
         int killedNodeCount = static_cast<int>(feedback->killed_nodes);
         RVIZ_COMMON_LOG_INFO("BU_end_goal_response: Killed complete count is " + std::to_string(killedNodeCount));
-        listElement->progressBar->setValue(killedNodeCount);
+        listElement->progressBar->setValue(maxTopics - killedNodeCount);
     }
 
     void BringupClient::BU_end_result_cb(const GHBringupEnd::WrappedResult & result)
     {
         listElement->progressBar->setValue(listElement->progressBar->maximum());
         listElement->startButton->setEnabled(true);
+        listElement->progressBar->setValue(0);
     }
 
     //Callback functions for BringupStart Client
