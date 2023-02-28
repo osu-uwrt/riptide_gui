@@ -93,22 +93,33 @@ namespace riptide_rviz
         for(auto diagnostic : msg.status){
             // handle robot voltage packet
             if(diagnostic.name == "/Robot Diagnostics/Electronics/Voltages and Currents/V+ Rail Voltage"){
+                bool found = false;
                 voltageConfig.text_ = "00.00 V";
                 voltageConfig.text_color_ = QColor(255, 0, 0, 255);
-                if(diagnostic.message.find("No data") == std::string::npos){
-                    // now we need to look at the status of the voltage to determine color
-                    // ok is green, warn is yellow, error is red
-                    if(diagnostic.level == diagnostic.ERROR){
-                        voltageConfig.text_color_ = QColor(255, 0, 0, 255);
-                    } else if (diagnostic.level == diagnostic.WARN){
-                        voltageConfig.text_color_ = QColor(255, 255, 0, 255);
-                    } else {
-                        voltageConfig.text_color_ = QColor(0, 255, 0, 255);
+                
+                for(auto pair : diagnostic.values){
+                    if(pair.key == "V+ Rail Voltage"){
+                        found = true;
+                        voltageConfig.text_ = pair.value;
                     }
-
-                    // TODO find voltage
-                    voltageConfig.text_ = "Not Implemented V";
                 }
+
+                if(!found){
+                    voltageConfig.text_ = "BAD CONV";
+                }
+
+                // now we need to look at the status of the voltage to determine color
+                // ok is green, warn is yellow, error is red
+                if(diagnostic.level == diagnostic.ERROR){
+                    voltageConfig.text_color_ = QColor(255, 0, 0, 255);
+                } else if (diagnostic.level == diagnostic.WARN){
+                    voltageConfig.text_color_ = QColor(255, 255, 0, 255);
+                } else if (diagnostic.level == diagnostic.STALE){
+                    diagLedConfig.inner_color_ = QColor(255, 0, 255, 255);
+                } else {
+                    voltageConfig.text_color_ = QColor(0, 255, 0, 255);
+                }
+                
 
                 // edit the text
                 updateText(voltageTextId, voltageConfig);
@@ -121,6 +132,8 @@ namespace riptide_rviz
                     diagLedConfig.inner_color_ = QColor(255, 0, 0, 255);
                 } else if (diagnostic.level == diagnostic.WARN){
                     diagLedConfig.inner_color_ = QColor(255, 255, 0, 255);
+                } else if (diagnostic.level == diagnostic.STALE){
+                    diagLedConfig.inner_color_ = QColor(255, 0, 255, 255);
                 } else {
                     diagLedConfig.inner_color_ = QColor(0, 255, 0, 255);
                 }
