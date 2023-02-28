@@ -26,7 +26,6 @@ namespace riptide_rviz
         public:
             BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent);
             void checkPids(launch_msgs::msg::ListLaunch launchMsgs);
-            ~BringupClient();
 
         private:
             Ui_BringupListElement *listElement;

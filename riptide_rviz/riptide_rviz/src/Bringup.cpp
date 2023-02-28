@@ -95,12 +95,19 @@ namespace riptide_rviz
 
     void Bringup::clearScrollArea()
     {
+        for(auto listObject : clientList)
+        {
+            delete listObject;
+        }
+        clientList.clear();
+
         delete scrollAreaLayout;
         createScrollArea();
     }
 
     void Bringup::bringupListRefresh()
     {
+        clearScrollArea();
         // get the list of nodes available
         std::vector<std::string> names = clientNode->get_node_names();
 
@@ -122,7 +129,9 @@ namespace riptide_rviz
                 // push these into the combo box
                 uiPanel->bringupHost->addItem(QString::fromStdString(name.substr(0, name.find_last_of('l') - 1)));
             }
-            uiPanel->bringupStart->setDisabled(false);
+            //Disable while ordered start does is not implemented
+            //TODO remove when staggered launch is working
+            //uiPanel->bringupStart->setDisabled(false);
         }
         else
         {
@@ -131,9 +140,10 @@ namespace riptide_rviz
         }
 
         // clear the list of bringup files
+        uiPanel->bringupFile->blockSignals(true);
         uiPanel->bringupFile->clear();
         uiPanel->bringupFile->addItem("None Selected");
-
+        
         // populate with new files
         bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
         for (const auto &entry : std::filesystem::directory_iterator(bringupFilesDir))
@@ -144,11 +154,11 @@ namespace riptide_rviz
                 uiPanel->bringupFile->addItem(QString::fromStdString(file.substr(file.find_last_of('/') + 1)));
             }
         }
+        uiPanel->bringupFile->blockSignals(false);
     }
 
     void Bringup::bringupFileChanged(const QString &text)
     {
-        clearScrollArea();
         const std::string stdStrFile = text.toStdString();
         if(stdStrFile != "None Selected")
         {
