@@ -130,7 +130,21 @@ namespace riptide_rviz
             }
             topicDataVec.push_back(temp);
         }
+
+        std::vector<std::string> argKeys;
+        std::vector<std::string> argValues;
+
+        argKeys.reserve(recipeLaunchData->arguments.size());
+        argValues.reserve(recipeLaunchData->arguments.size());
+        for (auto recipeArg : recipeLaunchData->arguments) {
+            argKeys.push_back(recipeArg.first);
+            argValues.push_back(recipeArg.second);
+        }
+
         goal_msg.topics = topicDataVec;
+        goal_msg.arg_keys = argKeys;
+        goal_msg.arg_values = argValues;
+        
         auto send_goal_options = rclcpp_action::Client<BringupStart>::SendGoalOptions();
         send_goal_options.goal_response_callback = std::bind(&BringupClient::BU_start_goal_response_cb, this, _1);
         send_goal_options.feedback_callback = std::bind(&BringupClient::BU_start_feedback_cb, this, _1, _2);
