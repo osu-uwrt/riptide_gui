@@ -77,7 +77,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: tempest/robot_description
+        Value: talos/robot_description
       Enabled: true
       Links:
         All Links Enabled: true
@@ -202,7 +202,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /tempest/odometry/filtered
+        Value: /talos/odometry/filtered
       Value: true
     - Class: rviz_default_plugins/Image
       Enabled: false
@@ -216,7 +216,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /tempest/yolov5/image_detection
+        Value: /talos/yolov5/image_detection
       Value: false
     - Class: rviz_common/Group
       Displays:
@@ -234,7 +234,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_0
+            Value: /talos/thruster_wrenches/thruster_0
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -252,7 +252,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_1
+            Value: /talos/thruster_wrenches/thruster_1
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -270,7 +270,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_2
+            Value: /talos/thruster_wrenches/thruster_2
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -288,7 +288,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_3
+            Value: /talos/thruster_wrenches/thruster_3
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -306,7 +306,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_4
+            Value: /talos/thruster_wrenches/thruster_4
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -324,7 +324,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_5
+            Value: /talos/thruster_wrenches/thruster_5
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -342,7 +342,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_6
+            Value: /talos/thruster_wrenches/thruster_6
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -360,7 +360,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /tempest/thruster_wrenches/thruster_7
+            Value: /talos/thruster_wrenches/thruster_7
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
@@ -389,7 +389,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /tempest/mapping_markers
+        Value: /talos/mapping_markers
       Value: true
   Enabled: true
   Global Options:
@@ -453,7 +453,7 @@ Visualization Manager:
       Name: Current View
       Near Clip Distance: 0.009999999776482582
       Pitch: 0.2703973948955536
-      Target Frame: tempest/base_link
+      Target Frame: talos/base_link
       Value: Orbit (rviz)
       Yaw: 2.358578681945801
     Saved: ~
