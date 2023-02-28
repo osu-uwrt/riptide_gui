@@ -7,7 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 
 import os
 
-robot = 'tempest'
+robot = 'talos'
 
 config = PathJoinSubstitution([
         get_package_share_directory('riptide_descriptions2'),
@@ -28,7 +28,7 @@ def generate_launch_description():
                 # declare the launch args here
                 DeclareLaunchArgument(
                     "robot", 
-                    default_value="tempest",
+                    default_value=robot,
                     description="Name of the vehicle",
                 ),
 
@@ -91,6 +91,13 @@ def generate_launch_description():
                         {"robot": robot},
                     ]
                 ),
+                
+                Node(
+                    package="riptide_rviz",
+                    executable="MarkerPublisher.py",
+                    name="marker_publisher",
+                    output="screen"
+                )
             ]
         )
     ])

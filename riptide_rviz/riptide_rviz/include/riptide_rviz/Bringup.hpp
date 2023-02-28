@@ -1,8 +1,8 @@
 #pragma once
 #include <rclcpp/rclcpp.hpp>
-#include <launch_msgs/srv/start_launch.hpp>
-#include <launch_msgs/srv/list_launch.hpp>
-#include <launch_msgs/srv/stop_launch.hpp>
+#include <launch_msgs/action/bringup_start.hpp>
+#include <launch_msgs/action/bringup_end.hpp>
+#include <launch_msgs/msg/list_launch.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
@@ -11,9 +11,11 @@
 
 #include "ui_Bringup.h"
 #include <QTimer>
+#include <vector>
+#include "riptide_rviz/BringupClient.hpp"
 
 #define BRINGUP_PKG "riptide_bringup2"
-#define BRINGUP_POLLING_RATE 1s
+#define RVIZ_PKG "riptide_rviz"
 
 namespace riptide_rviz
 {
@@ -34,6 +36,7 @@ namespace riptide_rviz
         void startBringup();
         void checkBringupStatus();
         void stopBringup();
+        void bringupFileChanged(const QString &text);
 
     protected:
         bool event(QEvent *event);
@@ -45,12 +48,15 @@ namespace riptide_rviz
         rclcpp::Node::SharedPtr clientNode;
         QTimer * spinTimer;
 
-        // Bringup clients
-        rclcpp::Client<launch_msgs::srv::StartLaunch>::SharedPtr bringupStartClient;
-        rclcpp::Client<launch_msgs::srv::ListLaunch>::SharedPtr bringupListClient;
-        rclcpp::Client<launch_msgs::srv::StopLaunch>::SharedPtr bringupStopClient;
-        QTimer * bringupCheckTimer;
-        int bringupID = -1;
+        std::vector<riptide_rviz::BringupClient*> clientList;
+        rclcpp::Subscription<launch_msgs::msg::ListLaunch>::SharedPtr listLaunchSub;
+        std::string bringupFilesDir;
+        QWidget *mainParent;
+        QWidget *scrollAreaLayout;
+        void createScrollArea();
+        void clearScrollArea();
+        void listLaunchCallback(const launch_msgs::msg::ListLaunch &msg);
+
     };
 
 } // namespace riptide_rviz

@@ -84,11 +84,11 @@ namespace riptide_rviz
         float * configVal = new float();
 
         // load the namesapce param
-        if(config.mapGetString("namespace", str)){
+        if(config.mapGetString("robot_namespace", str)){
             robot_ns = str->toStdString();
         } else {
             // default value
-            robot_ns = "/tempest";
+            robot_ns = "/talos";
             RVIZ_COMMON_LOG_WARNING("Loading default value for 'namespace'");
         }
 
@@ -158,7 +158,7 @@ namespace riptide_rviz
         rviz_common::Panel::save(config);
 
         // write our config values
-        config.mapSetValue("namespace", QString::fromStdString(robot_ns));
+        config.mapSetValue("robot_namespace", QString::fromStdString(robot_ns));
         config.mapSetValue("odom_timeout", odom_timeout.count());
         config.mapSetValue("max_depth_in_place", max_depth_in_place);
         config.mapSetValue("tgt_in_place_depth", tgt_in_place_depth);

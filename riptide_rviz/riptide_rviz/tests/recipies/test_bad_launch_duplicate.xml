@@ -1,0 +1,13 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!-- This tests one stage with one launch and one topic (i.e. the minimum required for a recipe file) -->
+<launches>
+    <stage id="1">
+        <launch name="something.launch.py" package="abcdef">
+            <topic name="a" type="t1" qos="system_default"/>
+        </launch>
+        
+        <launch name="something.launch.py" package="abcdef">
+            <topic name="a" type="t1" qos="system_default"/>
+        </launch>
+    </stage>
+</launches>

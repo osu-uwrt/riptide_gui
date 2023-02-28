@@ -1,0 +1,4 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!-- This tests is missing a <launches> tag, and thus is malformed -->
+<launches>
+</launches>

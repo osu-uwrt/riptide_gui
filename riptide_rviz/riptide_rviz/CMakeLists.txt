@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tinyxml2_vendor REQUIRED)
 
 # find message deps
 find_package(nav_msgs REQUIRED)
@@ -58,6 +59,15 @@ add_library(${PROJECT_NAME} SHARED
             ${UI_HEADERS}
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE ROBOT_NS="talos")
+
+# TODO: Maybe make bringup_recipe it's own library?
+add_executable(recipe_parser_test tests/recipe_parser_tests.cpp src/bringup_recipe.cpp)
+
+target_include_directories(recipe_parser_test PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/riptide_rviz>
+  $<INSTALL_INTERFACE:include>)
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 # Causes the visibility macros to use dllexport rather than dllimport,
@@ -93,6 +103,15 @@ target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
   rviz_ogre_vendor::OgreMain
   rviz_ogre_vendor::OgreOverlay
+  tinyxml2
+)
+
+target_link_libraries(recipe_parser_test
+  tinyxml2
+)
+
+ament_target_dependencies(recipe_parser_test
+  ament_index_cpp
 )
 
 # Export old-style CMake variables
@@ -118,16 +137,34 @@ install(
   RUNTIME DESTINATION bin
 )
 
+install(PROGRAMS 
+  python/MarkerPublisher.py
+
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(
   DIRECTORY include/
   DESTINATION include/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch
+install(DIRECTORY launch recipies
   DESTINATION share/${PROJECT_NAME})
 
+install(DIRECTORY tests/recipies
+  DESTINATION share/${PROJECT_NAME}/tests)
+
+install(TARGETS recipe_parser_test
+  DESTINATION lib/${PROJECT_NAME}
+)
+  
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/icons"
+  DESTINATION "share/${PROJECT_NAME}"
+)
+
+install(
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config"
   DESTINATION "share/${PROJECT_NAME}"
 )
 

@@ -4,20 +4,31 @@
 #include <chrono>
 #include <string>
 #include <rviz_common/display_context.hpp>
+#include <QVBoxLayout>
+#include <rviz_common/logging.hpp>
+
+#include "riptide_rviz/bringup_recipe.hpp"
+#include "riptide_rviz/BringupClient.hpp"
 
 using namespace std::chrono_literals;
+using namespace std::placeholders;
+
+QVBoxLayout *vbox;
 
 namespace riptide_rviz
 {
     Bringup::Bringup(QWidget *parent) : rviz_common::Panel(parent)
     {
         setFocusPolicy(Qt::ClickFocus);
+        mainParent = parent;
 
         uiPanel = new Ui_Bringup();
         uiPanel->setupUi(this);
 
         auto options = rclcpp::NodeOptions().arguments({});
         clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_bringup", options);
+
+        createScrollArea();
     }
 
     void Bringup::onInitialize()
@@ -31,18 +42,15 @@ namespace riptide_rviz
                 { rclcpp::spin_some(clientNode); });
         spinTimer->start(50);
 
+        uiPanel->bringupStart->setDisabled(true);
+
         // Connect UI signals for bringup
-        // create the bringup timer
-        bringupCheckTimer = new QTimer(this);
-        connect(bringupCheckTimer, &QTimer::timeout, [this](void)
-                { checkBringupStatus(); });
         connect(uiPanel->bringupRefresh, &QPushButton::clicked, [this](void)
                 { bringupListRefresh(); });
         connect(uiPanel->bringupStart, &QPushButton::clicked, [this](void)
                 { startBringup(); });
         connect(uiPanel->bringupHost, SIGNAL(currentIndexChanged(int)), SLOT(handleBringupHost(int)));
-        connect(uiPanel->bringupStop, &QPushButton::clicked, [this](void)
-                { stopBringup(); });
+        connect(uiPanel->bringupFile, SIGNAL(currentTextChanged(const QString &)), SLOT(bringupFileChanged(const QString &)));
     }
 
     void Bringup::load(const rviz_common::Config &config)
@@ -65,11 +73,41 @@ namespace riptide_rviz
         delete uiPanel;
 
         // remove the timers
-        delete spinTimer, bringupCheckTimer;
+        delete spinTimer;
+
+        // free all BringupClients
+        for (auto element : clientList)
+        {
+            delete element;
+        }
+    }
+
+    void Bringup::createScrollArea()
+    {
+        // Add Vertical Box layout to the Scroll area so we can actually add items to it
+        scrollAreaLayout = new QWidget(mainParent);
+        vbox = new QVBoxLayout(scrollAreaLayout);
+        vbox->setAlignment(Qt::AlignTop);
+        vbox->setSpacing(0);
+        scrollAreaLayout->setLayout(vbox);
+        uiPanel->scrollArea->setWidget(scrollAreaLayout);
+    }
+
+    void Bringup::clearScrollArea()
+    {
+        for(auto listObject : clientList)
+        {
+            delete listObject;
+        }
+        clientList.clear();
+
+        delete scrollAreaLayout;
+        createScrollArea();
     }
 
     void Bringup::bringupListRefresh()
     {
+        clearScrollArea();
         // get the list of nodes available
         std::vector<std::string> names = clientNode->get_node_names();
 
@@ -79,7 +117,7 @@ namespace riptide_rviz
         // filter names down to launch nodes
         std::vector<std::string> launchNodes;
         auto filt = [](const auto &s)
-        { return s.find("launch_srv") != std::string::npos; };
+        { return s.find("_launch_manager") != std::string::npos; };
         std::copy_if(names.begin(), names.end(), std::back_inserter(launchNodes), filt);
 
         // make sure we have availiable nodes in the list, otherwise place a blank list entry
@@ -91,7 +129,9 @@ namespace riptide_rviz
                 // push these into the combo box
                 uiPanel->bringupHost->addItem(QString::fromStdString(name.substr(0, name.find_last_of('l') - 1)));
             }
-            uiPanel->bringupStart->setDisabled(false);
+            //Disable while ordered start does is not implemented
+            //TODO remove when staggered launch is working
+            //uiPanel->bringupStart->setDisabled(false);
         }
         else
         {
@@ -100,17 +140,49 @@ namespace riptide_rviz
         }
 
         // clear the list of bringup files
+        uiPanel->bringupFile->blockSignals(true);
         uiPanel->bringupFile->clear();
         uiPanel->bringupFile->addItem("None Selected");
-
+        
         // populate with new files
-        std::string bringupFilesDir = ament_index_cpp::get_package_share_directory(BRINGUP_PKG) + "/launch";
+        bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
         for (const auto &entry : std::filesystem::directory_iterator(bringupFilesDir))
         {
             std::string file = std::string(entry.path());
-            if (file.find(".launch.py") != std::string::npos)
+            if (file.find(".xml") != std::string::npos)
             {
                 uiPanel->bringupFile->addItem(QString::fromStdString(file.substr(file.find_last_of('/') + 1)));
+            }
+        }
+        uiPanel->bringupFile->blockSignals(false);
+    }
+
+    void Bringup::bringupFileChanged(const QString &text)
+    {
+        const std::string stdStrFile = text.toStdString();
+        if(stdStrFile != "None Selected")
+        {
+            RVIZ_COMMON_LOG_INFO("Bringup file changed to: " + stdStrFile);
+            Recipe recipe;
+            auto recipeError = recipe.loadXml(bringupFilesDir + "/" + stdStrFile);
+            if (recipeError.errorCode == RecipeXMLErrorCode::SUCCESS)
+            {
+                auto launchList = recipe.getAllLaunches();
+                std::string hostName = uiPanel->bringupHost->currentText().toStdString();
+                if(hostName != "None Selected")
+                {
+                    for(auto launch : launchList)
+                    {
+                        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, launch, vbox);
+                        clientList.push_back(launchClient);
+                    }
+                    RVIZ_COMMON_LOG_INFO("Loaded XML Successfully");
+                }
+            }
+            else
+            {
+                RVIZ_COMMON_LOG_ERROR("Failed to load XML into Recipe");
+                RVIZ_COMMON_LOG_ERROR(getRecipeXMLErrorMessage(recipeError));
             }
         }
     }
@@ -122,10 +194,18 @@ namespace riptide_rviz
         // make sure the event wasnt generated by us
         if (targetNode != "None Selected")
         {
-            // overwrite the old clients
-            bringupStartClient = clientNode->create_client<launch_msgs::srv::StartLaunch>(targetNode + "/start_launch");
-            bringupListClient = clientNode->create_client<launch_msgs::srv::ListLaunch>(targetNode + "/list_launch");
-            bringupStopClient = clientNode->create_client<launch_msgs::srv::StopLaunch>(targetNode + "/stop_launch");
+            //Selected host is valid, now create action server clients (?)
+            listLaunchSub = clientNode->create_subscription<launch_msgs::msg::ListLaunch>(
+                targetNode + "/launch_status", rclcpp::SystemDefaultsQoS(), std::bind(&Bringup::listLaunchCallback, this, _1)
+            );
+        }
+    }
+
+    void Bringup::listLaunchCallback(const launch_msgs::msg::ListLaunch &msg)
+    {
+        for(auto client : clientList)
+        {
+            client->checkPids(msg);
         }
     }
 
@@ -134,103 +214,82 @@ namespace riptide_rviz
         // make sure that the bringup file is selected
         std::string targetFile = uiPanel->bringupFile->currentText().toStdString();
 
+        // std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch = std::make_shared<riptide_rviz::RecipeLaunch>();
+
+        // RecipeTopicData t1;
+        // t1.name = "/joint_states";
+        // t1.type_name = "sensor_msgs/msg/JointState";
+        // t1.qos_type = "sensor_data";
+
+        // recipeLaunch->name = "dummy_robot_bringup.launch.py";
+        // recipeLaunch->package = "dummy_robot_bringup";
+        // recipeLaunch->topicList.push_back(t1);
+
+
+        // std::string hostName = uiPanel->bringupHost->currentText().toStdString();
+        // if(hostName != "None Selected")
+        // {
+        //     riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, recipeLaunch, vbox);
+        //     clientList.push_back(launchClient);
+        // }
+        
         // validate selection
         if (targetFile != "None" && targetFile != "None Selected")
         {
             // disable the start button and enable the stop button
-            uiPanel->bringupStart->setDisabled(true);
-            uiPanel->bringupStop->setDisabled(false);
+            //uiPanel->bringupStart->setDisabled(true);
             uiPanel->bringupRefresh->setDisabled(true);
 
-            launch_msgs::srv::StartLaunch::Request::SharedPtr startReq = std::make_shared<launch_msgs::srv::StartLaunch::Request>();
-            startReq->launch_file = targetFile;
-            startReq->package = BRINGUP_PKG;
+            
+            // launch_msgs::srv::StartLaunch::Request::SharedPtr startReq = std::make_shared<launch_msgs::srv::StartLaunch::Request>();
+            // startReq->launch_file = targetFile;
+            // startReq->package = BRINGUP_PKG;
 
-            // check client not busy
-            while (!bringupStartClient->wait_for_service(100ms))
-                if (!rclcpp::ok())
-                    return;
+            // // check client not busy
+            // while (!bringupStartClient->wait_for_service(100ms))
+            //     if (!rclcpp::ok())
+            //         return;
 
-            // make the request and wait for the future to be valid
-            auto bringupFuture = bringupStartClient->async_send_request(startReq);
-            if (rclcpp::spin_until_future_complete(clientNode, bringupFuture, 1s) == rclcpp::FutureReturnCode::SUCCESS)
-            {
+            // // make the request and wait for the future to be valid
+            // auto bringupFuture = bringupStartClient->async_send_request(startReq);
+            // if (rclcpp::spin_until_future_complete(clientNode, bringupFuture, 1s) == rclcpp::FutureReturnCode::SUCCESS)
+            // {
 
-                auto result = bringupFuture.get();
-                if (result->started)
-                {
-                    // record the bringup id
-                    bringupID = result->formed_launch.launch_id;
+            //     auto result = bringupFuture.get();
+            //     if (result->started)
+            //     {
+            //         // record the bringup id
+            //         bringupID = result->formed_launch.launch_id;
 
-                    // start the check timer to make sure the service is still alive
-                    bringupCheckTimer->start(BRINGUP_POLLING_RATE);
+            //         // start the check timer to make sure the service is still alive
+            //         bringupCheckTimer->start(BRINGUP_POLLING_RATE);
 
-                    // bail early if everything went okay
-                    return;
-                }
-            }
+            //         // bail early if everything went okay
+            //         return;
+            //     }
+            // }
 
-            bringupID = -1;
+            // bringupID = -1;
 
             // reset the buttons durig an error
             uiPanel->bringupStart->setDisabled(false);
-            uiPanel->bringupStop->setDisabled(true);
             uiPanel->bringupRefresh->setDisabled(false);
         }
     }
 
     void Bringup::checkBringupStatus()
     {
-        launch_msgs::srv::ListLaunch::Request::SharedPtr listReq = std::make_shared<launch_msgs::srv::ListLaunch::Request>();
-        listReq->status = launch_msgs::msg::LaunchID::UNKNOWN;
-
-        auto start = clientNode->get_clock()->now();
-        while (!bringupListClient->wait_for_service(100ms))
-            if (!rclcpp::ok() || clientNode->get_clock()->now() - start > 1s)
-                return;
-
-        auto future = bringupListClient->async_send_request(listReq);
-        if (rclcpp::spin_until_future_complete(clientNode, future, 1s) == rclcpp::FutureReturnCode::SUCCESS)
-        {
-            // find the launch ID we want
-            auto launches = future.get()->launches;
-            for (auto launch : launches)
-            {
-                // we found the one we want and it has died
-                if (launch.launch_id == bringupID && launch.status != launch.RUNNING)
-                {
-                    uiPanel->bringupStart->setDisabled(false);
-                    uiPanel->bringupStop->setDisabled(true);
-                    uiPanel->bringupRefresh->setDisabled(false);
-
-                    bringupCheckTimer->stop();
-                }
-            }
-        }
+        //Modify to check if bringups are still alive
+        //Callback function for a subscriber subscribed to pid alive topic ListLaunch
+        // for (auto client : clientList)
+        // {    
+        //     client->checkPids();
+        // }
     }
 
     void Bringup::stopBringup()
     {
-        launch_msgs::srv::StopLaunch::Request::SharedPtr stopReq = std::make_shared<launch_msgs::srv::StopLaunch::Request>();
-        stopReq->launch_id = bringupID;
-
-        while (!bringupStopClient->wait_for_service(100ms))
-            if (!rclcpp::ok())
-                return;
-
-        auto future = bringupStopClient->async_send_request(stopReq);
-        if (rclcpp::spin_until_future_complete(clientNode, future, 1s) == rclcpp::FutureReturnCode::SUCCESS)
-        {
-            if (future.get()->stopped)
-            {
-                // launch has died, reset buttons
-                uiPanel->bringupStart->setDisabled(false);
-                uiPanel->bringupStop->setDisabled(true);
-                uiPanel->bringupRefresh->setDisabled(false);
-
-                bringupCheckTimer->stop();
-            }
-        }
+        
     }
 
 } // namespace riptide_rviz

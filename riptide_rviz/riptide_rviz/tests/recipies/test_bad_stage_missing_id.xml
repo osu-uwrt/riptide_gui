@@ -1,0 +1,9 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!-- This tests a stage without an id. This input is malformed -->
+<launches>
+    <stage>
+        <launch name="something.launch.py" package="abcdef">
+            <topic name="a" type="t1" qos="system_default"/>
+        </launch>
+    </stage>
+</launches>

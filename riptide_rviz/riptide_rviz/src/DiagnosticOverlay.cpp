@@ -26,12 +26,10 @@ namespace riptide_rviz
         }
 
         robotNsProperty = new rviz_common::properties::StringProperty(
-            "robot_namespace", "/tempest", "Robot namespace to attach to", this
-        );
+            "robot_namespace", "/tempest", "Robot namespace to attach to", this, SLOT(updateNS()));
 
         timeoutProperty = new rviz_common::properties::FloatProperty(
-            "diagnostic_timeout", 10.0, "Maximum time between diagnostic packets before indicators default", this
-        );
+            "diagnostic_timeout", 10.0, "Maximum time between diagnostic packets before default", this);
 
 
     }
@@ -47,10 +45,6 @@ namespace riptide_rviz
         // make the diagnostic subscriber
         diagSub = nodeHandle->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
-        );
-
-        killSub = nodeHandle->create_subscription<riptide_msgs2::msg::RobotState>(
-            robotNsProperty->getStdString() + std::string("/state/robot"), rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::killCallback, this, _1)
         );
 
         // watchdog timers for handling timeouts
@@ -81,6 +75,15 @@ namespace riptide_rviz
         addText(killLedLabel);
     }
 
+    void DiagnosticOverlay::updateNS(){
+        RVIZ_COMMON_LOG_INFO_STREAM("Robot NS update " << robotNsProperty->getStdString());
+        killSub.reset();
+        killSub = nodeHandle->create_subscription<riptide_msgs2::msg::RobotState>(
+            robotNsProperty->getStdString() + "/state/robot", rclcpp::SystemDefaultsQoS(),
+            std::bind(&DiagnosticOverlay::killCallback, this, _1)
+        );
+    }
+
     void DiagnosticOverlay::diagnosticCallback(const diagnostic_msgs::msg::DiagnosticArray & msg){
         // write down the timestamp that it was recieved
         lastDiag = nodeHandle->get_clock()->now();
@@ -90,22 +93,33 @@ namespace riptide_rviz
         for(auto diagnostic : msg.status){
             // handle robot voltage packet
             if(diagnostic.name == "/Robot Diagnostics/Electronics/Voltages and Currents/V+ Rail Voltage"){
+                bool found = false;
                 voltageConfig.text_ = "00.00 V";
                 voltageConfig.text_color_ = QColor(255, 0, 0, 255);
-                if(diagnostic.message.find("No data") == std::string::npos){
-                    // now we need to look at the status of the voltage to determine color
-                    // ok is green, warn is yellow, error is red
-                    if(diagnostic.level == diagnostic.ERROR){
-                        voltageConfig.text_color_ = QColor(255, 0, 0, 255);
-                    } else if (diagnostic.level == diagnostic.WARN){
-                        voltageConfig.text_color_ = QColor(255, 255, 0, 255);
-                    } else {
-                        voltageConfig.text_color_ = QColor(0, 255, 0, 255);
+                
+                for(auto pair : diagnostic.values){
+                    if(pair.key == "V+ Rail Voltage"){
+                        found = true;
+                        voltageConfig.text_ = pair.value;
                     }
-
-                    // TODO find voltage
-                    voltageConfig.text_ = "Not Implemented V";
                 }
+
+                if(!found){
+                    voltageConfig.text_ = "BAD CONV";
+                }
+
+                // now we need to look at the status of the voltage to determine color
+                // ok is green, warn is yellow, error is red
+                if(diagnostic.level == diagnostic.ERROR){
+                    voltageConfig.text_color_ = QColor(255, 0, 0, 255);
+                } else if (diagnostic.level == diagnostic.WARN){
+                    voltageConfig.text_color_ = QColor(255, 255, 0, 255);
+                } else if (diagnostic.level == diagnostic.STALE){
+                    diagLedConfig.inner_color_ = QColor(255, 0, 255, 255);
+                } else {
+                    voltageConfig.text_color_ = QColor(0, 255, 0, 255);
+                }
+                
 
                 // edit the text
                 updateText(voltageTextId, voltageConfig);
@@ -118,6 +132,8 @@ namespace riptide_rviz
                     diagLedConfig.inner_color_ = QColor(255, 0, 0, 255);
                 } else if (diagnostic.level == diagnostic.WARN){
                     diagLedConfig.inner_color_ = QColor(255, 255, 0, 255);
+                } else if (diagnostic.level == diagnostic.STALE){
+                    diagLedConfig.inner_color_ = QColor(255, 0, 255, 255);
                 } else {
                     diagLedConfig.inner_color_ = QColor(0, 255, 0, 255);
                 }
@@ -159,7 +175,6 @@ namespace riptide_rviz
     
     void DiagnosticOverlay::onDisable(){
         OverlayDisplay::onDisable();
-        
     }
     
     void DiagnosticOverlay::update(float wall_dt, float ros_dt){
