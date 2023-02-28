@@ -6,7 +6,7 @@
         <launch name="hardware.launch.py" package="riptide_hardware2">
             <arg name="robot" value="talos"/>
             <topic name="/talos/state/firmware" type="riptide_msgs2/msg/FirmwareState" qos="sensor_data"/>
-            <topic name="/talos/dvl/twist" type="geometry_msgs/msg/TwistWithCovarianceStamped" qos="sensor_data"/>
+            <topic name="/talos/dvl_twist" type="geometry_msgs/msg/TwistWithCovarianceStamped" qos="sensor_data"/>
             <topic name="/talos/vectornav/imu" type="sensor_msgs/msg/Imu" qos="sensor_data"/>
             <topic name="/talos/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
         </launch>
