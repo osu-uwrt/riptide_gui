@@ -40,12 +40,15 @@
     <stage id="mapping">
         <dependency id="controller"/>
 
-        <launch name="mapping.launch.py" package="riptide_mapping2"/>
+        <launch name="mapping.launch.py" package="riptide_mapping2">
+            <arg name="robot" value="talos"/>
+        </launch>
     </stage>
-
 
     <stage id="autonomy">
         <dependency id="mapping"/>
-        <launch name="autonomy.launch.py" package="riptide_autonomy2"/>
+        <launch name="autonomy.launch.py" package="riptide_autonomy2">
+            <arg name="robot" value="talos"/>
+        </launch>
     </stage>
 </launches>
