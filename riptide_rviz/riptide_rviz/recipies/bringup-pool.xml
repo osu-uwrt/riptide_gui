@@ -17,7 +17,7 @@
         <dependency id="hardware"/>
 
         <launch name="navigation.launch.py" package="riptide_hardware2">
-            <arg name="namespace" value="talos"/>
+            <arg name="robot" value="talos"/>
 
             <topic name="/talos/joint_states" type="sensor_msgs/msg/JointState" qos="system_default"/>
             <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
