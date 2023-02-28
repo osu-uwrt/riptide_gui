@@ -6,6 +6,7 @@
 using namespace std::chrono_literals;
 using namespace std::placeholders;
 
+
 namespace riptide_rviz
 {
     Actuators::Actuators(QWidget *parent) : rviz_common::Panel(parent)
@@ -17,12 +18,6 @@ namespace riptide_rviz
 
         auto options = rclcpp::NodeOptions().arguments({});
         clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_actuators", options);
-
-        //strings below are placeholders
-        armTorpedoDropper = rclcpp_action::create_client<ArmTorpedoDropper>(clientNode, "/tempest/arm_actuators");
-        changeClawState = rclcpp_action::create_client<ChangeClawState>(clientNode, "/tempest/change_claw_state");
-        actuateTorpedos = rclcpp_action::create_client<ActuateTorpedos>(clientNode, "/tempest/actuate_torpedos");
-        actuateDroppers = rclcpp_action::create_client<ActuateDroppers>(clientNode, "/tempest/actuate_droppers");
     }
 
     void Actuators::onInitialize()
@@ -229,11 +224,33 @@ namespace riptide_rviz
     void Actuators::load(const rviz_common::Config &config)
     {
         rviz_common::Panel::load(config);
+
+        // create our value containers
+        QString * str = new QString();
+        float * configVal = new float();
+
+        // load the namesapce param
+        if(config.mapGetString("robot_namespace", str)){
+            robot_ns = str->toStdString();
+        } else {
+            // default value
+            robot_ns = "/talos";
+            RVIZ_COMMON_LOG_WARNING("Loading default value for 'namespace'");
+        }
+
+        // now init the clients
+        armTorpedoDropper = rclcpp_action::create_client<ArmTorpedoDropper>(clientNode, robot_ns + "/arm_actuators");
+        changeClawState = rclcpp_action::create_client<ChangeClawState>(clientNode, robot_ns + "/change_claw_state");
+        actuateTorpedos = rclcpp_action::create_client<ActuateTorpedos>(clientNode, robot_ns + "/actuate_torpedos");
+        actuateDroppers = rclcpp_action::create_client<ActuateDroppers>(clientNode, robot_ns + "/actuate_droppers");
     }
 
     void Actuators::save(rviz_common::Config config) const
     {
         rviz_common::Panel::save(config);
+
+        // write our config values
+        config.mapSetValue("robot_namespace", QString::fromStdString(robot_ns));
     }
 
     bool Actuators::event(QEvent *event)

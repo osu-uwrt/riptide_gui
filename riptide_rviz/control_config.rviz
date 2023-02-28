@@ -36,13 +36,14 @@ Panels:
   - Class: riptide_rviz/ControlPanel
     Name: ControlPanel
     max_depth_in_place: -0.5
-    namespace: /tempest
+    robot_namespace: /talos
     odom_timeout: 2.5
     tgt_in_place_depth: -0.75
   - Class: riptide_rviz/Bringup
     Name: Bringup
   - Class: riptide_rviz/Actuators
     Name: Actuators
+    robot_namespace: /talos
   - Class: rviz_common/Transformation
     Name: Transformation
 Visualization Manager:
@@ -374,7 +375,7 @@ Visualization Manager:
       height: 128
       hor_alignment: left
       hor_dist: 0
-      robot_namespace: /tempest
+      robot_namespace: /talos
       ver_alignment: top
       ver_dist: 0
       width: 128

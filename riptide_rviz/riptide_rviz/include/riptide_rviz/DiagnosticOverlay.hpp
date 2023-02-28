@@ -34,6 +34,7 @@ namespace riptide_rviz
 
         protected Q_SLOTS:
         void updateFont();
+        void updateNS();
 
         private:
         // internal node

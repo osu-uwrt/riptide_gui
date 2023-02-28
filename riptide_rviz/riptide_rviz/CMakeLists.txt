@@ -59,6 +59,8 @@ add_library(${PROJECT_NAME} SHARED
             ${UI_HEADERS}
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE ROBOT_NS="talos")
+
 # TODO: Maybe make bringup_recipe it's own library?
 add_executable(recipe_parser_test tests/recipe_parser_tests.cpp src/bringup_recipe.cpp)
 

@@ -63,7 +63,8 @@ namespace riptide_rviz
         rclcpp::Subscription<riptide_msgs2::msg::TreeStack>::SharedPtr stackSub;
         rclcpp::Client<riptide_msgs2::srv::ListTrees>::SharedPtr refreshClient;
         rclcpp_action::Client<ExecuteTree>::SharedPtr actionServer;
-        // void discover_ns();
+        
+        std::string robot_ns;
     };
 
 } // namespace riptide_rviz

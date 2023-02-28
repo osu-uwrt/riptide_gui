@@ -77,6 +77,7 @@ namespace riptide_rviz
 
         //process vars
         bool armed_flag;
+        std::string robot_ns;
 
     };
 

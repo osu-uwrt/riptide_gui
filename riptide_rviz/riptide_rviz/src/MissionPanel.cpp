@@ -1,6 +1,7 @@
 #include "riptide_rviz/MissionPanel.hpp"
 #include <chrono>
 #include <algorithm>
+#include <rviz_common/logging.hpp>
 
 using namespace std::chrono_literals;
 using namespace std::placeholders;
@@ -18,13 +19,6 @@ namespace riptide_rviz
         clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_mission", options);
 
         treeList = std::vector<std::string>();
-
-        actionServer = rclcpp_action::create_client<ExecuteTree>(clientNode, "/tempest/autonomy/run_tree");
-    
-        stackSub = clientNode->create_subscription<riptide_msgs2::msg::TreeStack>(
-            "/tempest/autonomy/tree_stack", rclcpp::SystemDefaultsQoS(),
-            std::bind(&MissionPanel::stackCb, this, _1)
-        );
     }
 
     void MissionPanel::onInitialize()
@@ -52,19 +46,46 @@ namespace riptide_rviz
                 { cancelTask(); });
         connect(uiPanel->btRefresh, &QPushButton::clicked, [this](void)
                 { refresh(); });
-
-        // refresh the UI
-        refresh();
     }
 
     void MissionPanel::load(const rviz_common::Config &config)
     {
         rviz_common::Panel::load(config);
+
+        RVIZ_COMMON_LOG_INFO("Loaded parent panel config");
+
+        // create our value containers
+        QString * str = new QString();
+        float * configVal = new float();
+
+        // load the namesapce param
+        if(config.mapGetString("robot_namespace", str)){
+            robot_ns = str->toStdString();
+        } else {
+            // default value
+            robot_ns = "/talos";
+            RVIZ_COMMON_LOG_WARNING("Loading default value for 'namespace'");
+        }
+
+        actionServer = rclcpp_action::create_client<ExecuteTree>(clientNode, robot_ns + "/autonomy/run_tree");
+    
+        stackSub = clientNode->create_subscription<riptide_msgs2::msg::TreeStack>(
+            robot_ns + "/autonomy/tree_stack", rclcpp::SystemDefaultsQoS(),
+            std::bind(&MissionPanel::stackCb, this, _1)
+        );
+
+        refreshClient = clientNode->create_client<riptide_msgs2::srv::ListTrees>(robot_ns + "/autonomy/list_trees");
+
+        // refresh the UI
+        refresh();
     }
 
     void MissionPanel::save(rviz_common::Config config) const
     {
         rviz_common::Panel::save(config);
+
+        // write our config values
+        config.mapSetValue("robot_namespace", QString::fromStdString(robot_ns));
     }
 
     bool MissionPanel::event(QEvent *event)
@@ -86,8 +107,6 @@ namespace riptide_rviz
             uiPanel->btStart->setEnabled(true);
             uiPanel->btStop->setEnabled(false);
         }
-
-        refreshClient = clientNode->create_client<riptide_msgs2::srv::ListTrees>("/tempest/autonomy/list_trees");
 
         riptide_msgs2::srv::ListTrees::Request::SharedPtr startReq = std::make_shared<riptide_msgs2::srv::ListTrees::Request>();
         auto start = clientNode->get_clock()->now();

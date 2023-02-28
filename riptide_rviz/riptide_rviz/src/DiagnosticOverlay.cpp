@@ -26,12 +26,10 @@ namespace riptide_rviz
         }
 
         robotNsProperty = new rviz_common::properties::StringProperty(
-            "robot_namespace", "/tempest", "Robot namespace to attach to", this
-        );
+            "robot_namespace", "/tempest", "Robot namespace to attach to", this, SLOT(updateNS()));
 
         timeoutProperty = new rviz_common::properties::FloatProperty(
-            "diagnostic_timeout", 10.0, "Maximum time between diagnostic packets before indicators default", this
-        );
+            "diagnostic_timeout", 10.0, "Maximum time between diagnostic packets before default", this);
 
 
     }
@@ -47,10 +45,6 @@ namespace riptide_rviz
         // make the diagnostic subscriber
         diagSub = nodeHandle->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
-        );
-
-        killSub = nodeHandle->create_subscription<riptide_msgs2::msg::RobotState>(
-            robotNsProperty->getStdString() + std::string("/state/robot"), rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::killCallback, this, _1)
         );
 
         // watchdog timers for handling timeouts
@@ -79,6 +73,15 @@ namespace riptide_rviz
         };
         addText(diagLedLabel);
         addText(killLedLabel);
+    }
+
+    void DiagnosticOverlay::updateNS(){
+        RVIZ_COMMON_LOG_INFO_STREAM("Robot NS update " << robotNsProperty->getStdString());
+        killSub.reset();
+        killSub = nodeHandle->create_subscription<riptide_msgs2::msg::RobotState>(
+            robotNsProperty->getStdString() + "/state/robot", rclcpp::SystemDefaultsQoS(),
+            std::bind(&DiagnosticOverlay::killCallback, this, _1)
+        );
     }
 
     void DiagnosticOverlay::diagnosticCallback(const diagnostic_msgs::msg::DiagnosticArray & msg){
@@ -159,7 +162,6 @@ namespace riptide_rviz
     
     void DiagnosticOverlay::onDisable(){
         OverlayDisplay::onDisable();
-        
     }
     
     void DiagnosticOverlay::update(float wall_dt, float ros_dt){
