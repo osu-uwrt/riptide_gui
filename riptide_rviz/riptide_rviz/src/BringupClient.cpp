@@ -1,5 +1,6 @@
 #include "riptide_rviz/BringupClient.hpp"
 #include <rviz_common/logging.hpp>
+#include <sstream>
 
 namespace riptide_rviz
 {
@@ -91,6 +92,19 @@ namespace riptide_rviz
     {
         int completedCount = static_cast<int>(feedback->completed_topics);
         listElement->progressBar->setValue(completedCount);
+
+        if (feedback->uncompleted_topic_names.size() != 0) {
+            std::ostringstream topicToolTip;
+            topicToolTip << "Waiting on. . .\n";
+
+            for (std::string topic : feedback->uncompleted_topic_names) {
+                topicToolTip << "\t* " << topic << "\n";
+            }
+
+            listElement->progressBar->setToolTip(QString::fromStdString(topicToolTip.str()));
+        } else {
+            listElement->progressBar->setToolTip("Waiting on no topics");
+        }
     }
 
     void BringupClient::BU_start_result_cb(const GHBringupStart::WrappedResult & result)
@@ -110,6 +124,14 @@ namespace riptide_rviz
         listElement->progressBar->setValue(0);
         listElement->progressBar->setStyleSheet("");
         listElement->progressBar->setFormat("%v/%m");
+
+        std::ostringstream topicToolTip;
+        topicToolTip << "Waiting on. . .\n";
+        for (RecipeTopicData topic : recipeLaunchData->topicList) {
+            topicToolTip << "\t* " << topic.name << "\n";
+        }
+
+        listElement->progressBar->setToolTip(QString::fromStdString(topicToolTip.str()));
 
         auto goal_msg = BringupStart::Goal();
         goal_msg.launch_file = recipeLaunchData->name;
