@@ -32,9 +32,16 @@ namespace riptide_rviz
         //Change format of progress bar
         auto topicCount = recipeLaunch->topicList.size();
         maxTopics = static_cast<int>(topicCount);
-        listElement->progressBar->setMaximum(maxTopics);
-        listElement->progressBar->setFormat("%v/%m");
 
+        // If there are no topics, make sure the tool bar doesn't automatically
+        // fill up
+        if (maxTopics == 0) {
+            listElement->progressBar->setMaximum(1);
+            listElement->progressBar->setTextVisible(false);
+        } else {
+            listElement->progressBar->setMaximum(maxTopics);
+            listElement->progressBar->setFormat("%v/%m");
+        }
         //Create two action clients one for bringup start, one for bringup stop
         RVIZ_COMMON_LOG_INFO("BringupClient: Hostname is:" + hostName + "/bringup_start");
         bringupStart = rclcpp_action::create_client<BringupStart>(clientNode, hostName + "/bringup_start");
@@ -114,6 +121,10 @@ namespace riptide_rviz
         listElement->stopButton->setEnabled(true);
         listElement->startButton->setDisabled(true);
         started = true;
+
+        if (recipeLaunchData->topicList.size() == 0) {
+            listElement->progressBar->setValue(1);
+        }
     }
 
     //Create two callbacks for start and stop buttons
