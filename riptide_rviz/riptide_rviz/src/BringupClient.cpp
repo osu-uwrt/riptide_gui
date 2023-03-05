@@ -9,6 +9,7 @@ namespace riptide_rviz
     BringupClient::BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent)
     {
         started = false;
+        completedLaunch = false;
         listElement = new Ui_BringupListElement();
         listElement->setupUi(this);
         parent->addWidget(this);
@@ -121,6 +122,8 @@ namespace riptide_rviz
         listElement->stopButton->setEnabled(true);
         listElement->startButton->setDisabled(true);
         started = true;
+        //TODO this casues errors in the actual staggered launch
+        completedLaunch = true;
 
         if (recipeLaunchData->topicList.size() == 0) {
             listElement->progressBar->setValue(1);
@@ -207,5 +210,10 @@ namespace riptide_rviz
                 listElement->stopButton->setDisabled(true);
             }
         }
+    }
+
+    bool BringupClient::complete()
+    {
+        return completedLaunch;
     }
 }
