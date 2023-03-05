@@ -85,6 +85,8 @@ namespace riptide_rviz
         listElement->progressBar->setValue(listElement->progressBar->maximum());
         listElement->startButton->setEnabled(true);
         listElement->progressBar->setValue(0);
+
+        listElement->progressBar->setToolTip(QString());
     }
 
     //Callback functions for BringupStart Client
@@ -206,6 +208,7 @@ namespace riptide_rviz
                 listElement->progressBar->setValue(0);
                 listElement->progressBar->setStyleSheet("QProgressBar {color: white; background: rgb(140, 100, 100);}");
                 listElement->progressBar->setFormat("ERROR");
+                listElement->progressBar->setToolTip(QString());
                 listElement->startButton->setEnabled(true);
                 listElement->stopButton->setDisabled(true);
             }
