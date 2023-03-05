@@ -1,0 +1,54 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<launches>
+
+    <stage id="hardware">
+        <launch name="hardware.launch.py" package="riptide_hardware2">
+            <arg name="robot" value="puddles"/>
+            <topic name="/puddles/state/firmware" type="riptide_msgs2/msg/FirmwareStatus" qos="system_default"/>
+            <!-- TODO(hseachrist): Add the visual odometry topic -->
+            <topic name="/puddles/vectornav/imu" type="sensor_msgs/msg/Imu" qos="sensor_data"/>
+            <topic name="/puddles/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
+        </launch>
+    </stage>
+
+
+    <stage id="navigation">
+        <dependency id="hardware"/>
+
+        <launch name="navigation.launch.py" package="riptide_hardware2">
+            <arg name="robot" value="puddles"/>
+
+            <topic name="/puddles/joint_states" type="sensor_msgs/msg/JointState" qos="system_default"/>
+            <topic name="/puddles/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
+            <topic name="/puddles/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
+            <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        </launch>
+    </stage>
+
+
+    <stage id="controller">
+        <dependency id="navigation"/>
+
+        <launch name="controller.launch.py" package="riptide_controllers2">
+            <arg name="robot" value="puddles"/>
+
+            <topic name="/puddles/controller/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+        </launch>
+    </stage>
+
+    <!-- <stage id="mapping">
+        <dependency id="controller"/>
+
+        <launch name="mapping.launch.py" package="riptide_mapping2">
+            <arg name="robot" value="puddles"/>
+        </launch>
+    </stage> -->
+
+    <!-- <stage id="autonomy">
+        <dependency id="mapping"/>
+        <launch name="autonomy.launch.py" package="riptide_autonomy2">
+            <arg name="robot" value="puddles"/>
+        </launch>
+    </stage> -->
+</launches>
