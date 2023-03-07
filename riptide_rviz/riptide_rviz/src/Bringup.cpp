@@ -171,7 +171,7 @@ namespace riptide_rviz
                 {
                     for(auto launch : launchList)
                     {
-                        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, launch, vbox);
+                        riptide_rviz::BringupClient *launchClient = new riptide_rviz::BringupClient(hostName, clientNode, launch, vbox, mainParent);
                         clientList.push_back(launchClient);
                     }
                     RVIZ_COMMON_LOG_INFO("Loaded XML Successfully");

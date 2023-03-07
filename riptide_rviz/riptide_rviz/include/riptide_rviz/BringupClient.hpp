@@ -24,7 +24,7 @@ namespace riptide_rviz
     class BringupClient : public QWidget
     {
         public:
-            BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent);
+            BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent, QWidget *overallParent);
             void checkPids(launch_msgs::msg::ListLaunch launchMsgs);
             bool complete();
             void startButtonCallback();
@@ -46,5 +46,8 @@ namespace riptide_rviz
             void BU_end_goal_response_cb(const GHBringupEnd::SharedPtr & goal_handle);
             void BU_end_feedback_cb(GHBringupEnd::SharedPtr, const std::shared_ptr<const BringupEnd::Feedback> feedback);
             void BU_end_result_cb(const GHBringupEnd::WrappedResult & result);
+            void setProgBarError(std::string msg);
+            void resetProgBar();
+            QWidget *mainParent;
     };
 }
