@@ -12,6 +12,8 @@ namespace riptide_rviz
     {
         started = false;
         completedLaunch = false;
+        hasErrored = false;
+
         listElement = new Ui_BringupListElement();
         listElement->setupUi(this);
         parent->addWidget(this);
@@ -138,6 +140,7 @@ namespace riptide_rviz
         else if(result.code == rclcpp_action::ResultCode::ABORTED)
         {
             setProgBarError("ERROR: Launch");
+            hasErrored = true;
         }
     }
 
@@ -247,5 +250,10 @@ namespace riptide_rviz
     void BringupClient::resetProgBar()
     {
         //Not needed for now
+    }
+
+    bool BringupClient::hasError()
+    {
+        return hasErrored;
     }
 }

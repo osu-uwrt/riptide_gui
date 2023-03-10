@@ -27,6 +27,7 @@ namespace riptide_rviz
             BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent, QWidget *overallParent);
             void checkPids(launch_msgs::msg::ListLaunch launchMsgs);
             bool complete();
+            bool hasError();
             void startButtonCallback();
 
         private:
@@ -39,6 +40,7 @@ namespace riptide_rviz
             int maxTopics;
             bool started;
             bool completedLaunch;
+            bool hasErrored;
             void BU_start_goal_response_cb(const GHBringupStart::SharedPtr & goal_handle);
             void BU_start_feedback_cb(GHBringupStart::SharedPtr, const std::shared_ptr<const BringupStart::Feedback> feedback);
             void BU_start_result_cb(const GHBringupStart::WrappedResult & result);

@@ -154,6 +154,8 @@ namespace riptide_rviz
             }
         }
         uiPanel->bringupFile->blockSignals(false);
+
+        uiPanel->bringupStart->setDisabled(true);
     }
 
     void Bringup::bringupFileChanged(const QString &text)
@@ -226,6 +228,7 @@ namespace riptide_rviz
         std::string targetFile = uiPanel->bringupFile->currentText().toStdString();
         if (targetFile != "None" && targetFile != "None Selected")
         {
+            stage = 0;
             RVIZ_COMMON_LOG_INFO("Staged Launch Started");
             uiPanel->bringupStart->setDisabled(true);
             totalStages = recipe->getLaunchOrder().size();
@@ -252,7 +255,12 @@ namespace riptide_rviz
                 else
                 {
                     RVIZ_COMMON_LOG_INFO("Checking launch file");
-                    complete = complete && clientList.at(launchFileIndex)->complete();
+                    auto client = clientList.at(launchFileIndex);
+                    if(client->hasError())
+                    {
+                        stagedTimer->stop();
+                    }
+                    complete = complete && client->complete();
                 }
             }
 
