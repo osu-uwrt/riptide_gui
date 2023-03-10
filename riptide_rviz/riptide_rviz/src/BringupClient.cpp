@@ -213,7 +213,6 @@ namespace riptide_rviz
             listElement->startButton->setDisabled(true);
             listElement->stopButton->setDisabled(true);
         }
-
     }
     
     void BringupClient::checkPids(launch_msgs::msg::ListLaunch launchMsgs)

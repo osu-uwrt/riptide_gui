@@ -59,7 +59,7 @@ namespace riptide_rviz
         void stagedBringupTick();
         int stage = 0;
         int totalStages = 0;
-        Recipe recipe;
+        std::shared_ptr<riptide_rviz::Recipe> recipe;
         QTimer *stagedTimer;
         bool startTick = true;
 

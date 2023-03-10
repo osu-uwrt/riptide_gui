@@ -29,6 +29,7 @@ namespace riptide_rviz
         clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_bringup", options);
 
         createScrollArea();
+        recipe = std::make_shared<riptide_rviz::Recipe>();
     }
 
     void Bringup::onInitialize()
@@ -110,7 +111,6 @@ namespace riptide_rviz
         clearScrollArea();
         // get the list of nodes available
         std::vector<std::string> names = clientNode->get_node_names();
-
         // clear the entries in the combo boxes
         uiPanel->bringupHost->clear();
 
@@ -158,14 +158,18 @@ namespace riptide_rviz
 
     void Bringup::bringupFileChanged(const QString &text)
     {
+        clearScrollArea();
         const std::string stdStrFile = text.toStdString();
         if(stdStrFile != "None Selected")
         {
             RVIZ_COMMON_LOG_INFO("Bringup file changed to: " + stdStrFile);
-            auto recipeError = recipe.loadXml(bringupFilesDir + "/" + stdStrFile);
+            recipe.reset();
+            recipe = std::make_shared<riptide_rviz::Recipe>();
+            auto recipeError = recipe->loadXml(bringupFilesDir + "/" + stdStrFile);
             if (recipeError.errorCode == RecipeXMLErrorCode::SUCCESS)
             {
-                auto launchList = recipe.getAllLaunches();
+                uiPanel->bringupStart->setEnabled(true);
+                auto launchList = recipe->getAllLaunches();
                 std::string hostName = uiPanel->bringupHost->currentText().toStdString();
                 if(hostName != "None Selected")
                 {
@@ -176,7 +180,7 @@ namespace riptide_rviz
                     }
                     RVIZ_COMMON_LOG_INFO("Loaded XML Successfully");
                     RVIZ_COMMON_LOG_INFO("Printing launch sequence");
-                    for(auto stage : recipe.getLaunchOrder())
+                    for(auto stage : recipe->getLaunchOrder())
                     {
                         for (auto topic : stage)
                         {
@@ -224,7 +228,7 @@ namespace riptide_rviz
         {
             RVIZ_COMMON_LOG_INFO("Staged Launch Started");
             uiPanel->bringupStart->setDisabled(true);
-            totalStages = recipe.getLaunchOrder().size();
+            totalStages = recipe->getLaunchOrder().size();
             stagedTimer = new QTimer(this);
             connect(stagedTimer, &QTimer::timeout, [this](void) { Bringup::stagedBringupTick(); });
             stagedTimer->setInterval(500);
@@ -236,7 +240,7 @@ namespace riptide_rviz
     void Bringup::stagedBringupTick()
     {
             bool complete = true;
-            auto launchFileIndexes = recipe.getLaunchOrder().at(stage);
+            auto launchFileIndexes = recipe->getLaunchOrder().at(stage);
             for(auto launchFileIndex : launchFileIndexes)
             {
                 if(startTick)
@@ -260,7 +264,7 @@ namespace riptide_rviz
                 startTick = true;
                 if(stage == totalStages)
                 {
-                    uiPanel->bringupStart->setEnabled(true);
+                    //uiPanel->bringupStart->setEnabled(true);
                     stage = 0;
                     stagedTimer->stop();
                 }
