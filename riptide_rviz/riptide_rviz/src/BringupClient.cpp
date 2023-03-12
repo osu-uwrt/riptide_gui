@@ -1,16 +1,23 @@
 #include "riptide_rviz/BringupClient.hpp"
 #include <rviz_common/logging.hpp>
+#include <sstream>
+#include <QMessageBox>
+
 
 namespace riptide_rviz
 {
     using namespace std::placeholders;
 
-    BringupClient::BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent)
+    BringupClient::BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent, QWidget *overallParent)
     {
         started = false;
+        completedLaunch = false;
+        hasErrored = false;
+
         listElement = new Ui_BringupListElement();
         listElement->setupUi(this);
         parent->addWidget(this);
+        mainParent = overallParent;
 
         clientNode = parentNode;
         recipeLaunchData = recipeLaunch;
@@ -31,9 +38,16 @@ namespace riptide_rviz
         //Change format of progress bar
         auto topicCount = recipeLaunch->topicList.size();
         maxTopics = static_cast<int>(topicCount);
-        listElement->progressBar->setMaximum(maxTopics);
-        listElement->progressBar->setFormat("%v/%m");
 
+        // If there are no topics, make sure the tool bar doesn't automatically
+        // fill up
+        if (maxTopics == 0) {
+            listElement->progressBar->setMaximum(1);
+            listElement->progressBar->setTextVisible(false);
+        } else {
+            listElement->progressBar->setMaximum(maxTopics);
+            listElement->progressBar->setFormat("%v/%m");
+        }
         //Create two action clients one for bringup start, one for bringup stop
         RVIZ_COMMON_LOG_INFO("BringupClient: Hostname is:" + hostName + "/bringup_start");
         bringupStart = rclcpp_action::create_client<BringupStart>(clientNode, hostName + "/bringup_start");
@@ -76,6 +90,8 @@ namespace riptide_rviz
         listElement->progressBar->setValue(listElement->progressBar->maximum());
         listElement->startButton->setEnabled(true);
         listElement->progressBar->setValue(0);
+
+        listElement->progressBar->setToolTip(QString());
     }
 
     //Callback functions for BringupStart Client
@@ -91,6 +107,19 @@ namespace riptide_rviz
     {
         int completedCount = static_cast<int>(feedback->completed_topics);
         listElement->progressBar->setValue(completedCount);
+
+        if (feedback->uncompleted_topic_names.size() != 0) {
+            std::ostringstream topicToolTip;
+            topicToolTip << "Waiting on. . .\n";
+
+            for (std::string topic : feedback->uncompleted_topic_names) {
+                topicToolTip << "\t* " << topic << "\n";
+            }
+
+            listElement->progressBar->setToolTip(QString::fromStdString(topicToolTip.str()));
+        } else {
+            listElement->progressBar->setToolTip("Waiting on no topics");
+        }
     }
 
     void BringupClient::BU_start_result_cb(const GHBringupStart::WrappedResult & result)
@@ -99,7 +128,20 @@ namespace riptide_rviz
         RVIZ_COMMON_LOG_INFO("BU_start_result_cb: pid to look for is " + pid);
         listElement->stopButton->setEnabled(true);
         listElement->startButton->setDisabled(true);
-        started = true;
+        if(result.code == rclcpp_action::ResultCode::SUCCEEDED)
+        {
+            started = true;
+            completedLaunch = true;
+
+            if (recipeLaunchData->topicList.size() == 0) {
+                listElement->progressBar->setValue(1);
+            }
+        }
+        else if(result.code == rclcpp_action::ResultCode::ABORTED)
+        {
+            setProgBarError("ERROR: Launch");
+            hasErrored = true;
+        }
     }
 
     //Create two callbacks for start and stop buttons
@@ -107,9 +149,18 @@ namespace riptide_rviz
     void BringupClient::startButtonCallback()
     {
         RVIZ_COMMON_LOG_DEBUG("startButtonCallback: Launch file start button pressed");
+        started = false;
         listElement->progressBar->setValue(0);
         listElement->progressBar->setStyleSheet("");
         listElement->progressBar->setFormat("%v/%m");
+
+        std::ostringstream topicToolTip;
+        topicToolTip << "Waiting on. . .\n";
+        for (RecipeTopicData topic : recipeLaunchData->topicList) {
+            topicToolTip << "\t* " << topic.name << "\n";
+        }
+
+        listElement->progressBar->setToolTip(QString::fromStdString(topicToolTip.str()));
 
         auto goal_msg = BringupStart::Goal();
         goal_msg.launch_file = recipeLaunchData->name;
@@ -149,10 +200,22 @@ namespace riptide_rviz
         send_goal_options.goal_response_callback = std::bind(&BringupClient::BU_start_goal_response_cb, this, _1);
         send_goal_options.feedback_callback = std::bind(&BringupClient::BU_start_feedback_cb, this, _1, _2);
         send_goal_options.result_callback = std::bind(&BringupClient::BU_start_result_cb, this, _1);
-        bringupStart->async_send_goal(goal_msg, send_goal_options);
-
-        listElement->startButton->setDisabled(true);
-        listElement->stopButton->setDisabled(true);
+        if(!bringupStart->action_server_is_ready())
+        {
+            QMessageBox *mbox = new QMessageBox(mainParent);
+            mbox->setText("Error");
+            mbox->setInformativeText("Action server has gone offline");
+            mbox->setStandardButtons(QMessageBox::Ok);
+            mbox->setDefaultButton(QMessageBox::Ok);
+            mbox->setIcon(QMessageBox::Critical);
+            mbox->show();
+        }
+        else
+        {
+            bringupStart->async_send_goal(goal_msg, send_goal_options);
+            listElement->startButton->setDisabled(true);
+            listElement->stopButton->setDisabled(true);
+        }
     }
     
     void BringupClient::checkPids(launch_msgs::msg::ListLaunch launchMsgs)
@@ -165,14 +228,32 @@ namespace riptide_rviz
                 if(pid == runningPid) seen = true;
             }
             
-            if(!seen)
-            {
-                listElement->progressBar->setValue(0);
-                listElement->progressBar->setStyleSheet("QProgressBar {color: white; background: rgb(140, 100, 100);}");
-                listElement->progressBar->setFormat("ERROR");
-                listElement->startButton->setEnabled(true);
-                listElement->stopButton->setDisabled(true);
-            }
+            if(!seen) setProgBarError("ERROR: PID Term");
         }
+    }
+
+    bool BringupClient::complete()
+    {
+        return completedLaunch;
+    }
+
+    void BringupClient::setProgBarError(std::string msg)
+    {
+        listElement->progressBar->setValue(0);
+        listElement->progressBar->setStyleSheet("QProgressBar {color: white; background: rgb(140, 100, 100);}");
+        listElement->progressBar->setFormat(QString::fromStdString(msg));
+        listElement->progressBar->setToolTip(QString());
+        listElement->startButton->setEnabled(true);
+        listElement->stopButton->setDisabled(true);
+    }
+
+    void BringupClient::resetProgBar()
+    {
+        //Not needed for now
+    }
+
+    bool BringupClient::hasError()
+    {
+        return hasErrored;
     }
 }

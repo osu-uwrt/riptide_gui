@@ -56,6 +56,12 @@ namespace riptide_rviz
         void createScrollArea();
         void clearScrollArea();
         void listLaunchCallback(const launch_msgs::msg::ListLaunch &msg);
+        void stagedBringupTick();
+        int stage = 0;
+        int totalStages = 0;
+        std::shared_ptr<riptide_rviz::Recipe> recipe;
+        QTimer *stagedTimer;
+        bool startTick = true;
 
     };
 

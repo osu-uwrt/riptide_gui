@@ -24,8 +24,11 @@ namespace riptide_rviz
     class BringupClient : public QWidget
     {
         public:
-            BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent);
+            BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent, QWidget *overallParent);
             void checkPids(launch_msgs::msg::ListLaunch launchMsgs);
+            bool complete();
+            bool hasError();
+            void startButtonCallback();
 
         private:
             Ui_BringupListElement *listElement;
@@ -36,13 +39,17 @@ namespace riptide_rviz
             int pid;
             int maxTopics;
             bool started;
+            bool completedLaunch;
+            bool hasErrored;
             void BU_start_goal_response_cb(const GHBringupStart::SharedPtr & goal_handle);
             void BU_start_feedback_cb(GHBringupStart::SharedPtr, const std::shared_ptr<const BringupStart::Feedback> feedback);
             void BU_start_result_cb(const GHBringupStart::WrappedResult & result);
-            void startButtonCallback();
             void stopButtonCallback();
             void BU_end_goal_response_cb(const GHBringupEnd::SharedPtr & goal_handle);
             void BU_end_feedback_cb(GHBringupEnd::SharedPtr, const std::shared_ptr<const BringupEnd::Feedback> feedback);
             void BU_end_result_cb(const GHBringupEnd::WrappedResult & result);
+            void setProgBarError(std::string msg);
+            void resetProgBar();
+            QWidget *mainParent;
     };
 }
