@@ -28,7 +28,7 @@ def generate_launch_description():
 
                 DeclareLaunchArgument(
                     "control_config_file",
-                    default_value=["control_config_", LC("robot"), ".xml"]
+                    default_value=["control_config_", LC("robot"), ".rviz"]
                 ),
 
                 DeclareLaunchArgument('robot_yaml', default_value=[LC("robot"), '.yaml']),
@@ -43,8 +43,8 @@ def generate_launch_description():
                     arguments=[
                         "-d", 
                         PathJoinSubstitution([
-                            "osu-uwrt", "development", "software",
-                            "src", "riptide_gui", "riptide_rviz",
+                            os.path.expanduser("~"), "osu-uwrt", "development", 
+                            "software", "src", "riptide_gui", "riptide_rviz",
                             LC("control_config_file")
                         ])
                     ]
