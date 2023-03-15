@@ -22,7 +22,7 @@
             <topic name="/talos/joint_states" type="sensor_msgs/msg/JointState" qos="system_default"/>
             <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
             <topic name="/talos/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
-            <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+            <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
         </launch>
     </stage>
 
