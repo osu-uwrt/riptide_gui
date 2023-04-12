@@ -5,7 +5,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <diagnostic_msgs/msg/diagnostic_array.hpp>
-#include <riptide_msgs2/msg/robot_state.hpp>
+#include <std_msgs/msg/bool.hpp>
 
 #include <rviz_common/properties/string_property.hpp>
 #include <rviz_common/properties/float_property.hpp>
@@ -28,7 +28,7 @@ namespace riptide_rviz
         virtual void reset() override;
 
         void diagnosticCallback(const diagnostic_msgs::msg::DiagnosticArray & msg);
-        void killCallback(const riptide_msgs2::msg::RobotState & msg);
+        void killCallback(const std_msgs::msg::Bool & msg);
 
         void checkTimeout();
 
@@ -50,7 +50,7 @@ namespace riptide_rviz
 
         // subscription for diagnostics
         rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagSub;
-        rclcpp::Subscription<riptide_msgs2::msg::RobotState>::SharedPtr killSub;
+        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr killSub;
 
         // ids for rendering items so that we can edit them
         int voltageTextId = -1;

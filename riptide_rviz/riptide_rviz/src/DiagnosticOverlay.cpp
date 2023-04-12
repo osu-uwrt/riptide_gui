@@ -78,8 +78,8 @@ namespace riptide_rviz
     void DiagnosticOverlay::updateNS(){
         RVIZ_COMMON_LOG_INFO_STREAM("Robot NS update " << robotNsProperty->getStdString());
         killSub.reset();
-        killSub = nodeHandle->create_subscription<riptide_msgs2::msg::RobotState>(
-            robotNsProperty->getStdString() + "/state/robot", rclcpp::SystemDefaultsQoS(),
+        killSub = nodeHandle->create_subscription<std_msgs::msg::Bool>(
+            robotNsProperty->getStdString() + "/state/kill", rclcpp::SystemDefaultsQoS(),
             std::bind(&DiagnosticOverlay::killCallback, this, _1)
         );
     }
@@ -143,12 +143,12 @@ namespace riptide_rviz
         }
     }
 
-    void DiagnosticOverlay::killCallback(const riptide_msgs2::msg::RobotState & msg){
+    void DiagnosticOverlay::killCallback(const std_msgs::msg::Bool & msg){
         // write down the time that we recieve the last kill msg
         lastKill = nodeHandle->get_clock()->now();
         killTimedOut = false;
 
-        if(msg.kill_switch_inserted){
+        if(!msg.data){
             killLedConfig.inner_color_ = QColor(0, 255, 0, 255);
         } else {
             killLedConfig.inner_color_ = QColor(255, 0, 0, 255);
