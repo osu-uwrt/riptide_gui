@@ -245,7 +245,11 @@ namespace riptide_rviz
         {
             // the odom has timed out
             if (uiPanel->CtrlSendCmd->isEnabled()){
-                RVIZ_COMMON_LOG_WARNING("Odom timed out, or vehicle disabled! disabling local control buttons");
+                if(diff.to_chrono<std::chrono::seconds>() > odom_timeout)
+                    RVIZ_COMMON_LOG_WARNING("Odom timed out! disabling local control buttons");
+
+                if(!vehicleEnabled)
+                    RVIZ_COMMON_LOG_WARNING("vehicle disabled! disabling local control buttons");
 
                 // disable the vehicle
                 handleDisable();
@@ -440,6 +444,12 @@ namespace riptide_rviz
 
         // save the header timestamp
         odomTime = msg.header.stamp;
+
+        auto diff = clientNode->get_clock()->now() - odomTime;
+        if (diff.to_chrono<std::chrono::seconds>() > odom_timeout * 2)
+        {
+            RVIZ_COMMON_LOG_WARNING("Recieved odom message with old timestamp");
+        }
 
         // convert to degrees if its what we're showing
         if (degreeReadout)
