@@ -174,7 +174,8 @@ namespace riptide_rviz
         delete uiPanel;
 
         // remove the timers
-        delete spinTimer, uiTimer;
+        delete spinTimer;
+        delete uiTimer;
 
         rclcpp::shutdown();
     }
