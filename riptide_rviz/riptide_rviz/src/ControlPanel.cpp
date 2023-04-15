@@ -1,7 +1,7 @@
 #include "riptide_rviz/ControlPanel.hpp"
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <chrono>
 #include <algorithm>
 #include <iostream>
@@ -166,6 +166,7 @@ namespace riptide_rviz
 
     bool ControlPanel::event(QEvent *event)
     {
+        return false;
     }
 
     ControlPanel::~ControlPanel()
