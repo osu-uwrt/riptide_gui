@@ -52,8 +52,6 @@ namespace riptide_rviz
 
     private:
         Ui_MissionPanel *uiPanel;
-        rclcpp::Node::SharedPtr clientNode;
-        QTimer *spinTimer;
 
         // tree view item model
         QStandardItemModel * model;

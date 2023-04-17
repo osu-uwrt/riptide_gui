@@ -37,8 +37,6 @@ namespace riptide_rviz
         void updateNS();
 
         private:
-        // internal node
-        rclcpp::Node::SharedPtr nodeHandle;
 
         // timer for determining timeouts
         rclcpp::TimerBase::SharedPtr checkTimer;

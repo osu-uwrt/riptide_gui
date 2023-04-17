@@ -77,10 +77,6 @@ namespace riptide_rviz
         bool vehicleEnabled = false;
         bool degreeReadout = true;
 
-        // core stuff for creating and managing a ROS node
-        rclcpp::Node::SharedPtr clientNode;
-        QTimer *spinTimer;
-
         // QT ui timer for handling data freshness
         QTimer *uiTimer;
 
