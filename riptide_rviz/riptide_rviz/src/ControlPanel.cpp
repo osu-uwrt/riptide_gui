@@ -168,8 +168,6 @@ namespace riptide_rviz
 
         // remove the timers
         delete uiTimer;
-
-        rclcpp::shutdown();
     }
 
     // slots for handling mode setting of the controller

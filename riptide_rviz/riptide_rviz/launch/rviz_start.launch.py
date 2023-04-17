@@ -48,7 +48,7 @@ def generate_launch_description():
                             LC("control_config_file")
                         ])
                     ],
-                    prefix=["gdbserver localhost:3000"]
+                    # prefix=["gdbserver localhost:3000"]
                 ),
 
                 # send the rest into the tempest namespace
