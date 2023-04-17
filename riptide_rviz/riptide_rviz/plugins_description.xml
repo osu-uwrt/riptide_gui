@@ -14,6 +14,11 @@
             RVIZ plugin for starting up the riptide software package on remote targets
         </description>
     </class>
+    <class name="riptide_rviz/BaggingPanel" type="riptide_rviz::BaggingPanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for configuring bagging on remote targets
+        </description>
+    </class>
     <class name="riptide_rviz/Actuators" type="riptide_rviz::Actuators" base_class_type="rviz_common::Panel">
         <description>
             RVIZ plugin for controlling the actuators on a riptide vehicle
