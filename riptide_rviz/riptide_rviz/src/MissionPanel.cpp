@@ -89,6 +89,10 @@ namespace riptide_rviz
         delete uiPanel;
 
         delete model;
+
+        actionServer.reset();
+        refreshClient.reset();
+        stackSub.reset();
     }
 
     void MissionPanel::refresh()
