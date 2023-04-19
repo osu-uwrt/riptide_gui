@@ -1,4 +1,5 @@
 #pragma once
+
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/string.hpp>
@@ -8,11 +9,10 @@
 #include <rviz_common/panel.hpp>
 #include <rviz_common/config.hpp>
 
-#include "BaggingConfiguration.hpp"
-#include "ui_BaggingPanel.h"
-#include "ui_BaggingTopicSelection.h"
 #include <QTimer>
 #include <vector>
+
+#include "ui_BaggingPanel.h"
 
 namespace riptide_rviz
 {
@@ -39,7 +39,7 @@ namespace riptide_rviz
 
     private:
         // UI Panel instance
-        Ui_BaggingPanel *uiPanel;
+        // Ui_BaggingPanel *uiPanel;
 
         rclcpp::Node::SharedPtr clientNode;
         QTimer * spinTimer;
@@ -47,7 +47,7 @@ namespace riptide_rviz
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr baggingStateSub;
         QWidget *mainParent;
 
-        BaggingTopicModel *topicModel;
+        // BaggingTopicModel *topicModel;
 
         void baggingStateCallback(const std_msgs::msg::Bool &msg);
 
