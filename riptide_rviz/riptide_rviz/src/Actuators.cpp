@@ -220,7 +220,6 @@ namespace riptide_rviz
 
         // create our value containers
         QString * str = new QString();
-        float * configVal = new float();
 
         // load the namesapce param
         if(config.mapGetString("robot_namespace", str)){
@@ -240,6 +239,8 @@ namespace riptide_rviz
         changeClawState = rclcpp_action::create_client<ChangeClawState>(node, robot_ns + "/change_claw_state");
         actuateTorpedos = rclcpp_action::create_client<ActuateTorpedos>(node, robot_ns + "/actuate_torpedos");
         actuateDroppers = rclcpp_action::create_client<ActuateDroppers>(node, robot_ns + "/actuate_droppers");
+
+        delete str;
     }
 
     void Actuators::save(rviz_common::Config config) const

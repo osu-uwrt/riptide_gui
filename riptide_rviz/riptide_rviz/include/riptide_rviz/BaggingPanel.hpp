@@ -1,5 +1,7 @@
 #pragma once
 
+#include "riptide_rviz/BagItem.hpp"
+
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/string.hpp>
@@ -25,12 +27,15 @@ namespace riptide_rviz
         void save(rviz_common::Config config) const override;
 
         void onInitialize() override;
+        void clearScrollArea();
 
     protected Q_SLOTS:
         // QT slots (function callbacks)
         void baggingConfigure();
-        void baggingListRefresh();
-        void handleBaggingPanelHost(int selection);
+        void hostListRefresh();
+        void fileListRefresh();
+        void handleBaggingPanelHost(const QString &text);
+        void handleBaggingPanelFile(const QString &text);
         void startBagging();
         void stopBagging();
 
@@ -39,13 +44,16 @@ namespace riptide_rviz
 
     private:
         // UI Panel instance
-        // Ui_BaggingPanel *uiPanel;
+        Ui_BaggingPanel *uiPanel;
 
-        rclcpp::Node::SharedPtr clientNode;
-        QTimer * spinTimer;
+        // parent info for child widgets
+        QWidget *mainParent;
+        QWidget *scrollAreaLayout = nullptr;
+        QVBoxLayout *vbox = nullptr;
+
+        std::vector<riptide_rviz::BagItem *> bagList;
 
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr baggingStateSub;
-        QWidget *mainParent;
 
         // BaggingTopicModel *topicModel;
 

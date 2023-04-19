@@ -16,8 +16,8 @@
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>20</y>
+     <x>0</x>
+     <y>0</y>
      <width>331</width>
      <height>381</height>
     </rect>
@@ -71,7 +71,21 @@ QToolButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
      </widget>
     </item>
     <item>
-     <widget class="QListWidget" name="baggingList"/>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>327</width>
+         <height>284</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>

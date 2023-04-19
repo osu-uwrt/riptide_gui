@@ -43,7 +43,6 @@ namespace riptide_rviz
 
     private:
         // helper functions for managing UI
-        void createScrollArea();
         void clearScrollArea();
         void listLaunchCallback(const launch_msgs::msg::ListLaunch &msg);
         void stagedBringupTick();
@@ -56,7 +55,8 @@ namespace riptide_rviz
 
         // parent info for child widgets
         QWidget *mainParent;
-        QWidget *scrollAreaLayout;
+        QWidget *scrollAreaLayout = nullptr;
+        QVBoxLayout *vbox = nullptr;
 
         // launch information
         rclcpp::Subscription<launch_msgs::msg::ListLaunch>::SharedPtr listLaunchSub;

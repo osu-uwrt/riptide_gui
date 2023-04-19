@@ -14,8 +14,6 @@
 using namespace std::chrono_literals;
 using namespace std::placeholders;
 
-QVBoxLayout *vbox;
-
 namespace riptide_rviz
 {
     Bringup::Bringup(QWidget *parent) : rviz_common::Panel(parent)
@@ -26,12 +24,13 @@ namespace riptide_rviz
         uiPanel = new Ui_Bringup();
         uiPanel->setupUi(this);
 
-        createScrollArea();
         recipe = std::make_shared<riptide_rviz::Recipe>();
     }
 
     void Bringup::onInitialize()
     {
+        RVIZ_COMMON_LOG_INFO("BringupPanel: Initialzing");
+
         // refresh UI elements so they start displayed correctly
         bringupListRefresh();
 
@@ -58,6 +57,7 @@ namespace riptide_rviz
 
     bool Bringup::event(QEvent *event)
     {
+        return false;
     }
 
     Bringup::~Bringup()
@@ -72,8 +72,33 @@ namespace riptide_rviz
         }
     }
 
-    void Bringup::createScrollArea()
+    void Bringup::clearScrollArea()
     {
+        RVIZ_COMMON_LOG_INFO("BringupPanel: clearing scroll area");
+
+        // if the old stuff exists, remove it
+        if(clientList.size() > 0){
+            for(auto listObject : clientList)
+            {
+                delete listObject;
+            }
+
+            clientList.clear();
+        }
+
+        if(vbox != nullptr){
+            RVIZ_COMMON_LOG_INFO("BringupPanel: deleting vbox");
+            delete vbox;
+        }
+        
+        // also clear the scroll area data if it exists
+        if(scrollAreaLayout != nullptr){
+            RVIZ_COMMON_LOG_INFO("BringupPanel: deleting scroll area");
+            delete scrollAreaLayout;
+        }
+
+        RVIZ_COMMON_LOG_INFO("BringupPanel: creating new scroll area");
+        
         // Add Vertical Box layout to the Scroll area so we can actually add items to it
         scrollAreaLayout = new QWidget(mainParent);
         vbox = new QVBoxLayout(scrollAreaLayout);
@@ -81,18 +106,6 @@ namespace riptide_rviz
         vbox->setSpacing(0);
         scrollAreaLayout->setLayout(vbox);
         uiPanel->scrollArea->setWidget(scrollAreaLayout);
-    }
-
-    void Bringup::clearScrollArea()
-    {
-        for(auto listObject : clientList)
-        {
-            delete listObject;
-        }
-        clientList.clear();
-
-        delete scrollAreaLayout;
-        createScrollArea();
     }
 
     void Bringup::bringupListRefresh()
