@@ -6,6 +6,7 @@
 #include <string>
 
 #include <QLabel>
+#include <QDialog>
 
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/logging.hpp>
@@ -160,6 +161,7 @@ namespace riptide_rviz
         uiPanel->baggingFile->blockSignals(true);
         uiPanel->baggingFile->clear();
         uiPanel->baggingFile->addItem("None Selected");
+        uiPanel->baggingFile->setCurrentIndex(0);
         
         // populate with new files
         auto bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
@@ -173,6 +175,9 @@ namespace riptide_rviz
         }
         uiPanel->baggingFile->blockSignals(false);
         uiPanel->baggingFile->setEnabled(true); // SET this back to false
+
+        // clear the scroll area
+        clearScrollArea();
 
     }
 
@@ -211,30 +216,28 @@ namespace riptide_rviz
             // reset the scroll area
             clearScrollArea();
 
-            vbox->addWidget(new QLabel("AAAAAA"));
-
             // get our local rosnode
             auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
             // start creating the ui elements
-            for(size_t i = 0; i < 10; i++){
+            for(size_t i = 0; i < 15; i++){
                 auto bagItem = new BagItem(uiPanel->baggingHost->currentText().toStdString(), node, mainParent);
                 vbox->addWidget(bagItem);
                 bagItem->show();
 
                 bagList.push_back(bagItem);
             }
-
-            vbox->addWidget(new QLabel("BBBBB"));
         }
     }
 
     void BaggingPanel::baggingStateCallback(const std_msgs::msg::Bool &msg)
     {
-        // uiPanel->baggingStatus->setText((msg.data ? "Logging" : "Stopped"));
 
-        // uiPanel->baggingStart->setEnabled(!msg.data);
-        // uiPanel->baggingStop->setEnabled(msg.data);
+        std::vector<int> bids_active = {};
+
+        for(auto item : bagList){
+            item->bagAlive(bids_active);
+        }
     }
 
     void BaggingPanel::startBagging()

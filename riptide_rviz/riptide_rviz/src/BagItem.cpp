@@ -5,13 +5,14 @@
 namespace riptide_rviz
 {
     BagItem::BagItem(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, QWidget *overallParent){
-        uiPanel = new Ui_BagItem();
+        uiPanel = new Ui_BagListElement();
         uiPanel->setupUi(this);
         // mainParent = overallParent;
 
         //set the item to blank state
-        uiPanel->bagStart->setEnabled(true);
-        uiPanel->bagStop->setEnabled(false);
+        uiPanel->startButton->setEnabled(true);
+        uiPanel->stopButton->setEnabled(false);
+        uiPanel->bagName->setText("CCCCCC");
         uiPanel->bagCfg->setEnabled(true);
 
         // conect the buttons
@@ -35,4 +36,9 @@ namespace riptide_rviz
         RVIZ_COMMON_LOG_INFO("BagItem: configuring");
 
     }
+
+    void BagItem::bagAlive(std::vector<int> bids){
+
+    }
+    
 } // namespace riptide_rviz

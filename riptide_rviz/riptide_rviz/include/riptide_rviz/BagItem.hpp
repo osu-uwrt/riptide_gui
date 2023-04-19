@@ -10,6 +10,8 @@ namespace riptide_rviz
     public:
         BagItem(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, QWidget *overallParent);
         ~BagItem();
+
+        void bagAlive(std::vector<int> bids);
         
 
     protected:
@@ -18,7 +20,7 @@ namespace riptide_rviz
 
     private:
         // UI Panel instance
-        Ui_BagItem *uiPanel;
+        Ui_BagListElement *uiPanel;
 
         // bag id
         int bid;
