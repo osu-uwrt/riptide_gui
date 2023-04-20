@@ -219,13 +219,13 @@ namespace riptide_rviz
             auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
             //Selected host is valid, now create action server clients (?)
-            listLaunchSub = node->create_subscription<launch_msgs::msg::ListLaunch>(
+            listLaunchSub = node->create_subscription<launch_msgs::msg::ListPids>(
                 targetNode + "/launch_status", rclcpp::SystemDefaultsQoS(), std::bind(&Bringup::listLaunchCallback, this, _1)
             );
         }
     }
 
-    void Bringup::listLaunchCallback(const launch_msgs::msg::ListLaunch &msg)
+    void Bringup::listLaunchCallback(const launch_msgs::msg::ListPids &msg)
     {
         for(auto client : clientList)
         {

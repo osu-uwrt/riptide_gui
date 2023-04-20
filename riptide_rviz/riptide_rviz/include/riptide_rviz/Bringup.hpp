@@ -2,7 +2,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <launch_msgs/action/bringup_start.hpp>
 #include <launch_msgs/action/bringup_end.hpp>
-#include <launch_msgs/msg/list_launch.hpp>
+#include <launch_msgs/msg/list_pids.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
@@ -44,7 +44,7 @@ namespace riptide_rviz
     private:
         // helper functions for managing UI
         void clearScrollArea();
-        void listLaunchCallback(const launch_msgs::msg::ListLaunch &msg);
+        void listLaunchCallback(const launch_msgs::msg::ListPids &msg);
         void stagedBringupTick();
 
         // UI Panel instance
@@ -59,7 +59,7 @@ namespace riptide_rviz
         QVBoxLayout *vbox = nullptr;
 
         // launch information
-        rclcpp::Subscription<launch_msgs::msg::ListLaunch>::SharedPtr listLaunchSub;
+        rclcpp::Subscription<launch_msgs::msg::ListPids>::SharedPtr listLaunchSub;
         std::string bringupFilesDir;
 
         //active recipe

@@ -178,7 +178,6 @@ namespace riptide_rviz
 
         // clear the scroll area
         clearScrollArea();
-
     }
 
     void BaggingPanel::handleBaggingPanelHost(const QString & str)
@@ -232,7 +231,6 @@ namespace riptide_rviz
 
     void BaggingPanel::baggingStateCallback(const std_msgs::msg::Bool &msg)
     {
-
         std::vector<int> bids_active = {};
 
         for(auto item : bagList){

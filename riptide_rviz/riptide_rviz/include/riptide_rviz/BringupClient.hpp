@@ -11,7 +11,7 @@
 
 // Message headers
 #include <launch_msgs/action/bringup_end.hpp>
-#include <launch_msgs/msg/list_launch.hpp>
+#include <launch_msgs/msg/list_pids.hpp>
 #include <launch_msgs/action/bringup_start.hpp>
 
 namespace riptide_rviz
@@ -25,7 +25,7 @@ namespace riptide_rviz
     {
         public:
             BringupClient(std::string hostName, std::shared_ptr<rclcpp::Node> parentNode, std::shared_ptr<riptide_rviz::RecipeLaunch> recipeLaunch, QVBoxLayout *parent, QWidget *overallParent);
-            void checkPids(launch_msgs::msg::ListLaunch launchMsgs);
+            void checkPids(launch_msgs::msg::ListPids launchMsgs);
             bool complete();
             bool hasError();
             void startButtonCallback();

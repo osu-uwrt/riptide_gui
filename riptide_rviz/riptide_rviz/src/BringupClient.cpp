@@ -218,7 +218,7 @@ namespace riptide_rviz
         }
     }
     
-    void BringupClient::checkPids(launch_msgs::msg::ListLaunch launchMsgs)
+    void BringupClient::checkPids(launch_msgs::msg::ListPids launchMsgs)
     {
         if(started)
         {

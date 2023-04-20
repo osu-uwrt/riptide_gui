@@ -13,6 +13,9 @@ namespace riptide_rviz
 
         void bagAlive(std::vector<int> bids);
         
+        void startBagging();
+        void stopBagging();
+
 
     protected:
         bool event(QEvent *event);
