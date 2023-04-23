@@ -1,12 +1,13 @@
 #include "riptide_rviz/ControlPanel.hpp"
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <chrono>
 #include <algorithm>
 #include <iostream>
 
 #include <rviz_common/logging.hpp>
+#include <rviz_common/display_context.hpp>
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
@@ -20,25 +21,14 @@ namespace riptide_rviz
         uiPanel = new Ui_ControlPanel();
         uiPanel->setupUi(this);
 
-        // create the RCLCPP client
-        auto options = rclcpp::NodeOptions().arguments({});
-        clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_control", options);
-
         // create the default message
         ctrlMode = riptide_msgs2::msg::ControllerCommand::DISABLED;
 
-        RVIZ_COMMON_LOG_INFO("Constructed control panel");
+        RVIZ_COMMON_LOG_INFO("ControlPanel: Constructed control panel");
     }
 
     void ControlPanel::onInitialize()
     {
-        // RVIZ_COMMON_LOG_INFO("Initializing");
-        // create a spin timer
-        spinTimer = new QTimer(this);
-        connect(spinTimer, &QTimer::timeout, [this](void)
-                { rclcpp::spin_some(clientNode); });
-        spinTimer->start(50);
-
         // Connect UI signals for controlling the riptide vehicle
         connect(uiPanel->ctrlEnable, &QPushButton::clicked, [this](void)
                 { handleEnable(); });
@@ -69,15 +59,13 @@ namespace riptide_rviz
         connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, [this](void)
                 { handleCommand(); });
 
-        RVIZ_COMMON_LOG_INFO("Initialized control panel");
+        RVIZ_COMMON_LOG_INFO("ControlPanel: Initialized panel");
     }
 
     void ControlPanel::load(const rviz_common::Config &config)
     {
         // load the parent class config
         rviz_common::Panel::load(config);
-
-        RVIZ_COMMON_LOG_INFO("Loaded parent panel config");
 
         // create our value containers
         QString * str = new QString();
@@ -89,7 +77,7 @@ namespace riptide_rviz
         } else {
             // default value
             robot_ns = "/talos";
-            RVIZ_COMMON_LOG_WARNING("Loading default value for 'namespace'");
+            RVIZ_COMMON_LOG_WARNING("ControlPanel: Loading default value for 'namespace'");
         }
 
         if(config.mapGetFloat("odom_timeout", configVal)){
@@ -97,7 +85,7 @@ namespace riptide_rviz
         } else {
             // default value
             odom_timeout = std::chrono::duration<double>(2.5);
-            RVIZ_COMMON_LOG_WARNING("Loading default value for 'odom_timeout'");
+            RVIZ_COMMON_LOG_WARNING("ControlPanel: Loading default value for 'odom_timeout' in ");
         }
 
         if(config.mapGetFloat("tgt_in_place_depth", configVal)){
@@ -105,7 +93,7 @@ namespace riptide_rviz
         } else {
             // default value
             tgt_in_place_depth = -0.75;
-            RVIZ_COMMON_LOG_WARNING("Loading default value for 'tgt_in_place_depth'");
+            RVIZ_COMMON_LOG_WARNING("ControlPanel: Loading default value for 'tgt_in_place_depth'");
         }
 
         if(config.mapGetFloat("max_depth_in_place", configVal)){
@@ -113,7 +101,7 @@ namespace riptide_rviz
         } else {
             // default value
             max_depth_in_place = -0.5;
-            RVIZ_COMMON_LOG_WARNING("Loading default value for 'max_depth_in_place'");
+            RVIZ_COMMON_LOG_WARNING("ControlPanel: Loading default value for 'max_depth_in_place'");
         }
 
         // Free the allocated containers
@@ -125,22 +113,26 @@ namespace riptide_rviz
         connect(uiTimer, &QTimer::timeout, [this](void)
                 { refreshUI(); });
 
+        // get our local rosnode
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+
+
         // setup goal_pose sub
-        selectPoseSub = clientNode->create_subscription<geometry_msgs::msg::PoseStamped>(
+        selectPoseSub = node->create_subscription<geometry_msgs::msg::PoseStamped>(
             "goal_pose", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::selectedPose, this, _1)); 
 
         // setup the ROS topics that depend on namespace
         // make publishers
-        killStatePub = clientNode->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/control/software_kill", rclcpp::SystemDefaultsQoS());
-        ctrlCmdLinPub = clientNode->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
-        ctrlCmdAngPub = clientNode->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
+        killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/control/software_kill", rclcpp::SystemDefaultsQoS());
+        ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
+        ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
 
         // make ROS Subscribers
-        odomSub = clientNode->create_subscription<nav_msgs::msg::Odometry>(
+        odomSub = node->create_subscription<nav_msgs::msg::Odometry>(
             robot_ns + "/odometry/filtered", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::odomCallback, this, _1));
-        steadySub = clientNode->create_subscription<std_msgs::msg::Bool>(
+        steadySub = node->create_subscription<std_msgs::msg::Bool>(
             robot_ns + "/controller/steady", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::steadyCallback, this, _1));  
 
@@ -148,9 +140,9 @@ namespace riptide_rviz
         uiTimer->start(100);
         
         // and start the kill switch pub timer
-        killPubTimer = clientNode->create_wall_timer(50ms, std::bind(&ControlPanel::sendKillMsgTimer, this));
+        killPubTimer = node->create_wall_timer(50ms, std::bind(&ControlPanel::sendKillMsgTimer, this));
 
-        RVIZ_COMMON_LOG_INFO("Loading config complete");
+        RVIZ_COMMON_LOG_INFO("ControlPanel: Loading config complete");
     }
 
     void ControlPanel::save(rviz_common::Config config) const
@@ -166,6 +158,7 @@ namespace riptide_rviz
 
     bool ControlPanel::event(QEvent *event)
     {
+        return false;
     }
 
     ControlPanel::~ControlPanel()
@@ -174,9 +167,7 @@ namespace riptide_rviz
         delete uiPanel;
 
         // remove the timers
-        delete spinTimer, uiTimer;
-
-        rclcpp::shutdown();
+        delete uiTimer;
     }
 
     // slots for handling mode setting of the controller
@@ -231,7 +222,7 @@ namespace riptide_rviz
                 uiPanel->ctrlModeTele->setEnabled(true);
                 break;
             default:
-                RVIZ_COMMON_LOG_ERROR("Button not yet operable");
+                RVIZ_COMMON_LOG_ERROR("ControlPanel: Button not yet operable");
                 break;
             }
         }
@@ -239,13 +230,20 @@ namespace riptide_rviz
 
     void ControlPanel::refreshUI()
     {
+        // get our local rosnode
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+
         // handle timing out the UI buttons if odom gets too stale
-        auto diff = clientNode->get_clock()->now() - odomTime;
+        auto diff = node->get_clock()->now() - odomTime;
         if (diff.to_chrono<std::chrono::seconds>() > odom_timeout || !vehicleEnabled)
         {
             // the odom has timed out
             if (uiPanel->CtrlSendCmd->isEnabled()){
-                RVIZ_COMMON_LOG_WARNING("Odom timed out, or vehicle disabled! disabling local control buttons");
+                if(diff.to_chrono<std::chrono::seconds>() > odom_timeout)
+                    RVIZ_COMMON_LOG_WARNING("ControlPanel: Odom timed out! disabling local control buttons");
+
+                if(!vehicleEnabled)
+                    RVIZ_COMMON_LOG_WARNING("ControlPanel: vehicle disabled! disabling local control buttons");
 
                 // disable the vehicle
                 handleDisable();
@@ -289,7 +287,7 @@ namespace riptide_rviz
         if (std::any_of(std::begin(convOk), std::end(convOk), [](bool i)
                         { return !i; }))
         {
-            RVIZ_COMMON_LOG_ERROR("Failed to convert current position to floating point");
+            RVIZ_COMMON_LOG_ERROR("ControlPanel: Failed to convert current position to floating point");
             
             // set the red stylesheet
             uiPanel->ctrlDiveInPlace->setStyleSheet("QPushButton{color:black; background: red;}");
@@ -380,7 +378,7 @@ namespace riptide_rviz
         if (std::any_of(std::begin(convOk), std::end(convOk), [](bool i)
                         { return !i; }))
         {
-            RVIZ_COMMON_LOG_ERROR("Failed to convert current position to floating point");
+            RVIZ_COMMON_LOG_ERROR("ControlPanel: Failed to convert current position to floating point");
             // set the red stylesheet
             uiPanel->CtrlSendCmd->setStyleSheet("QPushButton{color:black; background: red;}");
 
@@ -440,6 +438,16 @@ namespace riptide_rviz
 
         // save the header timestamp
         odomTime = msg.header.stamp;
+
+        // get our local rosnode
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+
+
+        auto diff = node->get_clock()->now() - odomTime;
+        if (diff.to_chrono<std::chrono::seconds>() > odom_timeout * 2)
+        {
+            RVIZ_COMMON_LOG_WARNING("ControlPanel: Recieved odom message with old timestamp");
+        }
 
         // convert to degrees if its what we're showing
         if (degreeReadout)

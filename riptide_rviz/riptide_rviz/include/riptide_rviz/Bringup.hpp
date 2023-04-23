@@ -42,25 +42,33 @@ namespace riptide_rviz
         bool event(QEvent *event);
 
     private:
-        // UI Panel instance
-        Ui_Bringup *uiPanel;
-
-        rclcpp::Node::SharedPtr clientNode;
-        QTimer * spinTimer;
-
-        std::vector<riptide_rviz::BringupClient*> clientList;
-        rclcpp::Subscription<launch_msgs::msg::ListLaunch>::SharedPtr listLaunchSub;
-        std::string bringupFilesDir;
-        QWidget *mainParent;
-        QWidget *scrollAreaLayout;
+        // helper functions for managing UI
         void createScrollArea();
         void clearScrollArea();
         void listLaunchCallback(const launch_msgs::msg::ListLaunch &msg);
         void stagedBringupTick();
+
+        // UI Panel instance
+        Ui_Bringup *uiPanel;
+        
+        //client info
+        std::vector<riptide_rviz::BringupClient*> clientList;
+
+        // parent info for child widgets
+        QWidget *mainParent;
+        QWidget *scrollAreaLayout;
+
+        // launch information
+        rclcpp::Subscription<launch_msgs::msg::ListLaunch>::SharedPtr listLaunchSub;
+        std::string bringupFilesDir;
+
+        //active recipe
+        std::shared_ptr<riptide_rviz::Recipe> recipe;
+        
+        // staging timer information
+        QTimer *stagedTimer;
         int stage = 0;
         int totalStages = 0;
-        std::shared_ptr<riptide_rviz::Recipe> recipe;
-        QTimer *stagedTimer;
         bool startTick = true;
 
     };

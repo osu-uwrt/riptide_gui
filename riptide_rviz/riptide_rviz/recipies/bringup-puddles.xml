@@ -6,7 +6,7 @@
         <launch name="hardware.launch.py" package="riptide_hardware2">
             <arg name="robot" value="puddles"/>
             <topic name="/puddles/state/firmware" type="riptide_msgs2/msg/FirmwareStatus" qos="system_default"/>
-            <!-- TODO(hseachrist): Add the visual odometry topic -->
+            <!-- <topic name="/puddles/zed_node/pose_with_covariance" type="geometry_msgs/msg/PoseWithCovariance" qos="sensor_data" /> -->
             <topic name="/puddles/vectornav/imu" type="sensor_msgs/msg/Imu" qos="sensor_data"/>
             <topic name="/puddles/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
         </launch>
@@ -22,13 +22,23 @@
             <topic name="/puddles/joint_states" type="sensor_msgs/msg/JointState" qos="system_default"/>
             <topic name="/puddles/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
             <topic name="/puddles/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
-            <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+            <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        </launch>
+    </stage>
+
+    <stage id="solver">
+        <dependency id="navigation"/>
+
+        <launch name="solver.launch.py" package="riptide_controllers2">
+            <arg name="robot" value="puddles"/>
+
+            <!-- <topic name="/puddles/command/dshot" type="riptide_msgs2/msg/DshotCommand" qos="sensor_data"/> -->
         </launch>
     </stage>
 
 
     <stage id="controller">
-        <dependency id="navigation"/>
+        <dependency id="solver"/>
 
         <launch name="controller.launch.py" package="riptide_controllers2">
             <arg name="robot" value="puddles"/>

@@ -1,5 +1,7 @@
 #include "riptide_rviz/Actuators.hpp"
 #include <chrono>
+
+#include <rviz_common/display_context.hpp>
 #include <rviz_common/logging.hpp>
 
 
@@ -15,19 +17,10 @@ namespace riptide_rviz
 
         uiPanel = new Ui_Actuators();
         uiPanel->setupUi(this);
-
-        auto options = rclcpp::NodeOptions().arguments({});
-        clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_actuators", options);
     }
 
     void Actuators::onInitialize()
     {
-        // create a spin timer
-        spinTimer = new QTimer(this);
-        connect(spinTimer, &QTimer::timeout, [this](void)
-                { rclcpp::spin_some(clientNode); });
-        spinTimer->start(50);
-
         armed_flag = false;
         // Connect UI signals for controlling the riptide vehicle
         connect(uiPanel->actDrop1, &QPushButton::clicked, [this](void)
@@ -75,7 +68,7 @@ namespace riptide_rviz
     void Actuators::armTaskStartCb(const GHArmTorpedoDropper::SharedPtr &goalHandle)
     { 
         if (!goalHandle) {
-            RVIZ_COMMON_LOG_ERROR("REJECTED: Failed to arm");
+            RVIZ_COMMON_LOG_ERROR("ActuatorPanel: REJECTED: Failed to arm");
             
             // set the red stylesheet
             uiPanel->actDropArm->setStyleSheet("QPushButton{color:black; background: red;}");
@@ -130,7 +123,7 @@ namespace riptide_rviz
     void Actuators::clawTaskStartCb(const GHChangeClawState::SharedPtr &goalHandle)
     { 
         if (!goalHandle) {
-            RVIZ_COMMON_LOG_ERROR("REJECTED: Failed to change claw state");
+            RVIZ_COMMON_LOG_ERROR("ActuatorPanel: REJECTED: Failed to change claw state");
             
             // set the red stylesheet
             uiPanel->actClawOpen->setStyleSheet("QPushButton{color:black; background: red;}");
@@ -235,14 +228,18 @@ namespace riptide_rviz
         } else {
             // default value
             robot_ns = "/talos";
-            RVIZ_COMMON_LOG_WARNING("Loading default value for 'namespace'");
+            RVIZ_COMMON_LOG_WARNING("ActuatorPanel: Loading default value for 'namespace'");
         }
 
+        // get our local rosnode
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+
+
         // now init the clients
-        armTorpedoDropper = rclcpp_action::create_client<ArmTorpedoDropper>(clientNode, robot_ns + "/arm_actuators");
-        changeClawState = rclcpp_action::create_client<ChangeClawState>(clientNode, robot_ns + "/change_claw_state");
-        actuateTorpedos = rclcpp_action::create_client<ActuateTorpedos>(clientNode, robot_ns + "/actuate_torpedos");
-        actuateDroppers = rclcpp_action::create_client<ActuateDroppers>(clientNode, robot_ns + "/actuate_droppers");
+        armTorpedoDropper = rclcpp_action::create_client<ArmTorpedoDropper>(node, robot_ns + "/arm_actuators");
+        changeClawState = rclcpp_action::create_client<ChangeClawState>(node, robot_ns + "/change_claw_state");
+        actuateTorpedos = rclcpp_action::create_client<ActuateTorpedos>(node, robot_ns + "/actuate_torpedos");
+        actuateDroppers = rclcpp_action::create_client<ActuateDroppers>(node, robot_ns + "/actuate_droppers");
     }
 
     void Actuators::save(rviz_common::Config config) const
@@ -261,9 +258,6 @@ namespace riptide_rviz
     {
         // master window control removal
         delete uiPanel;
-
-        // remove the timers
-        delete spinTimer;
     }
 
 } // namespace riptide_rviz

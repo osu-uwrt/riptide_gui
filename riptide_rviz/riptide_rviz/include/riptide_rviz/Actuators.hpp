@@ -65,10 +65,6 @@ namespace riptide_rviz
         // UI Panel instance
         Ui_Actuators *uiPanel;
 
-        //ros node and timer
-        rclcpp::Node::SharedPtr clientNode;
-        QTimer * spinTimer;
-
         //action clients
         rclcpp_action::Client<ArmTorpedoDropper>::SharedPtr armTorpedoDropper;
         rclcpp_action::Client<ChangeClawState>::SharedPtr changeClawState;

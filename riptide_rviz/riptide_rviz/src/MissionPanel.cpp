@@ -1,6 +1,8 @@
 #include "riptide_rviz/MissionPanel.hpp"
 #include <chrono>
 #include <algorithm>
+
+#include <rviz_common/display_context.hpp>
 #include <rviz_common/logging.hpp>
 
 using namespace std::chrono_literals;
@@ -15,28 +17,14 @@ namespace riptide_rviz
         uiPanel = new Ui_MissionPanel();
         uiPanel->setupUi(this);
 
-        auto options = rclcpp::NodeOptions().arguments({});
-        clientNode = std::make_shared<rclcpp::Node>("riptide_rviz_mission", options);
-
         treeList = std::vector<std::string>();
     }
 
     void MissionPanel::onInitialize()
     {
-        // create a spin timer
-        spinTimer = new QTimer(this);
-        connect(spinTimer, &QTimer::timeout, [this](void)
-                { rclcpp::spin_some(clientNode); });
-        spinTimer->start(50);
-
         // create the item model and attach it to the panel
         model = new QStandardItemModel();
         uiPanel->btStackView->setModel(model);
-
-        // uiTimer = new QTimer(this);
-        // connect(uiTimer, &QTimer::timeout, [this](void)
-        //         { refreshUI(); });
-        // uiTimer->start(100);
 
         // Connect UI signals for controlling the riptide vehicle
         connect(uiPanel->btSelect, SIGNAL(currentIndexChanged(int)), SLOT(handleSelectTree(int)));
@@ -52,7 +40,7 @@ namespace riptide_rviz
     {
         rviz_common::Panel::load(config);
 
-        RVIZ_COMMON_LOG_INFO("Loaded parent panel config");
+        RVIZ_COMMON_LOG_INFO("MissionPanel: Loaded parent panel config");
 
         // create our value containers
         QString * str = new QString();
@@ -64,17 +52,20 @@ namespace riptide_rviz
         } else {
             // default value
             robot_ns = "/talos";
-            RVIZ_COMMON_LOG_WARNING("Loading default value for 'namespace'");
+            RVIZ_COMMON_LOG_WARNING("MissionPanel: Loading default value for 'namespace'");
         }
 
-        actionServer = rclcpp_action::create_client<ExecuteTree>(clientNode, robot_ns + "/autonomy/run_tree");
+        // get our local rosnode
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+
+        actionServer = rclcpp_action::create_client<ExecuteTree>(node, robot_ns + "/autonomy/run_tree");
     
-        stackSub = clientNode->create_subscription<riptide_msgs2::msg::TreeStack>(
+        stackSub = node->create_subscription<riptide_msgs2::msg::TreeStack>(
             robot_ns + "/autonomy/tree_stack", rclcpp::SystemDefaultsQoS(),
             std::bind(&MissionPanel::stackCb, this, _1)
         );
 
-        refreshClient = clientNode->create_client<riptide_msgs2::srv::ListTrees>(robot_ns + "/autonomy/list_trees");
+        refreshClient = node->create_client<riptide_msgs2::srv::ListTrees>(robot_ns + "/autonomy/list_trees");
 
         // refresh the UI
         refresh();
@@ -96,8 +87,12 @@ namespace riptide_rviz
     {
         // master window control removal
         delete uiPanel;
-        delete spinTimer;
+
         delete model;
+
+        actionServer.reset();
+        refreshClient.reset();
+        stackSub.reset();
     }
 
     void MissionPanel::refresh()
@@ -108,14 +103,17 @@ namespace riptide_rviz
             uiPanel->btStop->setEnabled(false);
         }
 
+        // get our local rosnode
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+
         riptide_msgs2::srv::ListTrees::Request::SharedPtr startReq = std::make_shared<riptide_msgs2::srv::ListTrees::Request>();
-        auto start = clientNode->get_clock()->now();
+        auto start = node->get_clock()->now();
         while (!refreshClient->wait_for_service(100ms))
-            if (clientNode->get_clock()->now() - start > 1s || !rclcpp::ok())
+            if (node->get_clock()->now() - start > 1s || !rclcpp::ok())
                 return;
 
         auto refreshFuture = refreshClient->async_send_request(startReq);
-        if (rclcpp::spin_until_future_complete(clientNode, refreshFuture, 1s) == rclcpp::FutureReturnCode::SUCCESS)
+        if (rclcpp::spin_until_future_complete(node, refreshFuture, 1s) == rclcpp::FutureReturnCode::SUCCESS)
         {
 
             auto response = refreshFuture.get();
@@ -153,9 +151,12 @@ namespace riptide_rviz
         // disable the start button
         uiPanel->btStart->setEnabled(false);
 
-        auto start = clientNode->get_clock()->now();
+        // get our local rosnode
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+
+        auto start = node->get_clock()->now();
         while (!actionServer->wait_for_action_server(100ms))
-            if (clientNode->get_clock()->now() - start > 1s || !rclcpp::ok())
+            if (node->get_clock()->now() - start > 1s || !rclcpp::ok())
             {
                 // we have timed out waiting, re-enable the button
                 uiPanel->btStart->setEnabled(true);

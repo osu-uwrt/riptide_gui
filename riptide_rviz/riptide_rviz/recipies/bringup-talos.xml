@@ -22,18 +22,27 @@
             <topic name="/talos/joint_states" type="sensor_msgs/msg/JointState" qos="system_default"/>
             <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
             <topic name="/talos/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
-            <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+            <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
         </launch>
     </stage>
 
-
-    <stage id="controller">
+    <stage id="solver">
         <dependency id="navigation"/>
 
-        <launch name="controller.launch.py" package="riptide_controllers2">
-            <arg name="robot" value="talos"/>
+        <launch name="solver.launch.py" package="riptide_controllers2">
+            <arg name="robot" value="puddles"/>
 
-            <topic name="/talos/controller/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+            <!-- <topic name="/puddles/command/dshot" type="riptide_msgs2/msg/DshotCommand" qos="sensor_data"/> -->
+        </launch>
+    </stage>
+
+    <stage id="controller">
+        <dependency id="solver"/>
+
+        <launch name="controller.launch.py" package="riptide_controllers2">
+            <arg name="robot" value="puddles"/>
+
+            <topic name="/puddles/controller/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
         </launch>
     </stage>
 

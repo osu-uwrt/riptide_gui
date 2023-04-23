@@ -1,5 +1,5 @@
 from launch.actions import GroupAction, DeclareLaunchArgument, Shutdown
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration as LC
 from launch_ros.actions import Node, PushRosNamespace
 from launch import LaunchDescription
 
@@ -7,19 +7,13 @@ from ament_index_python.packages import get_package_share_directory
 
 import os
 
-robot = 'talos'
+robot = 'puddles'
 
 config = PathJoinSubstitution([
         get_package_share_directory('riptide_descriptions2'),
         'config',
-        LaunchConfiguration("robot_yaml")
+        LC("robot_yaml")
     ])
-
-# path to rviz config
-rviz_cfg_path = os.path.join(
-    os.path.expanduser("~"),
-    "osu-uwrt", "development", "software", "src",
-    "riptide_gui", "riptide_rviz" , "control_config.rviz")
 
 def generate_launch_description():
     return LaunchDescription([
@@ -32,7 +26,12 @@ def generate_launch_description():
                     description="Name of the vehicle",
                 ),
 
-                DeclareLaunchArgument('robot_yaml', default_value=[LaunchConfiguration("robot"), '.yaml']),
+                DeclareLaunchArgument(
+                    "control_config_file",
+                    default_value=["control_config_", LC("robot"), ".rviz"]
+                ),
+
+                DeclareLaunchArgument('robot_yaml', default_value=[LC("robot"), '.yaml']),
 
                 # start rviz
                 Node(
@@ -41,11 +40,19 @@ def generate_launch_description():
                     # DONT USE IT RENAMES ALL OF THE CHILD NODES CREATED FOR THE PLUGINS
                     # name='riptide_rviz', 
                     on_exit=Shutdown(),
-                    arguments=["-d", rviz_cfg_path]
+                    arguments=[
+                        "-d", 
+                        PathJoinSubstitution([
+                            os.path.expanduser("~"), "osu-uwrt", "development", 
+                            "software", "src", "riptide_gui", "riptide_rviz",
+                            LC("control_config_file")
+                        ])
+                    ],
+                    # prefix=["gdbserver localhost:3000"]
                 ),
 
                 # send the rest into the tempest namespace
-                PushRosNamespace(["/", LaunchConfiguration('robot')]),
+                PushRosNamespace(["/", LC('robot')]),
 
                 # start the thruster wrench visualizer
                 Node(
@@ -55,7 +62,7 @@ def generate_launch_description():
                     output="screen",
                     parameters=[
                         {"vehicle_config": config},
-                        {"robot": robot},
+                        {"robot": LC("robot")},
                     ]
                 ),
 
@@ -66,7 +73,7 @@ def generate_launch_description():
                     output="screen",
                     parameters=[
                         {"vehicle_config": config},
-                        {"robot": robot},
+                        {"robot": LC("robot")},
                     ]
                 ),
 
@@ -77,7 +84,7 @@ def generate_launch_description():
                     output="screen",
                     parameters=[
                         {"vehicle_config": config},
-                        {"robot": robot},
+                        {"robot": LC("robot")},
                     ]
                 ),
 
@@ -88,7 +95,7 @@ def generate_launch_description():
                     output="screen",
                     parameters=[
                         {"vehicle_config": config},
-                        {"robot": robot},
+                        {"robot": LC("robot")},
                     ]
                 ),
                 

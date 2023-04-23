@@ -1,6 +1,8 @@
 #include "riptide_rviz/DiagnosticOverlay.hpp"
 
 #include <QFontDatabase>
+
+#include <rviz_common/display_context.hpp>
 #include <rviz_common/logging.hpp>
 
 using namespace std::placeholders;
@@ -9,14 +11,6 @@ using namespace std::chrono_literals;
 namespace riptide_rviz
 {
     DiagnosticOverlay::DiagnosticOverlay(){
-        // make the ROS node
-        auto options = rclcpp::NodeOptions().arguments({});
-        nodeHandle = std::make_shared<rclcpp::Node>("riptide_rviz_diag_overlay", options);
-
-        // backdate timeouts
-        lastDiag = nodeHandle->get_clock()->now() - 1h;
-        lastKill = nodeHandle->get_clock()->now() - 1h;
-
         // init font parameter
         QFontDatabase database;
         fontFamilies = database.families();
@@ -42,13 +36,20 @@ namespace riptide_rviz
     void DiagnosticOverlay::onInitialize(){
         OverlayDisplay::onInitialize();
 
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
+        // backdate timeouts
+        lastDiag = node->get_clock()->now() - 1h;
+        lastKill = node->get_clock()->now() - 1h;
+
         // make the diagnostic subscriber
-        diagSub = nodeHandle->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+        diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
         );
 
         // watchdog timers for handling timeouts
-        checkTimer = nodeHandle->create_wall_timer(0.25s, std::bind(&DiagnosticOverlay::checkTimeout, this));
+        checkTimer = node->create_wall_timer(0.25s, std::bind(&DiagnosticOverlay::checkTimeout, this));
 
         // add all of the variable design items
         voltageConfig.text_color_ = QColor(255, 0, 255, 255);
@@ -76,17 +77,24 @@ namespace riptide_rviz
     }
 
     void DiagnosticOverlay::updateNS(){
-        RVIZ_COMMON_LOG_INFO_STREAM("Robot NS update " << robotNsProperty->getStdString());
+        RVIZ_COMMON_LOG_INFO_STREAM("DiagnosticOverlay: Robot NS update " << robotNsProperty->getStdString());
         killSub.reset();
-        killSub = nodeHandle->create_subscription<riptide_msgs2::msg::RobotState>(
-            robotNsProperty->getStdString() + "/state/robot", rclcpp::SystemDefaultsQoS(),
+
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
+        killSub = node->create_subscription<std_msgs::msg::Bool>(
+            robotNsProperty->getStdString() + "/state/kill", rclcpp::SystemDefaultsQoS(),
             std::bind(&DiagnosticOverlay::killCallback, this, _1)
         );
     }
 
     void DiagnosticOverlay::diagnosticCallback(const diagnostic_msgs::msg::DiagnosticArray & msg){
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
         // write down the timestamp that it was recieved
-        lastDiag = nodeHandle->get_clock()->now();
+        lastDiag = node->get_clock()->now();
         diagsTimedOut = false;
 
         // look for specific packets
@@ -143,12 +151,15 @@ namespace riptide_rviz
         }
     }
 
-    void DiagnosticOverlay::killCallback(const riptide_msgs2::msg::RobotState & msg){
+    void DiagnosticOverlay::killCallback(const std_msgs::msg::Bool & msg){
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
         // write down the time that we recieve the last kill msg
-        lastKill = nodeHandle->get_clock()->now();
+        lastKill = node->get_clock()->now();
         killTimedOut = false;
 
-        if(msg.kill_switch_inserted){
+        if(!msg.data){
             killLedConfig.inner_color_ = QColor(0, 255, 0, 255);
         } else {
             killLedConfig.inner_color_ = QColor(255, 0, 0, 255);
@@ -161,7 +172,7 @@ namespace riptide_rviz
         if (font_index < fontFamilies.size()) {
             fontName = fontFamilies[font_index].toStdString();
         } else {
-            RVIZ_COMMON_LOG_ERROR_STREAM("Unexpected error at selecting font index " << font_index);
+            RVIZ_COMMON_LOG_ERROR_STREAM("DiagnosticOverlay: Unexpected error at selecting font index " << font_index);
             return;
         }
 
@@ -178,8 +189,6 @@ namespace riptide_rviz
     }
     
     void DiagnosticOverlay::update(float wall_dt, float ros_dt){
-        rclcpp::spin_some(nodeHandle);
-
         OverlayDisplay::update(wall_dt, ros_dt);
     }
 
@@ -187,11 +196,14 @@ namespace riptide_rviz
         // read current timeout property and convert to duration
         auto timeoutDur = std::chrono::duration<double>(timeoutProperty->getFloat());
 
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
         // check for diagnostic timeout
-        auto duration = nodeHandle->get_clock()->now() - lastDiag;
+        auto duration = node->get_clock()->now() - lastDiag;
         if(duration > timeoutDur){
             if(! diagsTimedOut){
-                RVIZ_COMMON_LOG_WARNING("Diagnostics timed out!");
+                RVIZ_COMMON_LOG_WARNING("DiagnosticsOverlay: Diagnostics timed out!");
                 diagsTimedOut = true;
             }
 
@@ -204,10 +216,10 @@ namespace riptide_rviz
         }
 
         // check for kill timeout
-        duration = nodeHandle->get_clock()->now() - lastKill;
+        duration = node->get_clock()->now() - lastKill;
         if(duration > timeoutDur){
             if(! killTimedOut){
-                RVIZ_COMMON_LOG_WARNING("Kill switch timed out!");
+                RVIZ_COMMON_LOG_WARNING("DiagnosticsOverlay: Kill switch timed out!");
                 killTimedOut = true;
             }
 
