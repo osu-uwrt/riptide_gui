@@ -740,7 +740,7 @@ namespace riptide_rviz
         };
     }
 
-    RecipeXMLError Bag::parseBagTag(const tinyxml2::XMLElement *bagXML, RecipeBag &launch){
+    RecipeXMLError Bag::parseBagTag(const tinyxml2::XMLElement *bagXML, RecipeBag &bag){
         using namespace tinyxml2;
 
         // look for the name attribute
@@ -753,6 +753,10 @@ namespace riptide_rviz
             };
         }
 
+        // set the name
+        bag.name = std::string(name);
+
+
         for (const XMLElement *tag = bagXML->FirstChildElement(); tag != nullptr; tag = tag->NextSiblingElement()) {
             if (strcmp(tag->Name(), "topic") == 0) {
                 
@@ -762,7 +766,8 @@ namespace riptide_rviz
                     return err;
                 }
 
-                launch.topicList.emplace_back(topic);
+                bag.topicList.push_back(topic);
+
             } else {
                 return RecipeXMLError {
                     RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,

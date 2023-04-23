@@ -25,6 +25,8 @@ namespace riptide_rviz
         // set the item to blank state
         stateStopped();
 
+        RVIZ_COMMON_LOG_INFO("BagItem: loading bag " + bagData->name);
+
         // set the name TODO
         uiPanel->bagName->setText(QString::fromStdString(bagData->name));
         
@@ -41,6 +43,8 @@ namespace riptide_rviz
             {
                 data.qos_type = data.QOS_SYSTEM_DEFAULT;
             }
+
+            RVIZ_COMMON_LOG_INFO("BagItem: adding topic " + data.name + " " + data.type_name + " " + std::to_string(data.qos_type));
 
             topics.push_back(data);
         }
@@ -60,7 +64,7 @@ namespace riptide_rviz
         // set the default state
         pid = -1;
 
-        RVIZ_COMMON_LOG_INFO("BagItem: created child item " + uiPanel->bagName->text().toStdString());
+        RVIZ_COMMON_LOG_INFO("BagItem: created child item ");
     }
 
     BagItem::~BagItem()
