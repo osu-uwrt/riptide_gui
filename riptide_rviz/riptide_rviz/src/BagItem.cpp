@@ -1,5 +1,7 @@
 #include "riptide_rviz/BagItem.hpp"
 
+#include <riptide_rviz/BaggingConfiguration.hpp>
+
 #include "ui_BaggingTopicSelection.h"
 
 #include <QTimer>
@@ -27,27 +29,14 @@ namespace riptide_rviz
 
         RVIZ_COMMON_LOG_INFO("BagItem: loading bag " + bagData->name);
 
-        // set the name TODO
-        uiPanel->bagName->setText(QString::fromStdString(bagData->name));
+        if(isLocal){
+            this->bagData = bagData;
+
+            uiPanel->bagName->setText(QString::fromStdString(bagData->name));
         
-        for(auto recipeTopic : bagData->topicList){
-            launch_msgs::msg::TopicData data;
-
-            data.name = recipeTopic.name;
-            data.type_name = recipeTopic.type_name;
-            if(recipeTopic.qos_type == "sensor_data")
-            {
-                data.qos_type = data.QOS_SENSOR_DATA;
-            }
-            else if(recipeTopic.qos_type == "system_default")
-            {
-                data.qos_type = data.QOS_SYSTEM_DEFAULT;
-            }
-
-            RVIZ_COMMON_LOG_INFO("BagItem: adding topic " + data.name + " " + data.type_name + " " + std::to_string(data.qos_type));
-
-            topics.push_back(data);
+            loadTopics(bagData->topicList);
         }
+        
 
         // conect the buttons
         connect(uiPanel->bagCfg, &QPushButton::clicked, [this](void)
@@ -86,10 +75,20 @@ namespace riptide_rviz
         Ui_BaggingTopicSelection uiSelection;
         uiSelection.setupUi(selectionDialog);
 
-        // uiSelection.topicSelector->setModel();
+        auto topicView = new BaggingTopicModel(bagData->topicList, selectionDialog);
+        uiSelection.topicSelector->setModel(topicView);
+
+        uiSelection.topicSelector->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
         selectionDialog->exec();
 
+        auto newTopicConfig = topicView->getTopicConfig();
+
+        // re-read the topics from the updates
+        bagData->topicList = newTopicConfig;
+        loadTopics(newTopicConfig);
+
+        delete topicView;
         delete selectionDialog;
     }
 
@@ -316,6 +315,31 @@ namespace riptide_rviz
 
             uiPanel->startButton->setToolTip("Stop bag service never replied");
             bagStopClient->remove_pending_request(stopReqId);
+        }
+    }
+
+    void BagItem::loadTopics(const std::vector<RecipeTopicData> & topicList){
+        topics.clear();
+
+        RVIZ_COMMON_LOG_INFO("BagItem: loading topics ");
+
+        for(auto recipeTopic : topicList){
+            launch_msgs::msg::TopicData data;
+
+            data.name = recipeTopic.name;
+            data.type_name = recipeTopic.type_name;
+            if(recipeTopic.qos_type == "sensor_data")
+            {
+                data.qos_type = data.QOS_SENSOR_DATA;
+            }
+            else if(recipeTopic.qos_type == "system_default")
+            {
+                data.qos_type = data.QOS_SYSTEM_DEFAULT;
+            }
+
+            RVIZ_COMMON_LOG_INFO("BagItem: adding topic " + data.name + " " + data.type_name + " " + std::to_string(data.qos_type));
+
+            topics.push_back(data);
         }
     }
 

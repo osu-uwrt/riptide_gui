@@ -39,11 +39,14 @@ namespace riptide_rviz
         void stateChanging();
         void stateRunning();
 
+        void loadTopics(const std::vector<RecipeTopicData> & topicList);
+
         // UI Panel instance
         Ui_BagListElement *uiPanel;
 
-        // list of topics from topicdatas 
+        // list of bag information containers
         std::vector<launch_msgs::msg::TopicData> topics;
+        std::shared_ptr<RecipeBag> bagData;
 
         // service clients
         rclcpp::Client<launch_msgs::srv::StartBag>::SharedPtr bagStartClient;

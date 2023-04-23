@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>859</width>
+    <height>408</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
-    <widget class="QListView" name="topicSelector"/>
+    <widget class="QTableView" name="topicSelector"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="dialogButtons">
