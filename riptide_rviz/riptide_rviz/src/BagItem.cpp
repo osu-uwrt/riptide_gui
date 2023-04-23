@@ -82,7 +82,7 @@ namespace riptide_rviz
         Ui_BaggingTopicSelection uiSelection;
         uiSelection.setupUi(selectionDialog);
 
-        uiSelection.topicSelector->setModel();
+        // uiSelection.topicSelector->setModel();
 
         selectionDialog->exec();
 
