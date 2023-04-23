@@ -104,16 +104,7 @@ namespace riptide_rviz
 
     void BaggingPanel::baggingConfigure()
     {
-        // QDialog* selectionDialog = new QDialog();
-
-        // Ui_BaggingTopicSelection uiSelection;
-        // uiSelection.setupUi(selectionDialog);
-
-        // uiSelection.topicSelector->setModel(topicModel);
-
-        // selectionDialog->exec();
-
-        // delete selectionDialog;
+        
     }
 
     void BaggingPanel::hostListRefresh()
@@ -130,7 +121,7 @@ namespace riptide_rviz
         // filter names down to bagging nodes
         std::vector<std::string> baggingNodes;
         auto filt = [](const auto &s)
-        { return s.find("_bagging_manager") != std::string::npos; };
+        { return s.find("_bag_manager") != std::string::npos; };
         std::copy_if(names.begin(), names.end(), std::back_inserter(baggingNodes), filt);
 
         // stop any events while we refresh the list
@@ -196,8 +187,8 @@ namespace riptide_rviz
             auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
             //Selected host is valid, now create action server clients (?)
-            baggingStateSub = node->create_subscription<std_msgs::msg::Bool>(
-                targetNode + "/bagging_status", rclcpp::SystemDefaultsQoS(), std::bind(&BaggingPanel::baggingStateCallback, this, _1)
+            baggingStateSub = node->create_subscription<launch_msgs::msg::ListPids>(
+                targetNode + "/bag_status", rclcpp::SystemDefaultsQoS(), std::bind(&BaggingPanel::baggingStateCallback, this, _1)
             );
 
 
@@ -218,23 +209,34 @@ namespace riptide_rviz
             // get our local rosnode
             auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
-            // start creating the ui elements
-            for(size_t i = 0; i < 15; i++){
-                auto bagItem = new BagItem(uiPanel->baggingHost->currentText().toStdString(), node, mainParent);
-                vbox->addWidget(bagItem);
-                bagItem->show();
+            // hunt down the file location for search 
+            auto bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
 
-                bagList.push_back(bagItem);
+            // parse the bag file
+            auto bags = Bag();
+            auto errCode = bags.loadXml(bringupFilesDir + "/" + text.toStdString());
+            if(errCode.errorCode != RecipeXMLErrorCode::SUCCESS){
+                uiPanel->baggingFile->setToolTip("Unable to read bag cfg file. " + QString::fromStdString(getRecipeXMLErrorMessage(errCode)));
+                RVIZ_COMMON_LOG_ERROR("BaggingPanels: unable to read cffg file. " + getRecipeXMLErrorMessage(errCode));
+            } else {
+                // start creating the ui elements
+                for(auto bag : bags.getAllBags()){
+                    auto bagItem = new BagItem(uiPanel->baggingHost->currentText().toStdString(), bag, node, mainParent);
+                    vbox->addWidget(bagItem);
+                    bagItem->show();
+
+                    bagList.push_back(bagItem);
+                }
+
+                // now load in the ones from the server
             }
         }
     }
 
-    void BaggingPanel::baggingStateCallback(const std_msgs::msg::Bool &msg)
+    void BaggingPanel::baggingStateCallback(const launch_msgs::msg::ListPids &msg)
     {
-        std::vector<int> bids_active = {};
-
         for(auto item : bagList){
-            item->bagAlive(bids_active);
+            item->bagAlive(msg.pids);
         }
     }
 

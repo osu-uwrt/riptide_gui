@@ -1,20 +1,9 @@
 <?xml version="1.1" encoding="UTF-8"?>
 
-<group title="All">
-    <group title="Core" default_enabled="true">
-        <topic name="odometry/filtered" />
-        <topic name="controller/linear" />
-        <topic name="controller/angular" />
-        <topic name="controller/body_force" />
-    </group>
-    <group title="Sensors Raw">
-        <topic name="vectornav/imu" />
-        <topic name="depth/raw" />
-        <topic name="dvl_twist" />
-    </group>
-    <group title="Mapping">
-        <topic name="mapping/cutie" default_enabled="true" />
-        <topic name="mapping/tommy" />
-        <topic name="mapping/gman" />
-    </group>
-</group>
+<bags>
+    <bag name='brrrr'>
+        <topic name="/puddles/aaa/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+        <topic name="/puddles/bbb/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+        <topic name="/puddles/ccc/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+    </bag>
+</bags>

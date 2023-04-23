@@ -1,10 +1,9 @@
 #pragma once
 
 #include "riptide_rviz/BagItem.hpp"
+#include "riptide_rviz/bringup_recipe.hpp"
 
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/bool.hpp>
-#include <std_msgs/msg/string.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
@@ -15,6 +14,9 @@
 #include <vector>
 
 #include "ui_BaggingPanel.h"
+
+#include <launch_msgs/msg/list_pids.hpp>
+#include <launch_msgs/srv/who_is.hpp>
 
 namespace riptide_rviz
 {
@@ -51,13 +53,16 @@ namespace riptide_rviz
         QWidget *scrollAreaLayout = nullptr;
         QVBoxLayout *vbox = nullptr;
 
+        // data fo storing all of the bag info
         std::vector<riptide_rviz::BagItem *> bagList;
 
-        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr baggingStateSub;
+        rclcpp::Subscription<launch_msgs::msg::ListPids>::SharedPtr baggingStateSub;
+        rclcpp::Client<launch_msgs::srv::WhoIs>::SharedPtr bagWhoIsClient;
+
 
         // BaggingTopicModel *topicModel;
 
-        void baggingStateCallback(const std_msgs::msg::Bool &msg);
+        void baggingStateCallback(const launch_msgs::msg::ListPids &msg);
 
     };
 

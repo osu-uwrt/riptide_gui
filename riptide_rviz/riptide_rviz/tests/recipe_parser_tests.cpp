@@ -121,7 +121,7 @@ std::string errEnumToStr(RecipeXMLErrorCode code) {
     case RecipeXMLErrorCode::INVALID_QOS_TYPE: return "INVALID_QOS_TYPE";
     case RecipeXMLErrorCode::EMPTY_RECIPE: return "EMPTY_RECIPE";
     case RecipeXMLErrorCode::DUPLICATE_STAGE_IDS: return "DUPLICATE_STAGE_IDS";
-    case RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES: return "DUPLICATE_LAUNCH_NAMES";
+    case RecipeXMLErrorCode::DUPLICATE_NAMES: return "DUPLICATE_LAUNCH_NAMES";
     case RecipeXMLErrorCode::DUPLICATE_TOPIC: return "DUPLICATE_TOPIC";
     case RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH: return "STAGE_WITH_NO_LAUNCH";
     case RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY: return "NON_EXISTANT_DEPENDENCY";
@@ -456,7 +456,7 @@ void test_bad_launch_duplicate(const std::string &path) {
     RecipeXMLError actualErr = actual.loadXml(path + testName);
 
     RecipeXMLError expectedErr = RecipeXMLError {
-        RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
+        RecipeXMLErrorCode::DUPLICATE_NAMES,
         9
     };
 

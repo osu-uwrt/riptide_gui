@@ -20,6 +20,55 @@ namespace riptide_rviz
         return !(operator==(lhs));
     }
 
+    RecipeXMLError RecipeTopicData::parseXml(const tinyxml2::XMLElement *tag, RecipeTopicData &topic){
+        // Check this stage has an id
+        const char * topicName = tag->Attribute("name");
+        if (topicName == nullptr) {
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+                tag->GetLineNum()
+            };
+        }
+
+        // Get the type information
+        const char * topicType = tag->Attribute("type");
+        if (topicType == nullptr) {
+            // No type info provided. Return with error.
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
+                tag->GetLineNum()
+            };
+        }
+
+        // Get the topic quality of service
+        const char * topicQOS = tag->Attribute("qos");
+        if (topicQOS == nullptr) {
+            // No QOS provided. Return with error
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
+                tag->GetLineNum()
+            };
+        }
+
+        topic.name = topicName;
+        topic.type_name = topicType;
+        // Ensure topic qos is only 
+        if (strcmp(topicQOS, "system_default") == 0 || strcmp(topicQOS, "sensor_data") == 0) {
+            topic.qos_type = topicQOS;
+        } else {
+            // The qos is not a valid type. Retunr with error.
+            return RecipeXMLError {
+                RecipeXMLErrorCode::INVALID_QOS_TYPE,
+                tag->GetLineNum()
+            };
+        }
+
+        return RecipeXMLError {
+            RecipeXMLErrorCode::SUCCESS,
+            -1
+        };
+    }
+
     bool RecipeLaunch::operator==(const RecipeLaunch& lhs) {
         if (name != lhs.name) {
             return false;
@@ -61,6 +110,26 @@ namespace riptide_rviz
     }
 
     bool RecipeLaunch::operator!=(const RecipeLaunch& lhs) {
+        return !(operator==(lhs));
+    }
+
+    bool RecipeBag::operator==(const RecipeBag & lhs){
+        if(name != lhs.name) 
+            return false;
+
+        if(topicList.size() != lhs.topicList.size()) 
+            return false;
+
+        for (size_t i = 0; i < topicList.size(); ++i) {
+            if (topicList[i] != lhs.topicList[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool RecipeBag::operator!=(const RecipeBag & lhs){
         return !(operator==(lhs));
     }
 
@@ -131,17 +200,9 @@ namespace riptide_rviz
             oss << "tinyxml2 could not parse the document. This recipe is malformed in some way";
             break;
 
-        case RecipeXMLErrorCode::NO_LAUNCHES_TAG:
-            oss << "The recipe parser requires there exist a <launches> tag. Please see the example in the recipies directory.";
-            break;
-        case RecipeXMLErrorCode::NON_STAGE_TAG:
-            oss << "The parser only allows <stage> tags to be children of the <launches> tag.";
-            break;
+        // general errors
         case RecipeXMLErrorCode::UNKNOWN_TAG_TYPE:
             oss << "The parser could not identify this tag type, or the tag you are using is not in the correct place. Please see the example in the recipies directory.";
-            break;
-        case RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE:
-            oss << "This tag is missing the 'id' attribute. Please see the example in the recipies directory.";
             break;
         case RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE:
             oss << "This tag is missing the 'name' attribute. Please see the example in the recipies directory.";
@@ -149,9 +210,11 @@ namespace riptide_rviz
         case RecipeXMLErrorCode::MISSING_VALUE_ATTRIBUTE:
             oss << "This tag is missing the 'value' attribute. Please see the example in the recipies directory.";
             break;
-        case RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE:
-            oss << "This tag is missing the 'package' attribute. Please see the example in the recipies directory.";
+        case RecipeXMLErrorCode::DUPLICATE_NAMES:
+            oss << "This launch's name is a duplicate of a previous launch. All launches must have unique id's";
             break;
+
+        // topic parse errors
         case RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE:
             oss << "This tag is missing the 'type' attribute. Please see the example in the recipies directory.";
             break;
@@ -161,20 +224,31 @@ namespace riptide_rviz
         case RecipeXMLErrorCode::INVALID_QOS_TYPE:
             oss << "This topic's QOS type is invalid. Note that the qos attribute can only be set to \"system_default\" or \"sensor_data\" (case-sensitive).";
             break;
-        case RecipeXMLErrorCode::EMPTY_RECIPE:
-            oss << "This recipe is empty.";
-            break;
-        case RecipeXMLErrorCode::DUPLICATE_STAGE_IDS:
-            oss << "This stage's id is a duplicate of a previous stage. All stages must have unique id's";
-            break;
-        case RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES:
-            oss << "This launch's name is a duplicate of a previous launch. All launches must have unique id's";
-            break;
         case RecipeXMLErrorCode::DUPLICATE_TOPIC:
             oss << "This topic's name is a duplicate of a previous topic. All topics within a launch must have unique names";
             break;
+
+        // launch related errors
+        case RecipeXMLErrorCode::EMPTY_RECIPE:
+            oss << "This recipe is empty.";
+            break;
+        case RecipeXMLErrorCode::NO_LAUNCHES_TAG:
+            oss << "The recipe parser requires there exist a <launches> tag. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::NON_STAGE_TAG:
+            oss << "The parser only allows <stage> tags to be children of the <launches> tag.";
+            break;
         case RecipeXMLErrorCode::STAGE_WITH_NO_LAUNCH:
             oss << "This stage contains no launches. All stages must have launches.";
+            break;
+        case RecipeXMLErrorCode::MISSING_ID_ATTRIBUTE:
+            oss << "This tag is missing the 'id' attribute. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::MISSING_PACKAGE_ATTRIBUTE:
+            oss << "This tag is missing the 'package' attribute. Please see the example in the recipies directory.";
+            break;
+        case RecipeXMLErrorCode::DUPLICATE_STAGE_IDS:
+            oss << "This stage's id is a duplicate of a previous stage. All stages must have unique id's";
             break;
         case RecipeXMLErrorCode::NON_EXISTANT_DEPENDENCY:
             oss << "This stage has a dependency that doesn't exist.";
@@ -182,6 +256,20 @@ namespace riptide_rviz
         case RecipeXMLErrorCode::DEPENDENCY_CYCLE:
             oss << "This stage is contained within a dependency cycle (i.e. the stage, either directly or indirectly, depends on itself).";
             break;
+
+        // Bag recipe related errors
+        case RecipeXMLErrorCode::NO_BAGS_TAG:
+            oss << "This file does not have a root bags tag. All bag configs must have a root bags tag.";
+            break;
+        case RecipeXMLErrorCode::EMPTY_BAGS:
+            oss << "This bag config contains no bags. All bag configs must have bag tags.";
+            break;
+        case RecipeXMLErrorCode::NON_BAG_TAG:
+            oss << "This parser only allows <bag> tags to be children of the <bags> tag.";
+            break;
+
+
+
         default:
             oss << "Somehow an unknown error occurred. Please yell at Hunter and tell him to fix his flippin' parser.";
             break;
@@ -362,7 +450,7 @@ namespace riptide_rviz
                 if (existingLaunches.find(launch.name) != existingLaunches.end()) {
                     // This launch already exists
                     return RecipeXMLError {
-                        RecipeXMLErrorCode::DUPLICATE_LAUNCH_NAMES,
+                        RecipeXMLErrorCode::DUPLICATE_NAMES,
                         tag->GetLineNum()
                     };
                 }
@@ -457,53 +545,17 @@ namespace riptide_rviz
         
         for (const XMLElement *tag = launchXML->FirstChildElement(); tag != nullptr; tag = tag->NextSiblingElement()) {
             if (strcmp(tag->Name(), "topic") == 0) {
-                // Check this stage has an id
-                const char * topicName = tag->Attribute("name");
-                if (topicName == nullptr) {
-                    return RecipeXMLError {
-                        RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
-                        tag->GetLineNum()
-                    };
+                
+                RecipeTopicData topic;
+                auto err = RecipeTopicData::parseXml(tag, topic);
+                if(err.errorCode != RecipeXMLErrorCode::SUCCESS){
+                    return err;
                 }
 
                 // Check this id isn't used by other stages
-                if (launch.topicExists(topicName)) {
+                if (launch.topicExists(topic.name.c_str())) {
                     return RecipeXMLError {
                         RecipeXMLErrorCode::DUPLICATE_TOPIC,
-                        tag->GetLineNum()
-                    };
-                }
-
-                // Get the type information
-                const char * topicType = tag->Attribute("type");
-                if (topicType == nullptr) {
-                    // No type info provided. Return with error.
-                    return RecipeXMLError {
-                        RecipeXMLErrorCode::MISSING_TYPE_ATTRIBUTE,
-                        tag->GetLineNum()
-                    };
-                }
-
-                // Get the topic quality of service
-                const char * topicQOS = tag->Attribute("qos");
-                if (topicQOS == nullptr) {
-                    // No QOS provided. Return with error
-                    return RecipeXMLError {
-                        RecipeXMLErrorCode::MISSING_QOS_ATTRIBUTE,
-                        tag->GetLineNum()
-                    };
-                }
-
-                RecipeTopicData topic;
-                topic.name = topicName;
-                topic.type_name = topicType;
-                // Ensure topic qos is only 
-                if (strcmp(topicQOS, "system_default") == 0 || strcmp(topicQOS, "sensor_data") == 0) {
-                    topic.qos_type = topicQOS;
-                } else {
-                    // The qos is not a valid type. Retunr with error.
-                    return RecipeXMLError {
-                        RecipeXMLErrorCode::INVALID_QOS_TYPE,
                         tag->GetLineNum()
                     };
                 }
@@ -621,6 +673,112 @@ namespace riptide_rviz
         }
         
         return launchOrder;
+    }
+
+    RecipeXMLError Bag::loadXml(std::string const& recipePath){
+        using namespace tinyxml2;
+
+        XMLDocument doc;
+        XMLError err;
+
+        bags.clear();
+        
+        // Open Recipe document
+        err = doc.LoadFile(recipePath.c_str());
+        if (err != XML_SUCCESS) {
+            // Document did not load. Return with error
+            return RecipeXMLError {
+                static_cast<RecipeXMLErrorCode>(err),
+                doc.ErrorLineNum()
+            };
+        }
+
+        const XMLElement *root = doc.RootElement();
+
+        // Check if the root tag is a "launches" tag
+        if (strcmp(root->Name(),"bags") != 0) {
+            // Root tag is not a "launches" tag. Return with error
+            return RecipeXMLError {
+                RecipeXMLErrorCode::NO_BAGS_TAG,
+                root->GetLineNum()
+            };
+        }
+
+        // Check that there are launches
+        if (root->FirstChildElement() == nullptr) {
+            // No stages found. Return with error
+            return RecipeXMLError {
+                RecipeXMLErrorCode::EMPTY_BAGS,
+                root->GetLineNum()
+            };
+        }
+
+        for (const XMLElement *bagXML = root->FirstChildElement(); bagXML != nullptr; bagXML = bagXML->NextSiblingElement()) {
+            RecipeBag bag;
+
+            // check that it is a bag tag
+            if (strcmp(bagXML->Name(),"bag") != 0) {
+                // Root tag is not a "launches" tag. Return with error
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::NON_BAG_TAG,
+                    bagXML->GetLineNum()
+                };
+            }
+
+            // Parse this stage tag, and the launches within it    
+            RecipeXMLError err = parseBagTag(bagXML, bag);
+            if (err.errorCode != RecipeXMLErrorCode::SUCCESS) {
+                return err;
+            }
+
+            bags.push_back(std::make_shared<RecipeBag>(bag));
+        }
+
+        return RecipeXMLError {
+            RecipeXMLErrorCode::SUCCESS,
+            -1
+        };
+    }
+
+    RecipeXMLError Bag::parseBagTag(const tinyxml2::XMLElement *bagXML, RecipeBag &launch){
+        using namespace tinyxml2;
+
+        // look for the name attribute
+        const char *name = bagXML->Attribute("name");
+        if (name == nullptr) {
+            // launch does not have a name attribute. Return with error
+            return RecipeXMLError {
+                RecipeXMLErrorCode::MISSING_NAME_ATTRIBUTE,
+                bagXML->GetLineNum()
+            };
+        }
+
+        for (const XMLElement *tag = bagXML->FirstChildElement(); tag != nullptr; tag = tag->NextSiblingElement()) {
+            if (strcmp(tag->Name(), "topic") == 0) {
+                
+                RecipeTopicData topic;
+                auto err = RecipeTopicData::parseXml(tag, topic);
+                if(err.errorCode != RecipeXMLErrorCode::SUCCESS){
+                    return err;
+                }
+
+                launch.topicList.emplace_back(topic);
+            } else {
+                return RecipeXMLError {
+                    RecipeXMLErrorCode::UNKNOWN_TAG_TYPE,
+                    tag->GetLineNum()
+                };
+            }
+        }
+
+        return RecipeXMLError {
+            RecipeXMLErrorCode::SUCCESS,
+            -1
+        };
+    }
+
+    std::vector<std::shared_ptr<RecipeBag>> Bag::getAllBags(){
+        return bags;
     }
 
 } // namespace riptide_rviz
