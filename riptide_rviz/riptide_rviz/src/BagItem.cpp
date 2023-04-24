@@ -58,7 +58,7 @@ namespace riptide_rviz
         bagStartClient = parentNode->create_client<launch_msgs::srv::StartBag>(hostName + "/bag_start");
         bagStopClient = parentNode->create_client<launch_msgs::srv::StopBag>(hostName + "/bag_stop");
 
-        RVIZ_COMMON_LOG_INFO("BagItem: created child item ");
+        RVIZ_COMMON_LOG_DEBUG("BagItem: created child item ");
     }
 
     BagItem::~BagItem()
@@ -354,7 +354,7 @@ namespace riptide_rviz
     {
         topics.clear();
 
-        RVIZ_COMMON_LOG_INFO("BagItem: loading topics ");
+        RVIZ_COMMON_LOG_DEBUG("BagItem: loading topics ");
 
         for (auto recipeTopic : topicList)
         {
@@ -371,7 +371,7 @@ namespace riptide_rviz
                 data.qos_type = data.QOS_SYSTEM_DEFAULT;
             }
 
-            RVIZ_COMMON_LOG_INFO("BagItem: adding topic " + data.name + " " + data.type_name + " " + std::to_string(data.qos_type));
+            RVIZ_COMMON_LOG_DEBUG("BagItem: adding topic " + data.name + " " + data.type_name + " " + std::to_string(data.qos_type));
 
             topics.push_back(data);
         }

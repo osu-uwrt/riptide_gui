@@ -17,6 +17,7 @@
 
 #include <launch_msgs/msg/list_pids.hpp>
 #include <launch_msgs/srv/who_is.hpp>
+#include <std_msgs/msg/bool.hpp>
 
 namespace riptide_rviz
 {
@@ -39,7 +40,6 @@ namespace riptide_rviz
         void handleBaggingPanelHost(const QString &text);
         void handleBaggingPanelFile(const QString &text);
         void startBagging();
-        void stopBagging();
 
     protected:
         bool event(QEvent *event);
@@ -59,6 +59,7 @@ namespace riptide_rviz
         std::vector<BagItem *> bagList;
 
         rclcpp::Subscription<launch_msgs::msg::ListPids>::SharedPtr baggingStateSub;
+        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr bagTriggerSub;
         rclcpp::Client<launch_msgs::srv::WhoIs>::SharedPtr bagWhoIsClient;
 
         // request info for the whois client
@@ -69,9 +70,11 @@ namespace riptide_rviz
         // vector for keeping track of non-local bags
         std::vector<int> nonLocals;
 
-        // BaggingTopicModel *topicModel;
+        bool runningAll = false;
+        std_msgs::msg::Bool priorBagState;
 
         void baggingStateCallback(const launch_msgs::msg::ListPids &msg);
+        void autonomyTriggerCallback(const std_msgs::msg::Bool & msg);
     };
 
 } // namespace riptide_rviz
