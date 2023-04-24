@@ -176,6 +176,10 @@ namespace riptide_rviz
         }
         uiPanel->baggingFile->blockSignals(false);
         uiPanel->baggingFile->setEnabled(false);
+
+        // reset the start all synchronization
+        runningAll = false;
+        priorBagState = std_msgs::msg::Bool();
     }
 
     void BaggingPanel::handleBaggingPanelHost(const QString &str)
