@@ -85,6 +85,7 @@ namespace riptide_rviz
         if (vbox != nullptr)
         {
             RVIZ_COMMON_LOG_DEBUG("BaggingPanels: deleting vbox");
+
             delete vbox;
         }
 
@@ -92,13 +93,14 @@ namespace riptide_rviz
         if (scrollAreaLayout != nullptr)
         {
             RVIZ_COMMON_LOG_DEBUG("BaggingPanel: deleting scroll area");
+
             delete scrollAreaLayout;
         }
 
         RVIZ_COMMON_LOG_DEBUG("BaggingPanel: creating new scroll area");
 
         // Add Vertical Box layout to the Scroll area so we can actually add items to it
-        scrollAreaLayout = new QWidget(mainParent);
+        scrollAreaLayout = new QWidget(uiPanel->scrollArea);
         vbox = new QVBoxLayout(scrollAreaLayout);
         vbox->setAlignment(Qt::AlignTop);
         vbox->setSpacing(0);
@@ -213,6 +215,10 @@ namespace riptide_rviz
 
             // re enable file selection
             uiPanel->baggingFile->setEnabled(true);
+        }
+        else
+        {
+            fileListRefresh();
         }
     }
 
@@ -349,6 +355,18 @@ namespace riptide_rviz
 
     void BaggingPanel::waitForWhois()
     {
+        if (!whoisFuture.valid())
+        {
+
+            RVIZ_COMMON_LOG_ERROR("BagItem: stop future invalidated while sending request");
+
+            // clear the lookup lockout
+            whoisReqId = -1;
+
+            // prevent a re-schedule
+            return;
+        }
+
         // check if future has validated
         auto futureStatus = whoisFuture.wait_for(10ms);
         if (futureStatus == std::future_status::timeout && timerTick < 10)

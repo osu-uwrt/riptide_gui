@@ -156,6 +156,17 @@ namespace riptide_rviz
 
     void BagItem::startupTimer()
     {
+        if (!startFuture.valid())
+        {
+            RVIZ_COMMON_LOG_ERROR("BagItem: start future invalidated while sending request");
+
+            startReqId = -1;
+
+            uiPanel->startButton->setToolTip("Start future invalidated while sending request");
+
+            // prevent a re-schedule
+            return;
+        }
         auto futureStatus = startFuture.wait_for(10ms);
         if (futureStatus == std::future_status::timeout && timerTick < 10)
         {
@@ -238,7 +249,8 @@ namespace riptide_rviz
         return isLocal;
     }
 
-    bool BagItem::isStarting(){
+    bool BagItem::isStarting()
+    {
         return startReqId > -1;
     }
 
@@ -291,12 +303,25 @@ namespace riptide_rviz
                            { shutdownTimer(); });
     }
 
-    bool BagItem::isStopping(){
+    bool BagItem::isStopping()
+    {
         return stopReqId > -1;
     }
 
     void BagItem::shutdownTimer()
     {
+        if (!stopFuture.valid())
+        {
+            RVIZ_COMMON_LOG_ERROR("BagItem: stop future invalidated while sending request");
+
+            uiPanel->startButton->setToolTip("Stop future invalidated while sending request");
+
+            stopReqId = -1;
+
+            // prevent a re-schedule
+            return;
+        }
+
         auto futureStatus = stopFuture.wait_for(10ms);
         if (futureStatus == std::future_status::timeout && timerTick < 10)
         {
