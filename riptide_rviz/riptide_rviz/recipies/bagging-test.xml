@@ -1,9 +1,32 @@
 <?xml version="1.1" encoding="UTF-8"?>
 
 <bags>
-    <bag name='brrrr'>
-        <topic name="/puddles/aaa/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
-        <topic name="/puddles/bbb/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
-        <topic name="/puddles/ccc/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+    <bag name='/tmp/sensor_data'>
+        <topic name="/talos/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
+        <topic name="/talos/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
+        <topic name="/talos/dvl_twist" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
+        <topic name="/talos/vectornav/imu" type="sensor_msgs/msg/Imu" qos="system_default"/>
+        <topic name="/talos/zed_node/left/raw" type="sensor_msgs/msg/Image" qos="system_default"/>
+    </bag>
+
+    <bag name='/tmp/control_data'>
+        <topic name="/talos/state/kill" type="std_msgs/msg/Bool" qos="system_default"/>
+        <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        <topic name="/talos/controller/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+    </bag>
+
+    <bag name='/tmp/mapping_data'>
+        <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        <topic name="/talos/mapping/object_name" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="system_default"/>
+        <topic name="/talos/detections" type="vision_msgs/msg/Detection3DArray" qos="system_default"/>
+    </bag>
+
+    <bag name='/tmp/telemetry_data'>
+        <topic name="/talos/vectornav/temperature" type="sensor_msgs/msg/JointState" qos="system_default"/>
+        <topic name="/talos/depth/temp" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
+        <topic name="/talos/dvl/status" type="nortek_dvl_msgs/msg/DvlStatus" qos="sensor_data"/>
+        <topic name="/diagnostics" type="diagnostic_msgs/msg/DiagnosticStatus" qos="system_default"/>
     </bag>
 </bags>

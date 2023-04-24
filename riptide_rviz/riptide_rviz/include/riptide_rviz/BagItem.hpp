@@ -12,20 +12,23 @@
 
 namespace riptide_rviz
 {
-    class BagItem : public QWidget{
+    class BagItem : public QWidget
+    {
     public:
-        BagItem(std::string hostName, std::shared_ptr<RecipeBag> bagData, std::shared_ptr<rclcpp::Node> parentNode, QWidget *overallParent);
+        BagItem(std::string hostName, std::shared_ptr<RecipeBag> bagData, std::shared_ptr<rclcpp::Node> parentNode, int local = -1);
         ~BagItem();
 
-        void bagAlive(std::vector<int> bids);
+        bool bagAlive(std::vector<int> bids);
 
         // get the name of the bag
-        void getName(std::string & name);
+        void getName(std::string &name);
         int getPid();
-        
-        void startBagging();
-        void stopBagging();
+        bool local();
 
+        void startBagging();
+        bool isStarting();
+        void stopBagging();
+        bool isStopping();
 
     protected:
         bool event(QEvent *event);
@@ -39,7 +42,7 @@ namespace riptide_rviz
         void stateChanging();
         void stateRunning();
 
-        void loadTopics(const std::vector<RecipeTopicData> & topicList);
+        void loadTopics(const std::vector<RecipeTopicData> &topicList);
 
         // UI Panel instance
         Ui_BagListElement *uiPanel;
@@ -55,7 +58,7 @@ namespace riptide_rviz
         // futures
         std::shared_future<std::shared_ptr<launch_msgs::srv::StartBag_Response>> startFuture;
         std::shared_future<std::shared_ptr<launch_msgs::srv::StopBag_Response>> stopFuture;
-        int64_t startReqId = 0, stopReqId = 0;
+        int64_t startReqId = -1, stopReqId = -1;
 
         int timerTick = 0;
 

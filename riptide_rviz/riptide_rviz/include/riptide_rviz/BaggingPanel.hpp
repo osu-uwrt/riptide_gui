@@ -44,6 +44,8 @@ namespace riptide_rviz
     protected:
         bool event(QEvent *event);
 
+        void waitForWhois();
+
     private:
         // UI Panel instance
         Ui_BaggingPanel *uiPanel;
@@ -54,16 +56,22 @@ namespace riptide_rviz
         QVBoxLayout *vbox = nullptr;
 
         // data fo storing all of the bag info
-        std::vector<riptide_rviz::BagItem *> bagList;
+        std::vector<BagItem *> bagList;
 
         rclcpp::Subscription<launch_msgs::msg::ListPids>::SharedPtr baggingStateSub;
         rclcpp::Client<launch_msgs::srv::WhoIs>::SharedPtr bagWhoIsClient;
 
+        // request info for the whois client
+        std::shared_future<std::shared_ptr<launch_msgs::srv::WhoIs_Response>> whoisFuture;
+        int64_t whoisReqId = -1;
+        unsigned int timerTick = 0;
+
+        // vector for keeping track of non-local bags
+        std::vector<int> nonLocals;
 
         // BaggingTopicModel *topicModel;
 
         void baggingStateCallback(const launch_msgs::msg::ListPids &msg);
-
     };
 
 } // namespace riptide_rviz

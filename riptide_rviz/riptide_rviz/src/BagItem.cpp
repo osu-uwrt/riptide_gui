@@ -15,28 +15,36 @@ using namespace std::chrono_literals;
 
 namespace riptide_rviz
 {
-    BagItem::BagItem(std::string hostName, std::shared_ptr<RecipeBag> bagData, std::shared_ptr<rclcpp::Node> parentNode, QWidget *overallParent)
+    BagItem::BagItem(std::string hostName, std::shared_ptr<RecipeBag> bagData, std::shared_ptr<rclcpp::Node> parentNode, int local)
     {
         uiPanel = new Ui_BagListElement();
         uiPanel->setupUi(this);
-        // mainParent = overallParent;
 
-        // TODO set this from the constructor
-        isLocal = true;
-
-        // set the item to blank state
-        stateStopped();
+        isLocal = local < 0;
 
         RVIZ_COMMON_LOG_INFO("BagItem: loading bag " + bagData->name);
 
-        if(isLocal){
+        if (isLocal)
+        {
             this->bagData = bagData;
+            loadTopics(bagData->topicList);
 
             uiPanel->bagName->setText(QString::fromStdString(bagData->name));
-        
-            loadTopics(bagData->topicList);
+
+            // set the default state
+            pid = -1;
+            stateStopped();
         }
-        
+        else
+        {
+            uiPanel->bagName->setText(QString::fromStdString("NL: " + bagData->name));
+
+            // for non-local save the PID
+            pid = local;
+
+            // also set it into the running state
+            stateRunning();
+        }
 
         // conect the buttons
         connect(uiPanel->bagCfg, &QPushButton::clicked, [this](void)
@@ -49,9 +57,6 @@ namespace riptide_rviz
         // create the service clients
         bagStartClient = parentNode->create_client<launch_msgs::srv::StartBag>(hostName + "/bag_start");
         bagStopClient = parentNode->create_client<launch_msgs::srv::StopBag>(hostName + "/bag_stop");
-
-        // set the default state
-        pid = -1;
 
         RVIZ_COMMON_LOG_INFO("BagItem: created child item ");
     }
@@ -70,7 +75,7 @@ namespace riptide_rviz
     {
         RVIZ_COMMON_LOG_INFO("BagItem: configuring " + uiPanel->bagName->text().toStdString());
 
-        QDialog* selectionDialog = new QDialog();
+        QDialog *selectionDialog = new QDialog();
 
         Ui_BaggingTopicSelection uiSelection;
         uiSelection.setupUi(selectionDialog);
@@ -100,7 +105,8 @@ namespace riptide_rviz
             return;
         }
 
-        if(! isLocal){
+        if (!isLocal)
+        {
             RVIZ_COMMON_LOG_ERROR("BagItem: Tried to start a non-local service");
 
             uiPanel->startButton->setToolTip("Cannot start a non-local service");
@@ -173,18 +179,19 @@ namespace riptide_rviz
             else
             {
                 QString btnTip;
-                switch(resp->err_code){
-                    case launch_msgs::srv::StartBag::Response::ERR_MISSING_ARGS:
-                        btnTip = "Internal error occured on bagging server";
-                        break;
-                    case launch_msgs::srv::StartBag::Response::ERR_MISSING_TOPICS:
-                        btnTip = "Server recieved no topics to bag";
-                        break;
-                    case launch_msgs::srv::StartBag::Response::ERR_OPENING_BAG:
-                        btnTip = "Server failed to open bag file";
-                        break;
-                    default:
-                        btnTip = "Server returned an unknown error";
+                switch (resp->err_code)
+                {
+                case launch_msgs::srv::StartBag::Response::ERR_MISSING_ARGS:
+                    btnTip = "Internal error occured on bagging server";
+                    break;
+                case launch_msgs::srv::StartBag::Response::ERR_MISSING_TOPICS:
+                    btnTip = "Server recieved no topics to bag";
+                    break;
+                case launch_msgs::srv::StartBag::Response::ERR_OPENING_BAG:
+                    btnTip = "Server failed to open bag file";
+                    break;
+                default:
+                    btnTip = "Server returned an unknown error";
                 }
 
                 // set the tooltip for the status
@@ -192,6 +199,8 @@ namespace riptide_rviz
 
                 stateStopped();
             }
+
+            startReqId = -1;
         }
         else if (timerTick > 10)
         {
@@ -199,10 +208,12 @@ namespace riptide_rviz
 
             uiPanel->startButton->setToolTip("Start bag service never replied");
             bagStartClient->remove_pending_request(startReqId);
+
+            startReqId = -1;
         }
     }
 
-    void BagItem::bagAlive(std::vector<int> pids)
+    bool BagItem::bagAlive(std::vector<int> pids)
     {
         if (std::find(pids.begin(), pids.end(), pid) == pids.end())
         {
@@ -210,12 +221,25 @@ namespace riptide_rviz
 
             // TODO show the bag died!
             stateStopped();
+
+            return false;
         }
+
+        return true;
     }
 
     int BagItem::getPid()
     {
         return pid;
+    }
+
+    bool BagItem::local()
+    {
+        return isLocal;
+    }
+
+    bool BagItem::isStarting(){
+        return startReqId > -1;
     }
 
     void BagItem::getName(std::string &name)
@@ -265,7 +289,10 @@ namespace riptide_rviz
         // set a oneshot timer for 1s into the future and check status
         QTimer::singleShot(1000, [this]()
                            { shutdownTimer(); });
+    }
 
+    bool BagItem::isStopping(){
+        return stopReqId > -1;
     }
 
     void BagItem::shutdownTimer()
@@ -292,22 +319,25 @@ namespace riptide_rviz
             else
             {
                 QString btnTip;
-                switch(resp->err_code){
-                    case launch_msgs::srv::StopBag::Response::ALR_DEAD :
-                        btnTip = "Bag was already dead";
-                        break;
-                    case launch_msgs::srv::StopBag::Response::BAD_PERM:
-                        btnTip = "Server could not send signal to bag";
-                        break;
-                    default:
-                        btnTip = "Server returned an unknown error on stop";
+                switch (resp->err_code)
+                {
+                case launch_msgs::srv::StopBag::Response::ALR_DEAD:
+                    btnTip = "Bag was already dead";
+                    break;
+                case launch_msgs::srv::StopBag::Response::BAD_PERM:
+                    btnTip = "Server could not send signal to bag";
+                    break;
+                default:
+                    btnTip = "Server returned an unknown error on stop";
                 }
 
                 // set the tooltip for the status
                 uiPanel->stopButton->setToolTip(btnTip);
 
-                stateChanging();
+                stateStopped();
             }
+
+            stopReqId = -1;
         }
         else if (timerTick > 10)
         {
@@ -315,24 +345,28 @@ namespace riptide_rviz
 
             uiPanel->startButton->setToolTip("Stop bag service never replied");
             bagStopClient->remove_pending_request(stopReqId);
+
+            stopReqId = -1;
         }
     }
 
-    void BagItem::loadTopics(const std::vector<RecipeTopicData> & topicList){
+    void BagItem::loadTopics(const std::vector<RecipeTopicData> &topicList)
+    {
         topics.clear();
 
         RVIZ_COMMON_LOG_INFO("BagItem: loading topics ");
 
-        for(auto recipeTopic : topicList){
+        for (auto recipeTopic : topicList)
+        {
             launch_msgs::msg::TopicData data;
 
             data.name = recipeTopic.name;
             data.type_name = recipeTopic.type_name;
-            if(recipeTopic.qos_type == "sensor_data")
+            if (recipeTopic.qos_type == "sensor_data")
             {
                 data.qos_type = data.QOS_SENSOR_DATA;
             }
-            else if(recipeTopic.qos_type == "system_default")
+            else if (recipeTopic.qos_type == "system_default")
             {
                 data.qos_type = data.QOS_SYSTEM_DEFAULT;
             }
