@@ -150,7 +150,7 @@ namespace riptide_rviz
         timerTick = 0;
 
         // set a oneshot timer for 1s into the future and check status
-        QTimer::singleShot(1000, [this]()
+        QTimer::singleShot(250, [this]()
                            { startupTimer(); });
     }
 
@@ -170,7 +170,7 @@ namespace riptide_rviz
         auto futureStatus = startFuture.wait_for(10ms);
         if (futureStatus == std::future_status::timeout && timerTick < 10)
         {
-            QTimer::singleShot(1000, [this]()
+            QTimer::singleShot(250, [this]()
                                { startupTimer(); });
 
             timerTick++;
@@ -299,7 +299,7 @@ namespace riptide_rviz
         timerTick = 0;
 
         // set a oneshot timer for 1s into the future and check status
-        QTimer::singleShot(1000, [this]()
+        QTimer::singleShot(250, [this]()
                            { shutdownTimer(); });
     }
 
@@ -325,7 +325,7 @@ namespace riptide_rviz
         auto futureStatus = stopFuture.wait_for(10ms);
         if (futureStatus == std::future_status::timeout && timerTick < 10)
         {
-            QTimer::singleShot(1000, [this]()
+            QTimer::singleShot(250, [this]()
                                { shutdownTimer(); });
             timerTick++;
         }
