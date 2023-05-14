@@ -10,45 +10,6 @@
 namespace riptide_rviz
 {
 
-    struct RecipeTopicData {
-        std::string name;
-        std::string type_name;
-        std::string qos_type;
-
-        bool operator==(const RecipeTopicData&);
-        bool operator!=(const RecipeTopicData&);
-    };
-
-    /*
-     *  Structure representing the <launch> tag in a recipe. This should share
-     *  many similarities with the BringupStart action
-     */
-    class RecipeLaunch {
-    public:
-        std::string name = "";
-        std::string package = "";
-        std::string stageID = "";
-        std::vector<RecipeTopicData> topicList;
-        std::map<std::string, std::string> arguments;
-
-        bool topicExists(const char *topicName);
-        bool operator==(const RecipeLaunch&);
-        bool operator!=(const RecipeLaunch&);
-    };
-
-    /*
-     *   Structure representing the <stage> tag in a recipe.
-     */
-    class RecipeStage {
-    public:
-        std::string id = "";
-        std::vector<std::string> dependencies;
-        std::vector<int> launchIndicies;
-
-        bool operator==(const RecipeStage&);
-        bool operator!=(const RecipeStage&);
-    };
-
     enum class RecipeXMLErrorCode {
         SUCCESS                             = tinyxml2::XML_SUCCESS,
         XML_NO_ATTRIBUTE                    = tinyxml2::XML_NO_ATTRIBUTE,
@@ -71,24 +32,33 @@ namespace riptide_rviz
 	    XML_ELEMENT_DEPTH_EXCEEDED          = tinyxml2::XML_ELEMENT_DEPTH_EXCEEDED,
 	    XML_ERROR_COUNT                     = tinyxml2::XML_ERROR_COUNT,
 
-        NO_LAUNCHES_TAG,
-        NON_STAGE_TAG,
+        // general errors
         UNKNOWN_TAG_TYPE,
-        MISSING_ID_ATTRIBUTE,
         MISSING_NAME_ATTRIBUTE,
         MISSING_VALUE_ATTRIBUTE,
-        MISSING_PACKAGE_ATTRIBUTE,
+        DUPLICATE_NAMES,
+
+        // topic parsing errors
         MISSING_TYPE_ATTRIBUTE,
         MISSING_QOS_ATTRIBUTE,
         INVALID_QOS_TYPE,
-        EMPTY_RECIPE,
-        DUPLICATE_STAGE_IDS,
-        DUPLICATE_LAUNCH_NAMES,
         DUPLICATE_TOPIC,
-        STAGE_WITH_NO_LAUNCH,
-        NON_EXISTANT_DEPENDENCY,
 
-        DEPENDENCY_CYCLE
+        // launch specific errors
+        EMPTY_RECIPE,
+        NO_LAUNCHES_TAG,
+        NON_STAGE_TAG,
+        STAGE_WITH_NO_LAUNCH,
+        MISSING_ID_ATTRIBUTE,
+        MISSING_PACKAGE_ATTRIBUTE,
+        DUPLICATE_STAGE_IDS,
+        NON_EXISTANT_DEPENDENCY,
+        DEPENDENCY_CYCLE,
+
+        // Bag recipie related errors
+        NO_BAGS_TAG,
+        EMPTY_BAGS,
+        NON_BAG_TAG,
     };
 
     struct RecipeXMLError {
@@ -102,6 +72,56 @@ namespace riptide_rviz
      * about the error stored within RecipeXMLError.errorCode.
      */
     std::string getRecipeXMLErrorMessage(RecipeXMLError);
+
+    struct RecipeTopicData {
+        std::string name;
+        std::string type_name;
+        std::string qos_type;
+
+        static RecipeXMLError parseXml(const tinyxml2::XMLElement *topicXML, RecipeTopicData &launch);
+
+        bool operator==(const RecipeTopicData&);
+        bool operator!=(const RecipeTopicData&);
+    };
+
+    /*
+     *  Structure representing the <launch> tag in a recipe. This should share
+     *  many similarities with the BringupStart action
+     */
+    class RecipeLaunch {
+    public:
+        std::string name = "";
+        std::string package = "";
+        std::string stageID = "";
+        std::vector<RecipeTopicData> topicList;
+        std::map<std::string, std::string> arguments;
+
+        bool topicExists(const char *topicName);
+        bool operator==(const RecipeLaunch&);
+        bool operator!=(const RecipeLaunch&);
+    };
+
+    class RecipeBag {
+        public:
+        std::string name = "";
+        std::vector<RecipeTopicData> topicList;
+
+        bool operator==(const RecipeBag&);
+        bool operator!=(const RecipeBag&);
+    };
+
+    /*
+     *   Structure representing the <stage> tag in a recipe.
+     */
+    class RecipeStage {
+    public:
+        std::string id = "";
+        std::vector<std::string> dependencies;
+        std::vector<int> launchIndicies;
+
+        bool operator==(const RecipeStage&);
+        bool operator!=(const RecipeStage&);
+    };
 
     class Recipe {
     public:
@@ -128,6 +148,7 @@ namespace riptide_rviz
 
         std::vector<std::shared_ptr<RecipeLaunch>> getAllLaunches();
         std::vector<std::vector<int>> getLaunchOrder();
+        std::vector<std::shared_ptr<RecipeBag>> getAllBags();
 
         bool operator==(const Recipe&);
         bool operator!=(const Recipe&);
@@ -152,6 +173,41 @@ namespace riptide_rviz
          * relies, either indirectly. This is used to check for dependency cycles.
          */
         void walkDependencyTree(const std::string &stageID, std::set<std::string> &dependencyWalkResults);
+    };
+
+    class Bag {
+    public:
+        /*
+         * Initializes the Bag object from an XML file.
+         * 
+         * "recipePath" must be a full path to the XML document.
+         * 
+         * On success: The current Bag object will be initialized, with the
+         * bags vector filled with relavent information. The
+         * method will return a RecipeXMLError, with the errorCode set to
+         * XML_SUCCESS (an enum constant provided by tinyxml2) with the
+         * lineNumber set to -1.
+         * 
+         * On failure: The current Bag object will be in an unknown state,
+         * The method will return a RecipeXMLError, with the errorCode set to
+         * some value in the XMLError enum provided by tinyxml2. The lineNumber
+         * will also be set to what line in the XML file caused the error.
+         * 
+         * NOTE: tinyxml2 may set the lineNumber to 0 if the XML error occurred
+         * at an unknown location
+         */
+        RecipeXMLError loadXml(std::string const& recipePath);
+
+        std::vector<std::shared_ptr<RecipeBag>> getAllBags();
+
+        bool operator==(const Bag&);
+        bool operator!=(const Bag&);
+
+        private:
+
+        RecipeXMLError parseBagTag(const tinyxml2::XMLElement *bagXML, RecipeBag &launch);
+
+        std::vector<std::shared_ptr<RecipeBag>> bags;
     };
 
 } // namespace riptide_rviz

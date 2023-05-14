@@ -44,7 +44,6 @@ namespace riptide_rviz
 
         // create our value containers
         QString * str = new QString();
-        float * configVal = new float();
 
         // load the namesapce param
         if(config.mapGetString("robot_namespace", str)){
@@ -67,6 +66,8 @@ namespace riptide_rviz
 
         refreshClient = node->create_client<riptide_msgs2::srv::ListTrees>(robot_ns + "/autonomy/list_trees");
 
+        delete str;
+
         // refresh the UI
         refresh();
     }
@@ -80,7 +81,8 @@ namespace riptide_rviz
     }
 
     bool MissionPanel::event(QEvent *event)
-    {
+    { 
+        return false;
     }
 
     MissionPanel::~MissionPanel()
