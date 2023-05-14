@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BringupListElement</class>
- <widget class="QWidget" name="BringupListElement">
+ <class>BagListElement</class>
+ <widget class="QWidget" name="BagListElement">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>444</width>
-    <height>45</height>
+    <width>332</width>
+    <height>46</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,40 +17,25 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="launchFileLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>140</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>140</width>
-         <height>16777215</height>
-        </size>
-       </property>
+      <widget class="QLineEdit" name="bagName">
        <property name="text">
-        <string>id:</string>
+        <string>Bag Name</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QProgressBar" name="progressBar">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QPushButton" name="bagCfg">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
-       <property name="value">
-        <number>0</number>
+       <property name="maximumSize">
+        <size>
+         <width>26</width>
+         <height>26</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>⚙</string>
        </property>
       </widget>
      </item>
