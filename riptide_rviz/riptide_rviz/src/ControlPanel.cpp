@@ -124,7 +124,7 @@ namespace riptide_rviz
 
         // setup the ROS topics that depend on namespace
         // make publishers
-        killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/control/software_kill", rclcpp::SystemDefaultsQoS());
+        killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
         ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
         ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
 
