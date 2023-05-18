@@ -2,6 +2,7 @@ marker_publisher:
   mesh_pkg: riptide_meshes
   mesh_directory: meshes
   marker_topic: mapping_markers
+  robot: talos
   markers:
     axe:
       frame: axe_frame
