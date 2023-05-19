@@ -8,7 +8,7 @@
             <topic name="/talos/state/firmware" type="riptide_msgs2/msg/FirmwareStatus" qos="system_default"/>
             <topic name="/talos/dvl/status" type="nortek_dvl_msgs/msg/DvlStatus" qos="sensor_data"/>
             <topic name="/talos/vectornav/imu" type="sensor_msgs/msg/Imu" qos="sensor_data"/>
-            <topic name="/talos/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
+            <topic name="/talos/state/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
         </launch>
     </stage>
 

@@ -11,7 +11,7 @@ from geometry_msgs.msg import Quaternion, Vector3
 from std_msgs.msg import Empty, Bool
 from nav_msgs.msg import Odometry
 import riptide_msgs2.action
-from riptide_msgs2.msg import KillSwitchReport, RobotState, ControllerCommand
+from riptide_msgs2.msg import KillSwitchReport, ControllerCommand
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
@@ -395,7 +395,7 @@ class ControllersWidget(QWidget):
         self._position_sub = self._node.create_subscription(ControllerCommand, self.namespace + "/controller/linear", self._linear_callback, qos_profile_system_default)
         self._orientation_sub = self._node.create_subscription(ControllerCommand, self.namespace + "/controller/angular", self._angular_callback, qos_profile_system_default)
         self._steady_sub = self._node.create_subscription(Bool, self.namespace + "/controller/steady", self._steady_callback, qos_profile_system_default)
-        self._kill_switch_sub = self._node.create_subscription(RobotState, self.namespace + "/state/robot", self._kill_switch_callback, qos_profile_sensor_data)
+        self._kill_switch_sub = self._node.create_subscription(Bool, self.namespace + "/state/kill", self._kill_switch_callback, qos_profile_sensor_data)
 
     def _cleanup_topics(self):
         if self._software_kill_pub_timer.isActive():
@@ -486,10 +486,10 @@ class ControllersWidget(QWidget):
     def _steady_callback(self, msg):
         self.steady_light_data = msg.data
 
-    def _kill_switch_callback(self, msg: RobotState):
+    def _kill_switch_callback(self, msg: Bool):
         # If the kill switch was just inserted, clear target data
         # Not going to continuously clear the data so it'll be clear if topics are still publishing after kill
-        if not msg.kill_switch_inserted and not self.kill_switch_killed:
+        if not msg.data and not self.kill_switch_killed:
             self._linear_target_data = ["Position:", "No Data", None, None]
             self._angular_target_data = ["Orientation:", "No Data", None, None]
 

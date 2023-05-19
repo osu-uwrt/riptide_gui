@@ -2,8 +2,8 @@
 
 <bags>
     <bag name='/tmp/sensor_data'>
-        <topic name="/talos/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
-        <topic name="/talos/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
+        <topic name="/talos/state/depth/raw" type="riptide_msgs2/msg/Depth" qos="sensor_data"/>
+        <topic name="/talos/state/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
         <topic name="/talos/dvl_twist" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
         <topic name="/talos/vectornav/imu" type="sensor_msgs/msg/Imu" qos="system_default"/>
         <topic name="/talos/zed_node/left/raw" type="sensor_msgs/msg/Image" qos="system_default"/>

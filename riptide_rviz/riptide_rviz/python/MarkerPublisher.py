@@ -60,6 +60,7 @@ class MarkerPublisher(Node):
         self.meshPkg = docRoot["mesh_pkg"]
         self.meshDir = docRoot["mesh_directory"]
         self.markerTopic = docRoot["marker_topic"]
+        self.robot = docRoot["robot"]
         self.markers = docRoot["markers"]
         self.markerNames = list(self.markers.keys()) #so swe can iterate through the list with numerical ids
         
@@ -112,34 +113,34 @@ class MarkerPublisher(Node):
             
             array.markers.append(marker)
             
-        #publish ghost tempest
-        tempest = Marker()
-        tempest.header.frame_id = "world"
-        tempest.header.stamp = self.get_clock().now().to_msg()
-        tempest.ns = "tempest"
-        tempest.id = 0
-        tempest.type = Marker.MESH_RESOURCE
-        tempest.pose = self.latestOdom.pose.pose
-        tempest.scale = Vector3(x=1.0, y=1.0, z=1.0)
-        tempest.color = ColorRGBA(r=0.0, g=0.0, b=0.0, a=0.5)
-        tempest.lifetime = Duration().to_msg()
-        tempest.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, "tempest", "model.dae")
-        tempest.mesh_use_embedded_materials = False
+        #publish ghost robot
+        ghost = Marker()
+        ghost.header.frame_id = "world"
+        ghost.header.stamp = self.get_clock().now().to_msg()
+        ghost.ns = "ghost"
+        ghost.id = 0
+        ghost.type = Marker.MESH_RESOURCE
+        ghost.pose = self.latestOdom.pose.pose
+        ghost.scale = Vector3(x=1.0, y=1.0, z=1.0)
+        ghost.color = ColorRGBA(r=0.0, g=0.0, b=0.0, a=0.5)
+        ghost.lifetime = Duration().to_msg()
+        ghost.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, self.robot, "model.dae")
+        ghost.mesh_use_embedded_materials = False
         
         linearActive = self.latestLinearCmd.mode == ControllerCommand.POSITION
         angularActive = self.latestAngularCmd.mode == ControllerCommand.POSITION
         if not (linearActive or angularActive):
-            tempest.action = Marker.DELETE
+            ghost.action = Marker.DELETE
         else:
-            tempest.action = Marker.MODIFY
+            ghost.action = Marker.MODIFY
             
         if linearActive:
-            tempest.pose.position = toPoint(self.latestLinearCmd.setpoint_vect)
+            ghost.pose.position = toPoint(self.latestLinearCmd.setpoint_vect)
         
         if angularActive:
-            tempest.pose.orientation = self.latestAngularCmd.setpoint_quat
+            ghost.pose.orientation = self.latestAngularCmd.setpoint_quat
         
-        array.markers.append(tempest)
+        array.markers.append(ghost)
         self.markerPub.publish(array)
 
 
