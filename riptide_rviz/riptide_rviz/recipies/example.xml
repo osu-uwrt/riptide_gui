@@ -41,6 +41,7 @@
 
         <launch name="dummy_robot_bringup.launch.py" package="dummy_robot_bringup">
             <topic name="/joint_states" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
+            <topic name="/scan" type="sensor_msgs/msg/LaserScan" qos="system_default"/>
             <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
         </launch>
     </stage>

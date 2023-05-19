@@ -108,17 +108,60 @@ namespace riptide_rviz
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
+        RVIZ_COMMON_LOG_INFO("MissionPanel: Preparing to send refresh request");
+
         riptide_msgs2::srv::ListTrees::Request::SharedPtr startReq = std::make_shared<riptide_msgs2::srv::ListTrees::Request>();
         auto start = node->get_clock()->now();
         while (!refreshClient->wait_for_service(100ms))
-            if (node->get_clock()->now() - start > 1s || !rclcpp::ok())
+            if (node->get_clock()->now() - start > 1s || !rclcpp::ok()){
+                RVIZ_COMMON_LOG_INFO("MissionPanel: Refresh server not online");
                 return;
+            }
 
-        auto refreshFuture = refreshClient->async_send_request(startReq);
-        if (rclcpp::spin_until_future_complete(node, refreshFuture, 1s) == rclcpp::FutureReturnCode::SUCCESS)
+        auto refreshFutureInfo = refreshClient->async_send_request(startReq);
+        refreshFuture = refreshFutureInfo.share();
+        refreshFutureid = refreshFutureInfo.request_id;
+
+        // set a timer to get the results so we dont lock the thread :)
+        // clear the timer ticks
+        timerTick = 0;
+
+        RVIZ_COMMON_LOG_INFO("MissionPanel: Scheduled refresh timer");
+
+        // set a oneshot timer for 1s into the future and check status
+        QTimer::singleShot(250, [this]()
+                            { waitForRefresh(); });
+
+    }
+
+    void MissionPanel::waitForRefresh(){
+        if (!refreshFuture.valid())
         {
 
+            RVIZ_COMMON_LOG_ERROR("BagItem: stop future invalidated while sending request");
+
+            // clear the lookup lockout
+            refreshFutureid = -1;
+
+            // prevent a re-schedule
+            return;
+        }
+
+        // check if future has validated
+        auto futureStatus = refreshFuture.wait_for(10ms);
+        if (futureStatus == std::future_status::timeout && timerTick < 10)
+        {
+            QTimer::singleShot(250, [this]()
+                               { waitForRefresh(); });
+
+            timerTick++;
+        }
+        else if (futureStatus != std::future_status::timeout)
+        {
+            // future has come back parse the PID information
             auto response = refreshFuture.get();
+
+            RVIZ_COMMON_LOG_INFO("MissionPanel: refresh request validated");
 
             uiPanel->btSelect->clear();
 
@@ -133,6 +176,13 @@ namespace riptide_rviz
                 // push these into the combo box
                 uiPanel->btSelect->addItem(QString::fromStdString(tree));
             }
+        }
+        else if (timerTick == 10)
+        {
+            RVIZ_COMMON_LOG_ERROR("MissionPanel: refresh service never responded");
+
+            // remove the failed request
+            refreshClient->remove_pending_request(refreshFutureid);
         }
     }
 

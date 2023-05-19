@@ -213,7 +213,7 @@ namespace riptide_rviz
 
             startReqId = -1;
         }
-        else if (timerTick > 10)
+        else if (timerTick == 10)
         {
             RVIZ_COMMON_LOG_ERROR("BagItem: Start bag service never replied");
 
@@ -364,7 +364,7 @@ namespace riptide_rviz
 
             stopReqId = -1;
         }
-        else if (timerTick > 10)
+        else if (timerTick == 10)
         {
             RVIZ_COMMON_LOG_ERROR("BagItem: Stop bag service never replied");
 

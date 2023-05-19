@@ -404,7 +404,7 @@ namespace riptide_rviz
             // clear the lookup lockout
             whoisReqId = -1;
         }
-        else if (timerTick > 10)
+        else if (timerTick == 10)
         {
             RVIZ_COMMON_LOG_ERROR("BagItem: Whois service never responded");
 

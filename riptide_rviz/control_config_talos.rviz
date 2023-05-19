@@ -7,7 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
       Splitter Ratio: 0.6117647290229797
-    Tree Height: 703
+    Tree Height: 349
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -44,6 +44,9 @@ Panels:
     robot_namespace: /talos
   - Class: rviz_common/Transformation
     Name: Transformation
+  - Class: riptide_rviz/MissionPanel
+    Name: MissionPanel
+    robot_namespace: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -96,151 +99,17 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        BinBarrel_frame:
-          Value: false
-        BinPhone_frame:
-          Value: false
-        TommyGun_frame:
-          Value: false
-        TommyGun_frame_oriented:
-          Value: false
-        axe_frame:
-          Value: false
-        badge_frame:
-          Value: false
-        badge_frame_oriented:
-          Value: false
-        binBarrel_frame:
-          Value: false
-        binPhone_frame:
-          Value: false
-        bootlegger_frame:
-          Value: false
-        bootlegger_frame_oriented:
-          Value: false
-        cash_frame:
-          Value: true
-        estimated_origin_frame:
-          Value: false
-        gate_frame:
-          Value: false
-        gman_frame:
-          Value: true
-        gman_frame_oriented:
-          Value: false
-        map:
-          Value: false
-        octogon_frame:
-          Value: false
-        odom:
-          Value: false
-        tag36h11:0:
-          Value: false
-        talos/base_link:
-          Value: true
-        talos/dvl_link:
-          Value: false
-        talos/imu_revolute_link:
-          Value: false
-        talos/origin:
-          Value: true
-        talos/pose_sensor_link:
-          Value: false
-        talos/pressure_link:
-          Value: false
-        talos/stereo/base_link:
-          Value: false
-        talos/stereo/imu_revolute_link:
-          Value: false
-        talos/thruster_0:
-          Value: true
-        talos/thruster_1:
-          Value: true
-        talos/thruster_2:
-          Value: true
-        talos/thruster_3:
-          Value: true
-        talos/thruster_4:
-          Value: true
-        talos/thruster_5:
-          Value: true
-        talos/thruster_6:
-          Value: true
-        talos/thruster_7:
-          Value: true
-        torpedoBootlegger_frame:
-          Value: false
         torpedoGman_frame:
-          Value: false
-        world:
-          Value: false
+          Value: true
+        torpedoHole_frame:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        world:
-          map:
-            BinBarrel_frame:
-              {}
-            BinPhone_frame:
-              {}
-            TommyGun_frame:
-              TommyGun_frame_oriented:
-                {}
-            axe_frame:
-              {}
-            badge_frame:
-              badge_frame_oriented:
-                {}
-            binBarrel_frame:
-              {}
-            binPhone_frame:
-              {}
-            bootlegger_frame:
-              bootlegger_frame_oriented:
-                {}
-            cash_frame:
-              {}
-            gate_frame:
-              {}
-            gman_frame:
-              gman_frame_oriented:
-                {}
-            octogon_frame:
-              {}
-            torpedoBootlegger_frame:
-              {}
-            torpedoGman_frame:
-              {}
-          odom:
-            talos/base_link:
-              talos/origin:
-                talos/dvl_link:
-                  {}
-                talos/imu_revolute_link:
-                  {}
-                talos/pressure_link:
-                  {}
-                talos/thruster_0:
-                  {}
-                talos/thruster_1:
-                  {}
-                talos/thruster_2:
-                  {}
-                talos/thruster_3:
-                  {}
-                talos/thruster_4:
-                  {}
-                talos/thruster_5:
-                  {}
-                talos/thruster_6:
-                  {}
-                talos/thruster_7:
-                  {}
-              talos/pose_sensor_link:
-                {}
+        {}
       Update Interval: 0
       Value: true
     - Angle Tolerance: 0.10000000149011612
@@ -466,17 +335,17 @@ Visualization Manager:
       ver_dist: 0
       width: 128
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: true
+      Enabled: false
       Name: MarkerArray
       Namespaces:
-        mapping_markers: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /talos/mapping_markers
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -539,7 +408,7 @@ Visualization Manager:
       Name: Current View
       Near Clip Distance: 0.009999999776482582
       Pitch: 0.47039756178855896
-      Target Frame: talos/base_link
+      Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
       Yaw: 3.7535860538482666
     Saved: ~
@@ -552,14 +421,14 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1016
+  Height: 881
   Hide Left Dock: false
   Hide Right Dock: false
   Image:
     collapsed: false
   MissionPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000017f0000035ffc020000000cfb0000001200530065006c0065006300740069006f006e000000003d000000fb0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001c005400720061006e00730066006f0072006d006100740069006f006e000000031f000000c10000007b00fffffffb000000180043006f006e00740072006f006c00500061006e0065006c010000003d000001ca0000001600fffffffb00000012004100630074007500610074006f00720073010000020d000000980000001500fffffffb0000000c00430061006d00650072006100000002d0000000c70000000000000000fc000002ab000000f1000000ac00fffffffa000000000100000002fb0000000e004200720069006e0067007500700100000000ffffffff0000012900fffffffb0000001c005400720061006e00730066006f0072006d006100740069006f006e0000000000000001820000009e00ffffff00000001000001560000035ffc0200000006fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0049006d006100670065000000003d000000c90000002800fffffffc0000003d0000035f000000e60100001cfa000000010100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0000000000ffffffff0000008e00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006710000010f0000010000fffffffb0000000a0049006d00610067006501000002d3000000cd0000000000000000fb0000000a0049006d00610067006501000002a8000000f80000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073600000039fc0100000002fb0000000800540069006d0065010000000000000736000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004550000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000129000002d8fc020000000cfb0000001200530065006c0065006300740069006f006e000000003d000000fb0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001c005400720061006e00730066006f0072006d006100740069006f006e000000031f000000c10000007b00fffffffb000000180043006f006e00740072006f006c00500061006e0065006c010000003d0000018a0000001600fffffffb00000012004100630074007500610074006f0072007300000001c4000000800000001500fffffffb0000000c00430061006d00650072006100000002d0000000c70000000000000000fc000001cd00000148000000ac00fffffffa000000000100000002fb0000000e004200720069006e0067007500700100000000ffffffff0000012900fffffffb0000001c005400720061006e00730066006f0072006d006100740069006f006e0000000000000001820000009e00ffffff0000000100000156000002d8fc0200000006fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0049006d006100670065000000003d000000c90000002800fffffffc0000003d000002d8000000e60100001cfa000000000100000004fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000008e00fffffffb00000018004d0069007300730069006f006e00500061006e0065006c0000000000ffffffff0000008e00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006710000010f0000010000fffffffb0000000a0049006d00610067006501000002d3000000cd0000000000000000fb0000000a0049006d00610067006501000002a8000000f80000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000005e800000039fc0100000002fb0000000800540069006d00650100000000000005e8000002fb00fffffffb0000000800540069006d006501000000000000045000000000000000000000035d000002d800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -570,6 +439,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1846
-  X: 605
-  Y: 1107
+  Width: 1512
+  X: 0
+  Y: 27
