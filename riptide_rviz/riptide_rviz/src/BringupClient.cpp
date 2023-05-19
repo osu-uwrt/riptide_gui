@@ -132,10 +132,7 @@ namespace riptide_rviz
         {
             started = true;
             completedLaunch = true;
-
-            if (recipeLaunchData->topicList.size() == 0) {
-                listElement->progressBar->setValue(1);
-            }
+            listElement->progressBar->setValue(listElement->progressBar->maximum());
         }
         else if(result.code == rclcpp_action::ResultCode::ABORTED)
         {
