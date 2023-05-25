@@ -47,9 +47,9 @@ namespace riptide_rviz
         connect(uiPanel->ctrlModeFFD, &QPushButton::clicked,
                 [this](void)
                 { switchMode(riptide_msgs2::msg::ControllerCommand::FEEDFORWARD); });
-        connect(uiPanel->ctrlModeVel, &QPushButton::clicked,
+        connect(uiPanel->ctrlModeTele, &QPushButton::clicked,
                 [this](void)
-                { switchMode(22); });
+                { RVIZ_COMMON_LOG_INFO("ControlPanel: bad button >:("); });
 
         // command sending buttons
         connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, [this](void)
