@@ -62,6 +62,7 @@ namespace riptide_rviz
 
         // robot namespace used for config save and load
         std::string robot_ns;
+        std::string hostname;
 
         // doubles for max depth and duration for odom timeout
         double max_depth_in_place, tgt_in_place_depth;
