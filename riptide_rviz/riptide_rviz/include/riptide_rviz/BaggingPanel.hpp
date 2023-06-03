@@ -40,6 +40,7 @@ namespace riptide_rviz
         void handleBaggingPanelHost(const QString &text);
         void handleBaggingPanelFile(const QString &text);
         void startBagging();
+        void setGlobalBagState(bool run);
 
     protected:
         bool event(QEvent *event);

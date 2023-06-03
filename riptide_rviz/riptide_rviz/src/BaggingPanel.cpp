@@ -265,8 +265,8 @@ namespace riptide_rviz
 
     void BaggingPanel::autonomyTriggerCallback(const std_msgs::msg::Bool &msg)
     {
-        if (msg.data != priorBagState.data)
-            startBagging();
+        if (uiPanel->baggingTrigger->isChecked() && msg.data != priorBagState.data)
+            setGlobalBagState(msg.data);
 
         priorBagState = msg;
     }
@@ -413,9 +413,8 @@ namespace riptide_rviz
         }
     }
 
-    void BaggingPanel::startBagging()
-    {
-        if (runningAll)
+    void BaggingPanel::setGlobalBagState(bool run){
+        if (run)
         {
             // we are going to stop them all
             for (auto item : bagList)
@@ -439,7 +438,11 @@ namespace riptide_rviz
             uiPanel->baggingStart->setText("stop");
             uiPanel->baggingStart->setStyleSheet("QPushButton{color:black; background: red;}");
         }
+    }
 
+    void BaggingPanel::startBagging()
+    {
+        setGlobalBagState(runningAll);
         runningAll = !runningAll;
     }
 
