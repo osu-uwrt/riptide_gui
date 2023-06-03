@@ -25,8 +25,14 @@
 
     <bag name='/tmp/telemetry_data'>
         <topic name="/talos/vectornav/temperature" type="sensor_msgs/msg/JointState" qos="system_default"/>
-        <topic name="/talos/depth/temp" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
+        <topic name="/talos/state/depth/temp" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
         <topic name="/talos/dvl/status" type="nortek_dvl_msgs/msg/DvlStatus" qos="sensor_data"/>
         <topic name="/diagnostics" type="diagnostic_msgs/msg/DiagnosticStatus" qos="system_default"/>
+    </bag>
+
+    <bag name='/tmp/autonomy_data'>
+        <topic name="/talos/controller/linear" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
+        <topic name="/talos/controller/angular" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
+        <topic name="/talos/autonomy/tree_stack" type="riptide_msgs2/msg/TreeStack" qos="system_default"/>
     </bag>
 </bags>

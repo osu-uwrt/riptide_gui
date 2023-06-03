@@ -12,6 +12,35 @@
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
+#include <unistd.h>
+
+#define MAX_HOST_LEN 300
+
+const std::string get_hostname()
+{
+    // retrieve the system hostname in hopefully MAX_HOST_LEN characters -1 for null term
+    char hostCstr[MAX_HOST_LEN];
+    gethostname(hostCstr, MAX_HOST_LEN);
+
+    std::string hostnameInternal(hostCstr);
+
+    // make sure we have a null termination
+    if (hostnameInternal.length() >= MAX_HOST_LEN)
+    {
+        hostnameInternal = "unknown_host";
+        std::cerr << "Failed to discover system hostname, falling back to default, " << hostnameInternal;
+    }
+    else
+    {
+        // replace the dashes with underscores, because the spec doesnt like dashes
+        std::replace(hostnameInternal.begin(), hostnameInternal.end(), '-', '_');
+    }
+
+    // kinda important.... without this strings raise a bad_alloc
+    return hostnameInternal;
+}
+
+
 namespace riptide_rviz
 {
     ControlPanel::ControlPanel(QWidget *parent) : rviz_common::Panel(parent)
@@ -47,9 +76,9 @@ namespace riptide_rviz
         connect(uiPanel->ctrlModeFFD, &QPushButton::clicked,
                 [this](void)
                 { switchMode(riptide_msgs2::msg::ControllerCommand::FEEDFORWARD); });
-        connect(uiPanel->ctrlModeVel, &QPushButton::clicked,
+        connect(uiPanel->ctrlModeTele, &QPushButton::clicked,
                 [this](void)
-                { switchMode(22); });
+                { RVIZ_COMMON_LOG_INFO("ControlPanel: bad button >:("); });
 
         // command sending buttons
         connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, [this](void)
@@ -141,6 +170,9 @@ namespace riptide_rviz
         
         // and start the kill switch pub timer
         killPubTimer = node->create_wall_timer(50ms, std::bind(&ControlPanel::sendKillMsgTimer, this));
+
+        // save the hostanme for kill instance
+        hostname = "rviz_control_" + get_hostname();
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Loading config complete");
     }
@@ -509,7 +541,7 @@ namespace riptide_rviz
     {
         auto killMsg = riptide_msgs2::msg::KillSwitchReport();
         killMsg.kill_switch_id = riptide_msgs2::msg::KillSwitchReport::KILL_SWITCH_RQT_CONTROLLER;
-        killMsg.sender_id = "/riptide_rviz_control";
+        killMsg.sender_id = hostname;
         killMsg.switch_asserting_kill = !vehicleEnabled;
         killMsg.switch_needs_update = uiPanel->ctrlRequireKill->isChecked();
 
