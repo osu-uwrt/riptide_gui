@@ -32,7 +32,7 @@
         <launch name="solver.launch.py" package="riptide_controllers2">
             <arg name="robot" value="talos"/>
 
-            <topic name="/talos/command/dshot" type="riptide_msgs2/msg/DshotCommand" qos="system_default"/>
+            <!-- <topic name="/talos/command/dshot" type="riptide_msgs2/msg/DshotCommand" qos="system_default"/> -->
         </launch>
     </stage>
 

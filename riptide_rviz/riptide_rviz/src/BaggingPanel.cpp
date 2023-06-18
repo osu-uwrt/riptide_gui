@@ -182,6 +182,7 @@ namespace riptide_rviz
         // reset the start all synchronization
         runningAll = false;
         priorBagState = std_msgs::msg::Bool();
+        priorBagState.data = false;
     }
 
     void BaggingPanel::handleBaggingPanelHost(const QString &str)
@@ -244,7 +245,7 @@ namespace riptide_rviz
             if (errCode.errorCode != RecipeXMLErrorCode::SUCCESS)
             {
                 uiPanel->baggingFile->setToolTip("Unable to read bag cfg file. " + QString::fromStdString(getRecipeXMLErrorMessage(errCode)));
-                RVIZ_COMMON_LOG_ERROR("BaggingPanels: unable to read cfg file. " + getRecipeXMLErrorMessage(errCode));
+                RVIZ_COMMON_LOG_ERROR("BaggingPanel: unable to read cfg file. " + getRecipeXMLErrorMessage(errCode));
             }
             else
             {
@@ -265,6 +266,7 @@ namespace riptide_rviz
 
     void BaggingPanel::autonomyTriggerCallback(const std_msgs::msg::Bool &msg)
     {
+        RVIZ_COMMON_LOG_INFO_STREAM("BaggingPanel: recieved autonomy trigger " << (msg.data ? "start" : "stop"));
         if (uiPanel->baggingTrigger->isChecked() && msg.data != priorBagState.data)
             setGlobalBagState(msg.data);
 
@@ -444,6 +446,7 @@ namespace riptide_rviz
     {
         setGlobalBagState(runningAll);
         runningAll = !runningAll;
+        priorBagState.data = runningAll;
     }
 
 } // namespace riptide_rviz

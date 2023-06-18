@@ -7,6 +7,7 @@
         <topic name="/talos/dvl_twist" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
         <topic name="/talos/vectornav/imu" type="sensor_msgs/msg/Imu" qos="system_default"/>
         <topic name="/talos/zed_node/left/raw" type="sensor_msgs/msg/Image" qos="system_default"/>
+        <topic name="/talos/odometry/filtered" type="sensor_msgs/msg/Odometry" qos="system_default"/>
     </bag>
 
     <bag name='/tmp/control_data'>
