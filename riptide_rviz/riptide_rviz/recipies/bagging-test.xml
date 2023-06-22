@@ -6,8 +6,9 @@
         <topic name="/talos/state/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="sensor_data"/>
         <topic name="/talos/dvl_twist" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
         <topic name="/talos/vectornav/imu" type="sensor_msgs/msg/Imu" qos="system_default"/>
-        <topic name="/talos/zed_node/left/raw" type="sensor_msgs/msg/Image" qos="system_default"/>
-        <topic name="/talos/odometry/filtered" type="sensor_msgs/msg/Odometry" qos="system_default"/>
+        <!--<topic name="/talos/zed2i/zed_node/left/image_rect_color" type="sensor_msgs/msg/Image" qos="system_default"/>
+        <topic name="/talos/zed2i/zed_node/depth/depth_registered" type="sensor_msgs/msg/Image" qos="system_default"/>-->
+        <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
     </bag>
 
     <bag name='/mnt/sd/control_data'>
@@ -15,13 +16,9 @@
         <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
         <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
         <topic name="/talos/controller/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
-    </bag>
-
-    <bag name='/mnt/sd/mapping_data'>
-        <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
-        <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
-        <topic name="/talos/mapping/object_name" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="system_default"/>
-        <topic name="/talos/detections" type="vision_msgs/msg/Detection3DArray" qos="system_default"/>
+        <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
+        <topic name="/talos/controller/linear" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
+        <topic name="/talos/controller/angular" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
     </bag>
 
     <bag name='/mnt/sd/telemetry_data'>
@@ -29,11 +26,17 @@
         <topic name="/talos/state/depth/temp" type="sensor_msgs/msg/JointState" qos="sensor_data"/>
         <topic name="/talos/dvl/status" type="nortek_dvl_msgs/msg/DvlStatus" qos="sensor_data"/>
         <topic name="/diagnostics" type="diagnostic_msgs/msg/DiagnosticStatus" qos="system_default"/>
+        <topic name="/talos/state/thrusters/rpm" type="riptide_msgs2/msg/DshotRPMFeedback" qos="system_default" />
     </bag>
 
     <bag name='/mnt/sd/autonomy_data'>
         <topic name="/talos/controller/linear" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
         <topic name="/talos/controller/angular" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
         <topic name="/talos/autonomy/tree_stack" type="riptide_msgs2/msg/TreeStack" qos="system_default"/>
+        <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
+        <topic name="/talos/mapping/badge" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="system_default"/>
+        <topic name="/talos/detections" type="vision_msgs/msg/Detection3DArray" qos="system_default"/>
+        <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
     </bag>
 </bags>
