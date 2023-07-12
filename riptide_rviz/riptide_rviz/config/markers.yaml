@@ -17,12 +17,12 @@ marker_publisher:
     binBarrel:
       frame: binBarrel_frame
       mesh: binBarrel
-      pose: [0, 0, 0, 0, 0, 1.5707]
+      pose: [0, 0, 0, 1.5707, 0, 1.5707]
       scale: 1
     binPhone:
       frame: binPhone_frame
       mesh: binPhone
-      pose: [0, 0, 0, 0, 0, 0]
+      pose: [0, 0, 0, 0, 1.5707, 0]
       scale: 1
     bootlegger:
       frame: bootlegger_frame

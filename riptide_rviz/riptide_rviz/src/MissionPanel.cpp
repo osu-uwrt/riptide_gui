@@ -234,7 +234,6 @@ namespace riptide_rviz
         for(auto name : msg.stack){
             QStandardItem * item = new QStandardItem(QString::fromStdString(name));
             parentItem->appendRow(item);
-            parentItem = item;
         }
 
         uiPanel->btStackView->expandAll();
