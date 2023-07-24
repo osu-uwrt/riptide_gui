@@ -116,13 +116,10 @@
      </widget>
     </item>
     <item>
-     <widget class="QTreeView" name="btStackView">
+     <widget class="QListView" name="btStackView">
       <property name="alternatingRowColors">
        <bool>true</bool>
       </property>
-      <attribute name="headerVisible">
-       <bool>true</bool>
-      </attribute>
      </widget>
     </item>
    </layout>
