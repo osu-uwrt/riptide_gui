@@ -50,6 +50,9 @@ namespace riptide_rviz
         //subscriber callabck on the tree stack
         void stackCb(const riptide_msgs2::msg::TreeStack & stack);
 
+        // timer callabck for refresh future
+        void waitForRefresh(void);
+
     private:
         Ui_MissionPanel *uiPanel;
 
@@ -59,7 +62,15 @@ namespace riptide_rviz
         std::vector<std::string> treeList;
 
         rclcpp::Subscription<riptide_msgs2::msg::TreeStack>::SharedPtr stackSub;
+
+        // refresh request info
         rclcpp::Client<riptide_msgs2::srv::ListTrees>::SharedPtr refreshClient;
+        std::shared_future<std::shared_ptr<riptide_msgs2::srv::ListTrees_Response>> refreshFuture;
+        int64_t refreshFutureid = -1;
+
+        int timerTick = -1;
+
+
         rclcpp_action::Client<ExecuteTree>::SharedPtr actionServer;
         
         std::string robot_ns;

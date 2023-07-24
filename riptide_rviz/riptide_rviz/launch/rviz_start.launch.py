@@ -15,6 +15,10 @@ config = PathJoinSubstitution([
         LC("robot_yaml")
     ])
 
+rviz_pkg_dir = get_package_share_directory('riptide_rviz')
+
+riptide_rviz_src = os.path.join(rviz_pkg_dir[: rviz_pkg_dir.find("install") - 1], "src", "riptide_gui", "riptide_rviz")
+
 def generate_launch_description():
     return LaunchDescription([
         GroupAction(
@@ -43,8 +47,7 @@ def generate_launch_description():
                     arguments=[
                         "-d", 
                         PathJoinSubstitution([
-                            os.path.expanduser("~"), "osu-uwrt", "development", 
-                            "software", "src", "riptide_gui", "riptide_rviz",
+                            riptide_rviz_src,
                             LC("control_config_file")
                         ])
                     ],
