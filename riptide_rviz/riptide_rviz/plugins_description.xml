@@ -29,4 +29,14 @@
             RVIZ Plugin for rendering riptide vehicle diagnostics on the RVIZ display
         </description>
     </class>
+    <class name="riptide_rviz/MappingPanel" type="riptide_rviz::MappingPanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for controlling the map
+        </description>
+    </class>
+    <class name="riptide_rviz/ElectricalPanel" type="riptide_rviz::ElectricalPanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for commanding robot electronics
+        </description>
+    </class>
 </library>

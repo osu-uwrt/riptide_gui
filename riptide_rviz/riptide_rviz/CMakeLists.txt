@@ -20,6 +20,7 @@ find_package(riptide_msgs2 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(chameleon_tf_msgs REQUIRED)
 
 # rviz specific deps
 find_package(rviz_common REQUIRED)
@@ -96,6 +97,7 @@ ament_target_dependencies(${PROJECT_NAME}
   nav_msgs
   launch_msgs
   diagnostic_msgs
+  chameleon_tf_msgs
 )
 
 # Link non ament packages
