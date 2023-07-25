@@ -11,6 +11,10 @@ namespace riptide_rviz
 {
     class MappingPanel : public rviz_common::Panel
     {
+        using ModelFrame = chameleon_tf_msgs::action::ModelFrame;
+        using SendGoalOptions = rclcpp_action::Client<ModelFrame>::SendGoalOptions;
+        using CalibGoalHandle = rclcpp_action::Client<ModelFrame>::GoalHandle;
+        
         Q_OBJECT 
         public:
         MappingPanel(QWidget *parent = 0);
@@ -24,8 +28,16 @@ namespace riptide_rviz
         void calibMapFrame();
 
         private:
+        void setCalibStatus(const QString& text, const QString& color);
+        void goalResponseCb(const CalibGoalHandle::SharedPtr & goal_handle);
+        void feedbackCb(
+            CalibGoalHandle::SharedPtr,
+            const std::shared_ptr<const ModelFrame::Feedback> feedback);
+        void resultCb(const CalibGoalHandle::WrappedResult & result);
+
         Ui_MappingPanel *ui;
         std::string robotNs;
+        bool calibrationInProgress;
 
         rclcpp_action::Client<chameleon_tf_msgs::action::ModelFrame>::SharedPtr calibClient;
     };
