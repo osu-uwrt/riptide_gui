@@ -49,7 +49,6 @@ namespace riptide_rviz
         ui->numSamples->setValue(std::stoi(getFromConfig(config, "mapCalibNumSamples", "10")));
 
         std::string fullActionName = robotNs + "/" + CALIB_ACTION_NAME;
-        RVIZ_COMMON_LOG_INFO("full action: " + fullActionName);
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
         calibClient = rclcpp_action::create_client<ModelFrame>(node, fullActionName);
 
@@ -136,7 +135,7 @@ namespace riptide_rviz
                     setCalibStatus("Calibrating map frame...", "000000");
                     break;
                 case GOAL_STATE_CANCELING:
-                    setCalibStatus("Canceling calibration", "000000");
+                    setCalibStatus("Canceling calibration...", "000000");
                     break;
                 default:
                     setCalibStatus("Unknown goal state", "000000");
@@ -155,7 +154,7 @@ namespace riptide_rviz
     {
         ui->calibProgress->setValue(feedback->sample_count);
         setCalibStatus(
-            tr("Calibrating map frame (%1/%2)").arg(
+            tr("Calibrating map frame (%1/%2)...").arg(
                 QString::number(feedback->sample_count),
                 QString::number(ui->calibProgress->maximum())),
             "000000"
