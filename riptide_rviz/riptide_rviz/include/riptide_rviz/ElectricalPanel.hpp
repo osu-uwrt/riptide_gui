@@ -24,5 +24,6 @@ namespace riptide_rviz
         Ui_ElectricalPanel *ui;
         QString robotNs;
         rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr pub;
+        bool loaded = false;
     };
 }

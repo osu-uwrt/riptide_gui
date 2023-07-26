@@ -9,13 +9,14 @@ const static std::string CALIB_ACTION_NAME = "map/model_tf";
 
 namespace riptide_rviz
 {
-    std::string getFromConfig(const rviz_common::Config &config, const std::string& key, const std::string& defaultValue)
+    std::string getFromConfig(const rviz_common::Config &config, const QString& key, const QString& defaultValue)
     {
         QString str;
-        if(!config.mapGetString(QString::fromStdString(key), &str))
+        config.mapGetString(key, &str);
+        if(str == "")
         { 
-            str = QString::fromStdString(defaultValue); 
-            RVIZ_COMMON_LOG_WARNING("MappingPanel: Using " + defaultValue + " as the default value for " + key); 
+            str = defaultValue;
+            RVIZ_COMMON_LOG_WARNING("MappingPanel: Using " + defaultValue.toStdString() + " as the default value for " + key.toStdString()); 
         }
 
         return str.toStdString();
@@ -29,6 +30,8 @@ namespace riptide_rviz
         ui->setupUi(this);
 
         ui->calibStatus->setText("");
+
+        loaded = false;
     }
 
 
@@ -44,14 +47,15 @@ namespace riptide_rviz
         RVIZ_COMMON_LOG_INFO("MappingPanel: Loaded parent panel config");
 
         robotNs = getFromConfig(config, "robot_namespace", "/talos");
-        ui->worldFrame->setText(QString::fromStdString(getFromConfig(config, "worldFrameName", "map")));
+        ui->worldFrame->setText(QString::fromStdString(getFromConfig(config, "worldFrameName", "world")));
         ui->tagFrame->setText(QString::fromStdString(getFromConfig(config, "tagFrameName", "tag_36h11")));
         ui->numSamples->setValue(std::stoi(getFromConfig(config, "mapCalibNumSamples", "10")));
 
         std::string fullActionName = robotNs + "/" + CALIB_ACTION_NAME;
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
         calibClient = rclcpp_action::create_client<ModelFrame>(node, fullActionName);
-
+        RVIZ_COMMON_LOG_INFO("Created action client for server with name \"" + fullActionName + "\"");
+        loaded = true;
     }
 
     void MappingPanel::save(rviz_common::Config config) const
@@ -81,6 +85,12 @@ namespace riptide_rviz
 
     void MappingPanel::calibMapFrame()
     {   
+        if(!loaded)
+        {
+            setCalibStatus("Panel not loaded! Please save your config and restart RViz.", "FF0000");
+            return;
+        }
+
         //if the calibration is in progress, cancel it
         if(calibrationInProgress)
         {

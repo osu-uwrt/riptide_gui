@@ -11,6 +11,8 @@ namespace riptide_rviz
 
         ui = new Ui_ElectricalPanel();
         ui->setupUi(this);
+        ui->errLabel->setText("");
+        loaded = false;
     }
 
 
@@ -22,7 +24,8 @@ namespace riptide_rviz
 
     void ElectricalPanel::load(const rviz_common::Config &config) 
     {
-        if(!config.mapGetString("robot_namespace", &robotNs))
+        config.mapGetString("robot_namespace", &robotNs);
+        if(robotNs == "")
         {
             robotNs = QString::fromStdString("/talos"); 
             RVIZ_COMMON_LOG_WARNING("ElectricalPanel: Using /talos as the default value for robot_namespace"); 
@@ -31,6 +34,7 @@ namespace riptide_rviz
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
         std::string topicName = robotNs.toStdString() + "/command/electrical";
         pub = node->create_publisher<riptide_msgs2::msg::ElectricalCommand>(topicName, 10);
+        loaded = true;
     }
 
 
@@ -49,9 +53,16 @@ namespace riptide_rviz
 
     void ElectricalPanel::sendCommand()
     {
-        riptide_msgs2::msg::ElectricalCommand msg;
-        msg.command = ui->comboBox->currentIndex();
-        pub->publish(msg);
+        if(loaded)
+        {
+            riptide_msgs2::msg::ElectricalCommand msg;
+            msg.command = ui->comboBox->currentIndex();
+            pub->publish(msg);
+            ui->errLabel->setText("");
+        } else 
+        {
+            ui->errLabel->setText("Panel not loaded! Please save your config and restart RViz");
+        }
     }
 }
 

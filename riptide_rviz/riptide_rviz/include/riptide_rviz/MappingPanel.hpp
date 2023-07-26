@@ -37,7 +37,9 @@ namespace riptide_rviz
 
         Ui_MappingPanel *ui;
         std::string robotNs;
-        bool calibrationInProgress;
+        bool 
+            calibrationInProgress,
+            loaded = false;
 
         rclcpp_action::Client<chameleon_tf_msgs::action::ModelFrame>::SharedPtr calibClient;
     };
