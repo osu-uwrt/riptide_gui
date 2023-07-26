@@ -189,7 +189,10 @@ namespace riptide_rviz
                 }
                 break;
             case rclcpp_action::ResultCode::ABORTED:
-                setCalibStatus("Calibration aborted!", "FF0000");
+                setCalibStatus(
+                        tr("Calibration aborted (%1)").arg(QString::fromStdString(result.result->err_msg)),
+                        "FF0000"
+                    );
                 break;
             case rclcpp_action::ResultCode::CANCELED:
                 setCalibStatus("Calibration canceled!", "0000FF");
