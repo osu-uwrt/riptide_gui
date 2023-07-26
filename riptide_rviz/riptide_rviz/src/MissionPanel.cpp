@@ -137,7 +137,6 @@ namespace riptide_rviz
     void MissionPanel::waitForRefresh(){
         if (!refreshFuture.valid())
         {
-
             RVIZ_COMMON_LOG_ERROR("BagItem: stop future invalidated while sending request");
 
             // clear the lookup lockout
@@ -164,7 +163,6 @@ namespace riptide_rviz
             RVIZ_COMMON_LOG_INFO("MissionPanel: refresh request validated");
 
             uiPanel->btSelect->clear();
-
             uiPanel->btSelect->addItem("None Selected");
 
             // keep a list of the valid trees
@@ -284,10 +282,7 @@ namespace riptide_rviz
         for(auto name : msg.stack){
             QStandardItem * item = new QStandardItem(QString::fromStdString(name));
             parentItem->appendRow(item);
-            parentItem = item;
         }
-
-        uiPanel->btStackView->expandAll();
     }
 
     void MissionPanel::cancelTask()

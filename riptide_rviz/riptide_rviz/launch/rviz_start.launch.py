@@ -106,7 +106,10 @@ def generate_launch_description():
                     package="riptide_rviz",
                     executable="MarkerPublisher.py",
                     name="marker_publisher",
-                    output="screen"
+                    output="screen",
+                    parameters = [
+                        os.path.join(get_package_share_directory("riptide_rviz"), "config", "markers.yaml")
+                    ]
                 )
             ]
         )
