@@ -53,6 +53,8 @@ namespace riptide_rviz
                 { startBringup(); });
         connect(uiPanel->bringupHost, SIGNAL(currentIndexChanged(int)), SLOT(handleBringupHost(int)));
         connect(uiPanel->bringupFile, SIGNAL(currentTextChanged(const QString &)), SLOT(bringupFileChanged(const QString &)));
+        connect(uiPanel->launchServiceRestart, &QPushButton::clicked, [this](void)
+                { QTimer::singleShot(0, [this]() { restartService(); }); });
     }
 
     void Bringup::load(const rviz_common::Config &config)
@@ -225,10 +227,18 @@ namespace riptide_rviz
             hostname = uiPanel->bringupHost->itemText(uiPanel->bringupHost->currentIndex()).toStdString(),
             outMsg;
         
+        //cut the leading '/' off of the hostname
+        hostname = hostname.substr(1, hostname.length() - 1);
+        
         bool success = issueRemoteLaunchServiceRestart(hostname, outMsg);
         if(!success)
         {
             QMessageBox::warning(this, "Error", QString::fromStdString(outMsg));
+            RVIZ_COMMON_LOG_INFO("BringupPanel: " + outMsg);
+        } else 
+        {
+            RVIZ_COMMON_LOG_INFO("BringupPanel: Launch service restarted successfully.");
+            bringupListRefresh();
         }
     }
 
