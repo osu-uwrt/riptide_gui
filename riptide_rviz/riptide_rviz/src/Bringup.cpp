@@ -3,7 +3,12 @@
 #include <filesystem>
 #include <chrono>
 #include <string>
+#include <cstring>
+#include <system_error>
+#include <unistd.h>
+#include <sys/wait.h>
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/logging.hpp>
@@ -13,6 +18,11 @@
 
 using namespace std::chrono_literals;
 using namespace std::placeholders;
+
+#define SSH_USERNAME "ros"
+#define SSH_COMMAND "sudo systemctl restart ros2_launch_service_c.service"
+
+bool issueRemoteLaunchServiceRestart(std::string const& hostname, std::string &messageOut);
 
 namespace riptide_rviz
 {
@@ -207,6 +217,20 @@ namespace riptide_rviz
             }
         }
     }
+    
+    void Bringup::restartService()
+    {
+        RVIZ_COMMON_LOG_INFO("BringupPanel: Remotely restarting launch service");
+        std::string
+            hostname = uiPanel->bringupHost->itemText(uiPanel->bringupHost->currentIndex()).toStdString(),
+            outMsg;
+        
+        bool success = issueRemoteLaunchServiceRestart(hostname, outMsg);
+        if(!success)
+        {
+            QMessageBox::warning(this, "Error", QString::fromStdString(outMsg));
+        }
+    }
 
     void Bringup::handleBringupHost(int selection)
     {
@@ -308,6 +332,45 @@ namespace riptide_rviz
     }
 
 } // namespace riptide_rviz
+
+
+bool issueRemoteLaunchServiceRestart(std::string const& hostname, std::string &messageOut) {
+        std::string destination = SSH_USERNAME "@" + hostname;
+
+        pid_t child = fork();
+        if (!child) {
+            // You're a child
+            execlp("ssh", "ssh", "-n", destination.c_str(), SSH_COMMAND, NULL);
+            // If this fails, then the fork failed
+            fprintf(stderr, "Failed to execlp: %s\n", strerror(errno));
+            exit(255);
+        }
+        else if (child < 0) {
+            messageOut = std::string("Error during fork: ") + strerror(errno);
+            return false;
+        }
+
+        int ssh_status;
+        waitpid(child, &ssh_status, 0);
+        if (WIFEXITED(ssh_status)) {
+            int exit_code = WEXITSTATUS(ssh_status);
+            if (exit_code == 0) {
+                return true;
+            }
+            else {
+                messageOut = "Returned with non-zero exit code " + std::to_string(exit_code);
+                return false;
+            }
+        }
+        else if (WIFSIGNALED(ssh_status)) {
+            messageOut = "Exited due to signal " + std::to_string(WTERMSIG(ssh_status));
+            return false;
+        }
+        else {
+            messageOut = "Unknown exit reason with status " + std::to_string(ssh_status);
+            return false;
+        }
+    }
 
 #include <pluginlib/class_list_macros.hpp> // NOLINT
 PLUGINLIB_EXPORT_CLASS(riptide_rviz::Bringup, rviz_common::Panel);
