@@ -46,6 +46,14 @@
         </launch>
     </stage>
 
+    <stage id="tensor_detector">
+        <dependency id="hardware"/>
+
+        <launch name="tensorrt.launch.py" package="tensor_detector">
+            <arg name="robot" value="talos"/>
+        </launch>
+    </stage>
+
     <stage id="mapping">
         <dependency id="controller"/>
 
