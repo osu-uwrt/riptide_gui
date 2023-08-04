@@ -37,6 +37,7 @@ namespace riptide_rviz
         void checkBringupStatus();
         void stopBringup();
         void bringupFileChanged(const QString &text);
+        void restartService();
 
     protected:
         bool event(QEvent *event);
