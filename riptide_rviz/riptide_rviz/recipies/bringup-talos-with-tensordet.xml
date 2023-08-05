@@ -46,8 +46,16 @@
         </launch>
     </stage>
 
-    <stage id="mapping">
+    <stage id="tensor_detector">
         <dependency id="controller"/>
+
+        <launch name="tensorrt.launch.py" package="tensor_detector">
+            <arg name="robot" value="talos"/>
+        </launch>
+    </stage>
+
+    <stage id="mapping">
+        <dependency id="tensor_detector"/>
 
         <launch name="mapping.launch.py" package="riptide_mapping2">
             <arg name="robot" value="talos"/>
