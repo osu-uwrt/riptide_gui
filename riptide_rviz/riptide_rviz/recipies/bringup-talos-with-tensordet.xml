@@ -1,0 +1,71 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<launches>
+
+    <stage id="hardware">
+        <launch name="hardware.launch.py" package="riptide_hardware2">
+            <arg name="robot" value="talos"/>
+            <topic name="/talos/state/firmware" type="riptide_msgs2/msg/FirmwareStatus" qos="system_default"/>
+            <topic name="/talos/dvl/status" type="nortek_dvl_msgs/msg/DvlStatus" qos="system_default"/>
+            <topic name="/talos/vectornav/imu" type="sensor_msgs/msg/Imu" qos="system_default"/>
+            <topic name="/talos/state/depth/raw" type="riptide_msgs2/msg/Depth" qos="system_default"/>
+        </launch>
+    </stage>
+
+
+    <stage id="navigation">
+        <dependency id="hardware"/>
+
+        <launch name="navigation.launch.py" package="riptide_hardware2">
+            <arg name="robot" value="talos"/>
+
+            <topic name="/talos/joint_states" type="sensor_msgs/msg/JointState" qos="system_default"/>
+            <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
+            <topic name="/talos/depth/pose" type="geometry_msgs/msg/PoseWithCovarianceStamped" qos="system_default"/>
+            <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
+        </launch>
+    </stage>
+
+    <stage id="solver">
+        <dependency id="navigation"/>
+
+        <launch name="solver.launch.py" package="riptide_controllers2">
+            <arg name="robot" value="talos"/>
+
+            <!-- <topic name="/talos/command/dshot" type="riptide_msgs2/msg/DshotCommand" qos="system_default"/> -->
+        </launch>
+    </stage>
+
+    <stage id="controller">
+        <dependency id="solver"/>
+
+        <launch name="controller.launch.py" package="riptide_controllers2">
+            <arg name="robot" value="talos"/>
+
+            <topic name="/talos/controller/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
+        </launch>
+    </stage>
+
+    <stage id="tensor_detector">
+        <dependency id="controller"/>
+
+        <launch name="tensorrt.launch.py" package="tensor_detector">
+            <arg name="robot" value="talos"/>
+        </launch>
+    </stage>
+
+    <stage id="mapping">
+        <dependency id="tensor_detector"/>
+
+        <launch name="mapping.launch.py" package="riptide_mapping2">
+            <arg name="robot" value="talos"/>
+        </launch>
+    </stage>
+
+    <stage id="autonomy">
+        <dependency id="mapping"/>
+        <launch name="autonomy.launch.py" package="riptide_autonomy2">
+            <arg name="robot" value="talos"/>
+        </launch>
+    </stage>
+</launches>
