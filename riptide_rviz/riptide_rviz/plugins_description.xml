@@ -39,4 +39,9 @@
             RVIZ plugin for commanding robot electronics
         </description>
     </class>
+    <class name="riptide_rviz/BringupWebview" type="riptide_rviz::BringupWebview" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for viewing the bringup web server
+        </description>
+    </class>
 </library>

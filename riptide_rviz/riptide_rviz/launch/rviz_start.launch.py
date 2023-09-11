@@ -33,6 +33,10 @@ def generate_launch_description():
                 DeclareLaunchArgument(
                     "control_config_file",
                     default_value=["control_config_", LC("robot"), ".rviz"]
+
+                    ### DEBUG: Using this to test the new web view panel.
+                    # "control_config_file",
+                    # default_value=["bringup_webview_test.rviz"]
                 ),
 
                 DeclareLaunchArgument('robot_yaml', default_value=[LC("robot"), '.yaml']),
@@ -110,6 +114,13 @@ def generate_launch_description():
                     parameters = [
                         os.path.join(get_package_share_directory("riptide_rviz"), "config", "markers.yaml")
                     ]
+                ),
+
+                Node(
+                    package="remote_launch",
+                    executable="launcher",
+                    name="launcher",
+                    output="screen",
                 )
             ]
         )

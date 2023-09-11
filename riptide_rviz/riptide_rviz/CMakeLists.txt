@@ -28,7 +28,7 @@ find_package(vectornav_msgs REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_rendering REQUIRED)
 find_package(rviz_ogre_vendor REQUIRED)
-find_package(Qt5 COMPONENTS Widgets Core REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core WebEngine WebEngineWidgets REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(resource_retriever REQUIRED)
 find_package(diagnostic_msgs REQUIRED)
@@ -106,6 +106,8 @@ ament_target_dependencies(${PROJECT_NAME}
 # Link non ament packages
 target_link_libraries(${PROJECT_NAME} 
   Qt5::Widgets
+  Qt5::WebEngineWidgets
+  Qt5::WebEngine
   rviz_ogre_vendor::OgreMain
   rviz_ogre_vendor::OgreOverlay
   tinyxml2

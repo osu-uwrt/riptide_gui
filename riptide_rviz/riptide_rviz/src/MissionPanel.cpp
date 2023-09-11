@@ -14,6 +14,7 @@ namespace riptide_rviz
     {
         setFocusPolicy(Qt::ClickFocus);
 
+
         uiPanel = new Ui_MissionPanel();
         uiPanel->setupUi(this);
 
@@ -104,6 +105,7 @@ namespace riptide_rviz
             uiPanel->btStart->setEnabled(true);
             uiPanel->btStop->setEnabled(false);
         }
+
 
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
@@ -289,7 +291,6 @@ namespace riptide_rviz
     {
         actionServer->async_cancel_all_goals(std::bind(&MissionPanel::cancelAccept, this, _1));
     }
-
 } // namespace riptide_rviz
 
 #include <pluginlib/class_list_macros.hpp> // NOLINT
