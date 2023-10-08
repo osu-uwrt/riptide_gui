@@ -5,7 +5,7 @@
 #include <rviz_common/panel.hpp>
 
 #include <riptide_msgs2/msg/electrical_command.hpp>
-#include <vectornav_msgs/action/mag_cal.hpp>
+#include <riptide_msgs2/action/mag_cal.hpp>
 
 #include "ui_ElectricalPanel.h"
 
@@ -15,7 +15,7 @@ namespace riptide_rviz
 
     class ElectricalPanel : public rviz_common::Panel
     {
-        using MagCal = vectornav_msgs::action::MagCal;
+        using MagCal = riptide_msgs2::action::MagCal;
         using MagSendGoalOptions = rclcpp_action::Client<MagCal>::SendGoalOptions;
         using MagGoalHandle = rclcpp_action::Client<MagCal>::GoalHandle;
         
@@ -50,6 +50,6 @@ namespace riptide_rviz
         double maxVar = 0.0;
 
         rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr pub;
-        rclcpp_action::Client<vectornav_msgs::action::MagCal>::SharedPtr imuCalClient;
+        rclcpp_action::Client<riptide_msgs2::action::MagCal>::SharedPtr imuCalClient;
     };
 }
