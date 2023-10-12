@@ -32,6 +32,17 @@ namespace riptide_rviz
             robotNs = QString::fromStdString("/talos"); 
             RVIZ_COMMON_LOG_WARNING("FeedforwardPanel: Using /talos as the default value for robot_namespace"); 
         }
+
+        //create ROS peripherals
+        //we want a publisher to publish to controller/ff_body_force to command the feedforward of the solver
+        //we also want a timer to periodcally publish that message using the publisher
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        std::string fullTopicName = robotNs.toStdString() + "/controller/FF_body_force";
+        ffForcePub = node->create_publisher<geometry_msgs::msg::Twist>(fullTopicName, 10);
+        pubTimer = node->create_wall_timer(20ms, std::bind(&FeedforwardPanel::timerCb, this));
+        pubTimer->cancel(); //dont start publishing right away
+
+        RVIZ_COMMON_LOG_INFO("FeedForward Panel loaded. Robot NS: \"" + robotNs.toStdString() + "\"");
         
         loaded = true;
     }
@@ -46,14 +57,6 @@ namespace riptide_rviz
     //called when panel is initialized. perform any needed UI connections here
     void FeedforwardPanel::onInitialize()
     {
-        //create ROS peripherals
-        //we want a publisher to publish to controller/ff_body_force to command the feedforward of the solver
-        //we also want a timer to periodcally publish that message using the publisher
-        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
-        ffForcePub = node->create_publisher<geometry_msgs::msg::Twist>("controller/ff_body_force", 10);
-        pubTimer = node->create_wall_timer(20ms, std::bind(&FeedforwardPanel::timerCb, this));
-        pubTimer->cancel(); //dont start publishing right away
-
         connect(ui->XdoubleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &FeedforwardPanel::XFunction);
         connect(ui->YdoubleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &FeedforwardPanel::YFunction);
         connect(ui->ZdoubleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &FeedforwardPanel::ZFunction);
@@ -61,8 +64,6 @@ namespace riptide_rviz
         connect(ui->PdoubleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &FeedforwardPanel::PFunction);
         connect(ui->YAWdoubleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &FeedforwardPanel::YAWFunction);
         connect(ui->publishButton, &QPushButton::clicked, this, &FeedforwardPanel::togglePublish);
-
-        RVIZ_COMMON_LOG_INFO("FeedForward Panel initialized.");
     }
 
     //called when the doubleSpinBoxes are interacted with
