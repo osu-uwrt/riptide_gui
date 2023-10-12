@@ -1,11 +1,7 @@
 #pragma once
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp_action/rclcpp_action.hpp>
-
 #include <rviz_common/panel.hpp>
-
-#include <riptide_msgs2/msg/electrical_command.hpp>
-#include <vectornav_msgs/action/mag_cal.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 
 #include "ui_FeedforwardPanel.h"
 
@@ -25,23 +21,27 @@ namespace riptide_rviz
         void onInitialize() override;
 
         private slots:
-        void someButtonClicked();
         void XFunction(double value);
         void YFunction(double value);
         void ZFunction(double value);
         void RFunction(double value);
         void PFunction(double value);
         void YAWFunction(double value);
-
-       
-
-
+        void togglePublish();
 
         private:
-        // electrical command vars
-        bool loaded = false;
+        void timerCb();
+
+        bool
+            loaded = false,
+            publishing = false;
+        
         int counter;
         Ui_FeedforwardPanel *ui;
         QString robotNs;
+
+        rclcpp::TimerBase::SharedPtr pubTimer;
+        rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr ffForcePub;
+        geometry_msgs::msg::Twist msgToPublish;
     };
 }
