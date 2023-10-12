@@ -26,6 +26,16 @@ namespace riptide_rviz
 
         private slots:
         void someButtonClicked();
+        void XFunction(double value);
+        void YFunction(double value);
+        void ZFunction(double value);
+        void RFunction(double value);
+        void PFunction(double value);
+        void YAWFunction(double value);
+
+       
+
+
 
         private:
         // electrical command vars
