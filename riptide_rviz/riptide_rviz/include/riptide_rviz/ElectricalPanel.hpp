@@ -5,6 +5,7 @@
 #include <rviz_common/panel.hpp>
 
 #include <riptide_msgs2/msg/electrical_command.hpp>
+#include <riptide_msgs2/msg/imu_config.hpp>
 #include <riptide_msgs2/action/mag_cal.hpp>
 
 #include "ui_ElectricalPanel.h"
@@ -32,6 +33,9 @@ namespace riptide_rviz
         private Q_SLOTS:
         void sendCommand();
         void sendMagCal();
+        void handleMagCalMode();
+        void handleMagOutputMode();
+        void handleConvergenceRate();
 
         private:
         void goalResponseCb(const MagGoalHandle::SharedPtr & goal_handle);
@@ -39,6 +43,10 @@ namespace riptide_rviz
             MagGoalHandle::SharedPtr,
             const std::shared_ptr<const MagCal::Feedback> feedback);
         void resultCb(const MagGoalHandle::WrappedResult & result);
+        Qt::CheckState processCheckState(bool state);
+        void imuConfigCb(const riptide_msgs2::msg::ImuConfig config);
+        void publishImuConfig();
+        void requestCurrentImuConfig();
 
         // electrical command vars
         bool loaded = false;
@@ -49,7 +57,15 @@ namespace riptide_rviz
         bool calInProgress = false;
         double maxVar = 0.0;
 
+        // Continuous mag cal vars
+        bool imuHsiEnable = false;
+        bool imuHsiOutput = false;
+        int imuConvergenceRate = 1; 
+
         rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr pub;
         rclcpp_action::Client<riptide_msgs2::action::MagCal>::SharedPtr imuCalClient;
+        
+        rclcpp::Publisher<riptide_msgs2::msg::ImuConfig>::SharedPtr writeImuConfig;
+        rclcpp::Subscription<riptide_msgs2::msg::ImuConfig>::SharedPtr readImuConfig;
     };
 }

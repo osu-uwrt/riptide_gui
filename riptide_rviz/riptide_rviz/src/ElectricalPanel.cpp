@@ -41,8 +41,17 @@ namespace riptide_rviz
         pub = node->create_publisher<riptide_msgs2::msg::ElectricalCommand>(topicName, 10);
 
         //make the action client for the imu mag cal
-        std::string fullActionName = "/" + CALIB_ACTION_NAME;
+        std::string fullActionName = CALIB_ACTION_NAME;
         imuCalClient = rclcpp_action::create_client<MagCal>(node, fullActionName);
+
+        // Make publisher to write IMU config
+        writeImuConfig = node->create_publisher<riptide_msgs2::msg::ImuConfig>("vectornav/config/write", 10);
+
+        // Make subscriber to listen for IMU config
+        readImuConfig = node->create_subscription<riptide_msgs2::msg::ImuConfig>("vectornav/config/read", 10, 
+                                    std::bind(&ElectricalPanel::imuConfigCb, this, _1));
+
+        requestCurrentImuConfig();
 
         loaded = true;
     }
@@ -59,6 +68,9 @@ namespace riptide_rviz
     {
         connect(ui->commandSend, &QPushButton::clicked, this, &ElectricalPanel::sendCommand);
         connect(ui->magCalSend, &QPushButton::clicked, this, &ElectricalPanel::sendMagCal);
+        connect(ui->hsiEnable, &QCheckBox::stateChanged, this, &ElectricalPanel::handleMagCalMode);
+        connect(ui->hsiOutput,  &QCheckBox::stateChanged, this, &ElectricalPanel::handleMagOutputMode);
+        connect(ui->convergenceRate, &QSlider::sliderReleased, this, &ElectricalPanel::handleConvergenceRate);
 
         //initial UI state
         ui->calibProgress->setValue(0);
@@ -179,6 +191,56 @@ namespace riptide_rviz
 
         calInProgress = false;
         ui->magCalSend->setText("Calibrate");
+    }
+
+    void ElectricalPanel::handleMagCalMode() {
+        imuHsiEnable = ui->hsiEnable->checkState();
+        publishImuConfig();
+    }
+
+    void ElectricalPanel::handleMagOutputMode() {
+        imuHsiOutput = ui->hsiOutput->checkState();
+        publishImuConfig();
+    }
+
+    void ElectricalPanel::handleConvergenceRate() {
+        imuConvergenceRate = ui->convergenceRate->value();
+        publishImuConfig();
+    }
+
+    void ElectricalPanel::publishImuConfig() {
+        auto msg = riptide_msgs2::msg::ImuConfig();
+        msg.hsi_enable = imuHsiEnable;
+        msg.hsi_output = imuHsiOutput;
+        msg.convergence_rate = imuConvergenceRate;
+
+        writeImuConfig->publish(msg);
+    }
+
+    void ElectricalPanel::requestCurrentImuConfig() {
+        RVIZ_COMMON_LOG_INFO("Electrical panel: Requesting IMU config");
+        rclcpp::Rate loopRate(1);
+        loopRate.sleep();
+        auto resendRequest = riptide_msgs2::msg::ImuConfig();
+        // 100 asks the imu driver to publish its current settings
+        resendRequest.convergence_rate = 100;
+        writeImuConfig->publish(resendRequest);
+    }
+
+    void ElectricalPanel::imuConfigCb(const riptide_msgs2::msg::ImuConfig config) {
+        // Set class-scoped variables
+        imuHsiEnable = config.hsi_enable;
+        imuHsiOutput = config.hsi_output;
+        imuConvergenceRate = config.convergence_rate;
+
+        // Write values to the gui elements
+        ui->hsiEnable->setCheckState(processCheckState(config.hsi_enable));
+        ui->hsiOutput->setCheckState(processCheckState(config.hsi_output));
+        ui->convergenceRate->setValue(config.convergence_rate);
+    }
+
+    Qt::CheckState ElectricalPanel::processCheckState(bool state) {
+        return state ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
     }
 }
 
