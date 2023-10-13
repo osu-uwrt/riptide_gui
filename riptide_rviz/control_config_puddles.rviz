@@ -8,8 +8,9 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
+        - /MarkerArray1/Status1
       Splitter Ratio: 0.6117647290229797
-    Tree Height: 738
+    Tree Height: 730
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -32,12 +33,11 @@ Panels:
     Name: Transformation
   - Class: riptide_rviz/MissionPanel
     Name: MissionPanel
-    robot_namespace: /talos
   - Class: riptide_rviz/ControlPanel
     Name: ControlPanel
     max_depth_in_place: -0.5
-    odom_timeout: 2.5
     robot_namespace: /puddles
+    odom_timeout: 2.5
     tgt_in_place_depth: -0.75
   - Class: riptide_rviz/Bringup
     Name: Bringup
@@ -46,9 +46,6 @@ Panels:
     robot_namespace: /puddles
   - Class: rviz_common/Transformation
     Name: Transformation
-  - Class: riptide_rviz/ElectricalPanel
-    Name: ElectricalPanel
-    robot_namespace: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -88,9 +85,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-      Mass Properties:
-        Inertia: false
-        Mass: false
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
@@ -101,13 +95,74 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        BinBarrel_frame:
+          Value: true
+        BinPhone_frame:
+          Value: true
+        TommyGun_frame:
+          Value: true
+        axe_frame:
+          Value: true
+        badge_frame:
+          Value: true
+        binBarrel_frame:
+          Value: true
+        binPhone_frame:
+          Value: true
+        bootlegger_frame:
+          Value: true
+        cash_frame:
+          Value: true
+        gate_frame:
+          Value: true
+        gman_frame:
+          Value: true
+        map:
+          Value: true
+        octogon_frame:
+          Value: true
+        torpedoBootlegger_frame:
+          Value: true
+        torpedoGman_frame:
+          Value: true
+        world:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        {}
+        world:
+          gate_frame:
+            {}
+          map:
+            BinBarrel_frame:
+              {}
+            BinPhone_frame:
+              {}
+            TommyGun_frame:
+              {}
+            axe_frame:
+              {}
+            badge_frame:
+              {}
+            binBarrel_frame:
+              {}
+            binPhone_frame:
+              {}
+            bootlegger_frame:
+              {}
+            cash_frame:
+              {}
+            gman_frame:
+              {}
+            torpedoBootlegger_frame:
+              {}
+            torpedoGman_frame:
+              {}
+          octogon_frame:
+            {}
       Update Interval: 0
       Value: true
     - Angle Tolerance: 0.10000000149011612
@@ -165,8 +220,7 @@ Visualization Manager:
       Value: false
     - Class: rviz_common/Group
       Displays:
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -184,8 +238,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -203,8 +256,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -222,8 +274,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -241,8 +292,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -260,8 +310,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -279,8 +328,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -298,8 +346,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-        - Accept NaN Values: false
-          Alpha: 1
+        - Alpha: 1
           Arrow Width: 0.05000000074505806
           Class: rviz_default_plugins/Wrench
           Enabled: true
@@ -336,7 +383,7 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        {}
+        mapping_markers: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -419,8 +466,6 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  ElectricalPanel:
-    collapsed: false
   Height: 1043
   Hide Left Dock: false
   Hide Right Dock: false
@@ -428,7 +473,7 @@ Window Geometry:
     collapsed: false
   MissionPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001c00000037efc020000000dfb0000001200530065006c0065006300740069006f006e000000003d000000fb0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001c005400720061006e00730066006f0072006d006100740069006f006e000000031f000000c10000007900fffffffb000000180043006f006e00740072006f006c00500061006e0065006c010000003b000001ad0000001600fffffffb00000012004100630074007500610074006f0072007301000001ee0000008e0000001500fffffffb0000000c00430061006d00650072006100000002d0000000c70000000000000000fc00000282000000a8000000a800fffffffa000000000100000002fb0000000e004200720069006e0067007500700100000000ffffffff0000016a00fffffffb0000001c005400720061006e00730066006f0072006d006100740069006f006e0000000000000001820000008e00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000330000000890000008300ffffff00000001000001560000037efc0200000006fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0049006d006100670065000000003d000000c90000002800fffffffc0000003b0000037e000000e20100001afa000000010100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000008100fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006710000010f0000010000fffffffb0000000a0049006d00610067006501000002d3000000cd0000000000000000fb0000000a0049006d00610067006501000002a8000000f80000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000078000000039fc0100000002fb0000000800540069006d00650100000000000007800000025300fffffffb0000000800540069006d006501000000000000045000000000000000000000045e0000037e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000017c0000037afc020000000cfb0000001200530065006c0065006300740069006f006e000000003d000000fb0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001c005400720061006e00730066006f0072006d006100740069006f006e000000031f000000c10000007b00fffffffb000000180043006f006e00740072006f006c00500061006e0065006c010000003d000002240000001600fffffffb00000012004100630074007500610074006f007200730100000267000000b50000001500fffffffb0000000c00430061006d00650072006100000002d0000000c70000000000000000fc00000322000000950000001600fffffffa000000000100000002fb0000000e004200720069006e0067007500700100000000ffffffff0000006700fffffffb0000001c005400720061006e00730066006f0072006d006100740069006f006e0000000000000001820000009e00ffffff00000001000001560000037afc0200000006fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0049006d006100670065000000003d000000c90000002800fffffffc0000003d0000037a000000e60100001cfa000000010100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000008e00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006710000010f0000010000fffffffb0000000a0049006d00610067006501000002d3000000cd0000000000000000fb0000000a0049006d00610067006501000002a8000000f80000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000078000000039fc0100000002fb0000000800540069006d0065010000000000000780000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004a20000037a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -440,5 +485,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1920
-  X: -32
-  Y: -32
+  X: 0
+  Y: 0
