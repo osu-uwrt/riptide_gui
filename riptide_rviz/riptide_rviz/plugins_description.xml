@@ -9,6 +9,11 @@
             RVIZ plugin for more easily controlling and tuning the AUV's feedforward forces
         </description>
     </class>
+    <class name="riptide_rviz/ParamPanel" type="riptide_rviz::ParamPanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ plugin for more tuning controller and other params
+        </description>
+    </class>
     <class name="riptide_rviz/MissionPanel" type="riptide_rviz::MissionPanel" base_class_type="rviz_common::Panel">
         <description>
             RVIZ plugin for controlling riptide autonomy while underwater
