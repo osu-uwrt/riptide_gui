@@ -193,6 +193,7 @@ namespace riptide_rviz
         ui->magCalSend->setText("Calibrate");
     }
 
+    // Handle checkboxes for realtime HSI measure and output mode
     void ElectricalPanel::handleMagCalMode() {
         imuHsiEnable = ui->hsiEnable->checkState();
         publishImuConfig();
@@ -203,11 +204,13 @@ namespace riptide_rviz
         publishImuConfig();
     }
 
+    // Handle slider for realtime HSI convergence rate
     void ElectricalPanel::handleConvergenceRate() {
         imuConvergenceRate = ui->convergenceRate->value();
         publishImuConfig();
     }
 
+    // Publish the requested realtime HSI config to the IMU driver
     void ElectricalPanel::publishImuConfig() {
         auto msg = riptide_msgs2::msg::ImuConfig();
         msg.hsi_enable = imuHsiEnable;
@@ -217,8 +220,10 @@ namespace riptide_rviz
         writeImuConfig->publish(msg);
     }
 
+    // Publish a request to IMU driver to ask for current realtime HSI config
     void ElectricalPanel::requestCurrentImuConfig() {
         RVIZ_COMMON_LOG_INFO("Electrical panel: Requesting IMU config");
+        // Sleep for a second to make sure everything else is loaded
         rclcpp::Rate loopRate(1);
         loopRate.sleep();
         auto resendRequest = riptide_msgs2::msg::ImuConfig();
@@ -227,6 +232,7 @@ namespace riptide_rviz
         writeImuConfig->publish(resendRequest);
     }
 
+    // Get the current realtime HSI config from IMU driver
     void ElectricalPanel::imuConfigCb(const riptide_msgs2::msg::ImuConfig config) {
         // Set class-scoped variables
         imuHsiEnable = config.hsi_enable;
@@ -239,6 +245,7 @@ namespace riptide_rviz
         ui->convergenceRate->setValue(config.convergence_rate);
     }
 
+    // Process bool into enum
     Qt::CheckState ElectricalPanel::processCheckState(bool state) {
         return state ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
     }
