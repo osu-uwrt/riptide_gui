@@ -8,9 +8,9 @@
 #include <rviz_common/config.hpp>
 
 #include <QString>
+#include <QVBoxLayout>
+#include <QWebEngineView>
 #include <vector>
-
-#include "ui_BringupWebview.h"
 
 namespace riptide_rviz
 {
