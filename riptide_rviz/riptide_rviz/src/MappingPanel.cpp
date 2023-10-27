@@ -9,7 +9,7 @@ const static std::string CALIB_ACTION_NAME = "map/model_tf";
 
 namespace riptide_rviz
 {
-    std::string getFromConfig(const rviz_common::Config &config, const QString& key, const QString& defaultValue)
+    std::string MappingPanel::getFromConfig(const rviz_common::Config &config, const QString& key, const QString& defaultValue)
     {
         QString str;
         config.mapGetString(key, &str);
