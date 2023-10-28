@@ -2,6 +2,9 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/panel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <QGridLayout>
+#include <QPushButton>
+#include <QDoubleSpinBox>
 
 #include "ui_ParamPanel.h"
 
@@ -20,13 +23,16 @@ namespace riptide_rviz
 
         private slots:
         void buttonPressed();
+        void setValue(double val);
 
         private:
 
         bool
             loaded = false;
                 
-        int counter;
+        QGridLayout *paramGrid;
+        std::vector<QDoubleSpinBox*> widgetVec;
+        QPushButton* apply;
         Ui_ParamPanel *ui;
         QString robotNs;
     };
