@@ -5,8 +5,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QDoubleSpinBox>
-
-#include "ui_ParamPanel.h"
+#include <QComboBox>
 
 namespace riptide_rviz
 {
@@ -22,18 +21,25 @@ namespace riptide_rviz
         void onInitialize() override;
 
         private slots:
-        void buttonPressed();
-        void setValue(double val);
+        void apply();
+        void setNode(const QString &text);
+        void refresh();
 
         private:
 
-        bool
-            loaded = false;
-                
-        QGridLayout *paramGrid;
-        std::vector<QDoubleSpinBox*> widgetVec;
-        QPushButton* apply;
-        Ui_ParamPanel *ui;
+        void getNodes();
+        std::vector<rclcpp::Parameter> getParams();
+        void createParams(std::vector<rclcpp::Parameter> params);
+        void eraseLayout(QLayout* layout);
+
+        bool loaded = 0, connected = 0;
+
+        std::shared_ptr<rclcpp::Node> node;
+        std::shared_ptr<rclcpp::SyncParametersClient> param_client;
+        QComboBox* nodes;
+        QVBoxLayout* paramLayout;
+        QPushButton* applyButton;
+        QPushButton* refreshButton;
         QString robotNs;
     };
 }
