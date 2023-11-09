@@ -2,8 +2,16 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/panel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
-
 #include "ui_FeedforwardPanel.h"
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
+#include <iostream>
+#include <yaml-cpp/yaml.h> // Include the yaml-cpp library
+#include "ui_FeedforwardPanel.h"
+
+ 
+
 
 namespace riptide_rviz
 {
@@ -31,6 +39,9 @@ namespace riptide_rviz
 
         private:
         void timerCb();
+        // in python controllerOveseer.py line 60 :config_path = os.path.join(get_package_share_directory("riptide_descriptions2"), "config", "talos.yaml")
+        std::string config_path = ament_index_cpp::get_package_share_directory("riptide_descriptions2") + "/config/talos.yaml";
+        YAML::Node config = YAML::LoadFile(config_path);
 
         bool
             loaded = false,

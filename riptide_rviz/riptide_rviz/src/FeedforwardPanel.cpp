@@ -4,6 +4,7 @@
 #include <math.h>
 #include <QDoubleSpinBox>
 
+
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
@@ -54,6 +55,9 @@ namespace riptide_rviz
         config.mapSetValue("robot_namespace", robotNs);
     }
 
+    
+
+
     //called when panel is initialized. perform any needed UI connections here
     void FeedforwardPanel::onInitialize()
     {
@@ -64,8 +68,10 @@ namespace riptide_rviz
         connect(ui->PdoubleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &FeedforwardPanel::PFunction);
         connect(ui->YAWdoubleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &FeedforwardPanel::YAWFunction);
         connect(ui->publishButton, &QPushButton::clicked, this, &FeedforwardPanel::togglePublish);
+
     }
 
+    
     //called when the doubleSpinBoxes are interacted with
     void FeedforwardPanel::XFunction(double value)
     {
@@ -83,6 +89,23 @@ namespace riptide_rviz
     {
         ui->Zlabel->setText(tr("%1 N").arg(value));
         msgToPublish.linear.z = value;
+
+        // Volume calculations
+        double density = 1000;
+        double g = 9.8;
+        // Finds mass from talos.yaml file
+        double mass = config["mass"].as<double>(); 
+        // Takes z-value from the doublespin box in rviz
+        double Zforce = ui->ZdoubleSpinBox->value();
+        // net Force = 0 = buoyancyForce = mg + Zforce -> density*g*volume = mg + Zforce. So solving for volume...
+        double volume = (mass*g + (Zforce))/(density*g);
+        ui->VolumeOutput->setText(tr("%1 L").arg(volume));
+
+        // Buoyant force calculations
+        double buoyancyForce = mass*g + Zforce;
+        // Can also use: buoyancyForce = density * g * V;
+        ui->BuoyancyOutput->setText(tr("%1 N").arg(buoyancyForce));
+    
     }
 
     void FeedforwardPanel::RFunction(double value)
