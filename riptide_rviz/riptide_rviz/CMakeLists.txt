@@ -142,9 +142,9 @@ install(
   RUNTIME DESTINATION bin
 )
 
+file(GLOB python_programs python/*.py)
 install(PROGRAMS 
-  python/MarkerPublisher.py
-
+  ${python_programs}
   DESTINATION lib/${PROJECT_NAME}
 )
 
