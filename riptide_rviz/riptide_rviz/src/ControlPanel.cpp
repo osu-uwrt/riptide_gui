@@ -11,6 +11,7 @@
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
+using std::placeholders::_2;
 
 #include <unistd.h>
 
@@ -88,6 +89,14 @@ namespace riptide_rviz
         connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, [this](void)
                 { handleCommand(); });
 
+        //drag cal buttons
+        connect(uiPanel->dragStart, &QPushButton::clicked, [this](void)
+                { handleStartDragCal(); });
+        connect(uiPanel->dragStop, &QPushButton::clicked, [this](void)
+                { handleStopDragCal(); });
+        connect(uiPanel->dragTrigger, &QPushButton::clicked, [this](void)
+                { handleTriggerDragCal(); });
+
         RVIZ_COMMON_LOG_INFO("ControlPanel: Initialized panel");
     }
 
@@ -156,6 +165,7 @@ namespace riptide_rviz
         killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
         ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
         ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
+        dragCalTriggerPub = node->create_publisher<std_msgs::msg::Empty>(robot_ns + "/trigger", rclcpp::SystemDefaultsQoS());
 
         // make ROS Subscribers
         odomSub = node->create_subscription<nav_msgs::msg::Odometry>(
@@ -163,7 +173,10 @@ namespace riptide_rviz
             std::bind(&ControlPanel::odomCallback, this, _1));
         steadySub = node->create_subscription<std_msgs::msg::Bool>(
             robot_ns + "/controller/steady", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::steadyCallback, this, _1));  
+            std::bind(&ControlPanel::steadyCallback, this, _1));
+
+        //create action clients
+        calibrateDrag = rclcpp_action::create_client<CalibrateDrag>(node, robot_ns + "/calibrate_drag_new");
 
         // now we can start the UI refresh timer
         uiTimer->start(100);
@@ -546,6 +559,90 @@ namespace riptide_rviz
         killMsg.switch_needs_update = uiPanel->ctrlRequireKill->isChecked();
 
         killStatePub->publish(killMsg);
+    }
+
+
+    void ControlPanel::handleStartDragCal()
+    {
+        updateCalStatus("Attempting to start drag calibration");
+
+        if(!calibrateDrag->wait_for_action_server(1s))
+        {
+            updateCalStatus("Drag calibration action server unavailable!");
+            setDragCalRunning(false);
+            return;
+        }
+
+        CalibrateDrag::Goal goal;
+        goal.start_axis = uiPanel->dragCalStartAxis->currentIndex();
+
+        rclcpp_action::Client<CalibrateDrag>::SendGoalOptions sendgoalOptions;
+        sendgoalOptions.goal_response_callback = std::bind(&ControlPanel::dragGoalResponseCb, this, _1);
+        sendgoalOptions.result_callback = std::bind(&ControlPanel::dragResultCb, this, _1);
+
+        calibrateDrag->async_send_goal(goal, sendgoalOptions);
+        setDragCalRunning(true);
+    }
+
+
+    void ControlPanel::handleStopDragCal()
+    {
+        calibrateDrag->async_cancel_all_goals();
+    }
+
+
+    void ControlPanel::handleTriggerDragCal()
+    {
+        dragCalTriggerPub->publish(std_msgs::msg::Empty());
+    }
+
+
+    void ControlPanel::updateCalStatus(const std::string& status)
+    {
+        RVIZ_COMMON_LOG_INFO(status);
+        uiPanel->calStatus->setText(QString::fromStdString(status));
+    }
+
+
+    void ControlPanel::setDragCalRunning(bool running)
+    {
+        uiPanel->dragStart->setEnabled(!running);
+        uiPanel->dragStop->setEnabled(running);
+    }
+
+
+    void ControlPanel::dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle)
+    {
+        if (!goal_handle) {
+            updateCalStatus("Drag calibration rejected by server!");
+            setDragCalRunning(false);
+        } else {
+            updateCalStatus("Drag calibration in progress");
+            setDragCalRunning(true);
+        }
+    }
+
+
+
+    void ControlPanel::dragResultCb(const CalibrateDragGH::WrappedResult &result)
+    {
+        switch(result.code)
+        {
+            case rclcpp_action::ResultCode::ABORTED:
+                updateCalStatus("Drag calibration aborted!");
+                break;
+            case rclcpp_action::ResultCode::CANCELED:
+                updateCalStatus("Drag calibration canceled.");
+                break;
+            case rclcpp_action::ResultCode::SUCCEEDED:
+                updateCalStatus("Drag calibration succeeded.");
+                break;
+            case rclcpp_action::ResultCode::UNKNOWN:
+                updateCalStatus("Drag calibration status unknown");
+                break;
+        }
+
+        setDragCalRunning(false);
     }
 
 } // namespace riptide_rviz
