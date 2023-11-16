@@ -32,7 +32,7 @@ namespace riptide_rviz
         void createParams(std::vector<rclcpp::Parameter> params);
         void eraseLayout(QLayout* layout);
 
-        bool loaded = 0, connected = 0;
+        bool loaded = 0, connected = 0, gettingNodes = 0;
 
         std::shared_ptr<rclcpp::Node> node;
         std::shared_ptr<rclcpp::SyncParametersClient> param_client;

@@ -32,10 +32,6 @@ namespace riptide_rviz
 
         // Will hold the parameters that are being edited
         this->paramLayout = new QVBoxLayout();
-        QHBoxLayout* tempLayout = new QHBoxLayout();
-        tempLayout->addWidget(new QDoubleSpinBox());
-        tempLayout->addWidget(new QLabel("Test"));
-        this->paramLayout->addLayout(tempLayout);
         
         // Adds a button to refresh params
         this->refreshButton = new QPushButton("&Refresh");
@@ -50,12 +46,16 @@ namespace riptide_rviz
 
         // Holds the Node selector combo box
         QHBoxLayout* nodeBox = new QHBoxLayout();
-        nodeBox->addWidget(new QLabel("Node:"));
+        QLabel* nodeLabel = new QLabel("Node:");
+        nodeLabel->setMaximumWidth(nodeLabel->fontMetrics().horizontalAdvance("Node:"));
+        nodeBox->addWidget(nodeLabel);
         nodeBox->addWidget(this->nodes);
 
         // Adds nodeBox to the Main Layout
         mainLayout->addLayout(nodeBox);
 
+        // Add paramLayout to main layout
+        // Widgets will be added to paramLayout after ros node is loaded
         mainLayout->addLayout(this->paramLayout);
 
         // Create Layout for buttons
@@ -65,22 +65,23 @@ namespace riptide_rviz
 
         mainLayout->addLayout(buttons);
         
+        // Create a layout to hold widget that will be in QScrollArea
         QGridLayout* scrollLayout = new QGridLayout();
 
-        
-
+        // QScrollArea has to be applied to widget so widget container made
         QWidget* scrollWidget = new QWidget();
         scrollWidget->setLayout(mainLayout);
         
         
-
+        // Create QScrollArea and setWidgetResizable to true so widget fills scroll area
         QScrollArea* scroll = new QScrollArea();
         scroll->setWidget(scrollWidget);
         scroll->setWidgetResizable(true);
 
+        // Add Scroll Widget to Scroll Layout
         scrollLayout->addWidget(scroll, 0, 0);
         
-        // Sets the layout for the widget to the mainLayout
+        // Set Main Layout for Widget to scrollLayout
         setLayout(scrollLayout);
 
     }
@@ -88,7 +89,9 @@ namespace riptide_rviz
 
     ParamPanel::~ParamPanel()
     {
-        
+        this->eraseLayout(this->layout());
+        delete this->layout();
+        delete this;
     }
 
 
@@ -103,10 +106,11 @@ namespace riptide_rviz
 
         // Create a node to sync parameters to
         this->node = rclcpp::Node::make_shared("param_panel", robotNs.toStdString());
-        this->getNodes();
+        // Get list of available nodes and sets default values
 
         RVIZ_COMMON_LOG_INFO("ParamPanel Panel loaded. Robot NS: \"" + robotNs.toStdString() + "\"");
         loaded = true;
+        this->getNodes();
     }
 
 
@@ -122,20 +126,26 @@ namespace riptide_rviz
         connect(this->nodes, &QComboBox::currentTextChanged, this, &ParamPanel::setNode);
         connect(this->refreshButton, &QPushButton::clicked, this, &ParamPanel::refresh);
         connect(this->applyButton, &QPushButton::clicked, this, &ParamPanel::apply);
-        // connect(widgetVec.at(0), QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &ParamPanel::setValue);
     }
 
     void ParamPanel::getNodes(){
         
+        this->gettingNodes = 1;
+        // Gets current text of Node box
         QString currentText = this->nodes->currentText();
 
+        // Clears node box
         this->nodes->clear();
 
+        // Get available nodes from param ros node and add names to Node box
         for(std::string str : this->node->get_node_names())
             this->nodes->addItem(str.c_str());
 
+        // If the text from begining of method is in current node box then get index
         int ind = this->nodes->findText(currentText);
 
+        this->gettingNodes = 0;
+        // If text if found set currentIndex of nodebox to currentText index
         if(ind != -1)
             this->nodes->setCurrentIndex(ind);
 
@@ -152,6 +162,9 @@ namespace riptide_rviz
 
         std::vector<std::string> prefixes = {};
 
+        // Try to get parameters from requested node
+        // Doesn't always work and not really sure why as documentation of ros sucks
+        // Normally doesn't work on nodes outside of robot namespace
         try{
         rcl_interfaces::msg::ListParametersResult msg = param_client->list_parameters(prefixes, 1, 1s);
         paramReply = this->param_client->get_parameters(msg.names, 1s);
@@ -168,11 +181,22 @@ namespace riptide_rviz
         
         for(rclcpp::Parameter param : params){
 
+            // Create Horizontal Box for the current parameter
             QHBoxLayout* hBox = new QHBoxLayout();
+
+            // Get name of current parameter and put in QString
             QString name = QString::fromStdString(param.get_name());
 
-            hBox->addWidget(new QLabel(name));
+            // Generate the Label for Parameter name
+            QLabel* nameLabel = new QLabel(QString::fromStdString(param.get_name() + ":"));
+            QFontMetrics fontInfo = nameLabel->fontMetrics();
 
+            // Set Max size so label doesn't change size when window changes size
+            nameLabel->setMaximumSize(fontInfo.horizontalAdvance(name), fontInfo.height());
+            nameLabel->setObjectName(name);
+            hBox->addWidget(nameLabel);
+
+            // For every parameter type create a specific box that supports that type 
             switch(param.get_type()){
 
                 case rclcpp::PARAMETER_INTEGER: {
@@ -191,6 +215,10 @@ namespace riptide_rviz
                     std::vector<int64_t> arr = param.as_integer_array();
 
                     for(unsigned int i = 0; i < arr.size(); i++){
+                        QString num = QString::fromStdString(std::to_string(i) + ":");
+                        QLabel* label = new QLabel(num);
+                        label->setMaximumWidth(fontInfo.horizontalAdvance(num));
+                        
                         QSpinBox* box = new QSpinBox();
                         box->setMinimum(INT_MIN);
                         box->setMaximum(INT_MAX);
@@ -199,7 +227,7 @@ namespace riptide_rviz
 
                         QHBoxLayout* arrHBox = new QHBoxLayout();
 
-                        arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
+                        arrHBox->addWidget(label);
                         arrHBox->addWidget(box);
 
                         arrVBox->addLayout(arrHBox);
@@ -225,6 +253,11 @@ namespace riptide_rviz
                     std::vector<double> arr = param.as_double_array();
 
                     for(unsigned int i = 0; i < arr.size(); i++){
+                        
+                        QString num = QString::fromStdString(std::to_string(i) + ":");
+                        QLabel* label = new QLabel(num);
+                        label->setMaximumWidth(fontInfo.horizontalAdvance(num));
+
                         QDoubleSpinBox* box = new QDoubleSpinBox();
                         box->setMinimum(-DBL_MAX);
                         box->setMaximum(DBL_MAX);
@@ -233,7 +266,7 @@ namespace riptide_rviz
 
                         QHBoxLayout* arrHBox = new QHBoxLayout();
 
-                        arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
+                        arrHBox->addWidget(label);
                         arrHBox->addWidget(box);
 
                         arrVBox->addLayout(arrHBox);
@@ -261,6 +294,10 @@ namespace riptide_rviz
 
                     for(unsigned int i = 0; i < arr.size(); i++){
 
+                        QString num = QString::fromStdString(std::to_string(i) + ":");
+                        QLabel* label = new QLabel(num);
+                        label->setMaximumWidth(fontInfo.horizontalAdvance(num));
+
                         QCheckBox* box = new QCheckBox();
 
                         box->setObjectName(name);
@@ -268,7 +305,7 @@ namespace riptide_rviz
 
                         QHBoxLayout* arrHBox = new QHBoxLayout();
 
-                        arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
+                        arrHBox->addWidget(label);
                         arrHBox->addWidget(box);
 
                         arrVBox->addLayout(arrHBox);
@@ -294,13 +331,17 @@ namespace riptide_rviz
                     
                     for(unsigned int i = 0; i < arr.size(); i++){
 
+                        QString num = QString::fromStdString(std::to_string(i) + ":");
+                        QLabel* label = new QLabel(num);
+                        label->setMaximumWidth(fontInfo.horizontalAdvance(num));
+
                         QHBoxLayout* arrHBox = new QHBoxLayout();
 
                         QTextEdit* box = new QTextEdit();
                         box->setObjectName(name);
                         box->setPlainText(QString::fromStdString(arr.at(i)));
 
-                        arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
+                        arrHBox->addWidget(label);
                         arrHBox->addWidget(box);
 
                         arrVBox->addLayout(arrHBox);
@@ -327,6 +368,9 @@ namespace riptide_rviz
     // When the Node Combo Box Changes connect to the new node selected
     void ParamPanel::setNode(const QString &text){
         
+        if(this->gettingNodes)
+            return;
+
         // Erase items in paramLayout
         this->eraseLayout(this->paramLayout);
 
@@ -334,7 +378,7 @@ namespace riptide_rviz
         this->param_client = std::make_shared<rclcpp::SyncParametersClient>(this->node, text.toStdString());
 
         // If Node can't connect log error and terminate Else Connect to Node and call Helper Methods
-        if(!this->param_client->wait_for_service(1s)){
+        if(!this->param_client->wait_for_service(200ms)){
             RVIZ_COMMON_LOG_ERROR("Can't Connect to Param Node");
             this->connected = 0;
         }else{
@@ -347,7 +391,6 @@ namespace riptide_rviz
 
     void ParamPanel::refresh(){
         this->getNodes();
-        this->setNode(this->nodes->currentText());
     }
 
     // Storing layouts inside of layouts creates a tree this method gets to the bottom
@@ -375,15 +418,17 @@ namespace riptide_rviz
 
         std::vector<std::string> params;
 
+        // Get list of parameters that are currently in the ParamPanel
+        
         for(int i = 0; i < this->paramLayout->count(); i++){
             QLabel* label = dynamic_cast<QLabel*>(this->paramLayout->itemAt(i)->layout()->itemAt(0)->widget());
-            params.push_back(label->text().toStdString());
+            params.push_back(label->objectName().toStdString());
         }
 
         std::vector<rclcpp::ParameterType> paramType = this->param_client->get_parameter_types(params);
-
         std::vector<rclcpp::Parameter> newParams;
-
+        
+        // For each parameter in ParamPanel get the value and create a Parameter to be adde dto newParams
         for(unsigned int i = 0; i < params.size(); i++){
 
             switch(paramType.at(i)){
@@ -507,11 +552,15 @@ namespace riptide_rviz
 
                     newParams.push_back(newParam);
 
-                }
+                } break;
 
+                case rclcpp::PARAMETER_BYTE_ARRAY:
+                case rclcpp::PARAMETER_NOT_SET:
+                    RVIZ_COMMON_LOG_WARNING("Type not supported");
             }
-
-            this->param_client->set_parameters(newParams);
+            
+            // Sets parameters and logs result
+            RVIZ_COMMON_LOG_INFO(this->param_client->set_parameters_atomically(newParams).reason);
 
         }
 
