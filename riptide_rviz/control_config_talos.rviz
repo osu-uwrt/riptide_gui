@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
       Splitter Ratio: 0.47647058963775635
-    Tree Height: 730
+    Tree Height: 703
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -58,6 +58,9 @@ Panels:
   - Class: riptide_rviz/FeedforwardPanel
     Name: FeedforwardPanel
     robot_namespace: /talos
+  - Class: riptide_rviz/ParamPanel
+    Name: ParamPanel
+    robot_namespace: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -1035,7 +1038,7 @@ Window Geometry:
     collapsed: false
   FeedforwardPanel:
     collapsed: false
-  Height: 1043
+  Height: 1016
   Hide Left Dock: false
   Hide Right Dock: false
   Image:
