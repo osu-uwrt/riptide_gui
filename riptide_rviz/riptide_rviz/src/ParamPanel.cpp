@@ -137,8 +137,15 @@ namespace riptide_rviz
         // Clears node box
         this->nodes->clear();
 
+        std::vector<std::string> nodeList;
+
         // Get available nodes from param ros node and add names to Node box
         for(std::string str : this->node->get_node_names())
+            nodeList.push_back(str);
+
+        std::sort(nodeList.begin(), nodeList.end());
+
+        for(std::string str : nodeList)
             this->nodes->addItem(str.c_str());
 
         // If the text from begining of method is in current node box then get index
