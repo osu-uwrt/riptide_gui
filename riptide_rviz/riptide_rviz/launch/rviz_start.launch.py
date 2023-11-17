@@ -60,7 +60,7 @@ def generate_launch_description():
                 # start the thruster wrench visualizer
                 Node(
                     package="riptide_controllers2",
-                    executable="thruster_wrench_publisher",
+                    executable="thruster_wrench_publisher.py",
                     name="thruster_wrench_publisher",
                     output="screen",
                     parameters=[
