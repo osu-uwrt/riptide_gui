@@ -1,12 +1,12 @@
 Panels:
   - Class: rviz_common/Displays
-    Help Height: 70
+    Help Height: 123
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-      Splitter Ratio: 0.47647058963775635
-    Tree Height: 703
+        - /TF1/Frames1
+      Splitter Ratio: 0.5
+    Tree Height: 276
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -25,42 +25,32 @@ Panels:
     Name: Time
     SyncMode: 0
     SyncSource: ""
-  - Class: rviz_common/Transformation
-    Name: Transformation
-  - Class: riptide_rviz/MissionPanel
-    Name: MissionPanel
-    robot_namespace: /talos
   - Class: riptide_rviz/ControlPanel
     Name: ControlPanel
     max_depth_in_place: -0.5
     odom_timeout: 2.5
     robot_namespace: /talos
     tgt_in_place_depth: -0.75
-  - Class: riptide_rviz/Actuators
-    Name: Actuators
-    robot_namespace: /talos
-  - Class: rviz_common/Transformation
-    Name: Transformation
-  - Class: riptide_rviz/MissionPanel
-    Name: MissionPanel
-    robot_namespace: ""
-  - Class: riptide_rviz/BaggingPanel
-    Name: BaggingPanel
-  - Class: riptide_rviz/ElectricalPanel
-    Name: ElectricalPanel
-    robot_namespace: /talos
   - Class: riptide_rviz/MappingPanel
     Name: MappingPanel
     mapCalibNumSamples: 10
     robot_namespace: /talos
     tagFrameName: estimated_origin_frame
     worldFrameName: world
+  - Class: riptide_rviz/ElectricalPanel
+    Name: ElectricalPanel
+    robot_namespace: /talos
+  - Class: riptide_rviz/MissionPanel
+    Name: MissionPanel
+    robot_namespace: /talos
   - Class: riptide_rviz/FeedforwardPanel
     Name: FeedforwardPanel
     robot_namespace: /talos
+  - Class: riptide_rviz/BaggingPanel
+    Name: BaggingPanel
   - Class: riptide_rviz/ParamPanel
     Name: ParamPanel
-    robot_namespace: ""
+    robot_namespace: /talos
 Visualization Manager:
   Class: ""
   Displays:
@@ -82,255 +72,6 @@ Visualization Manager:
       Plane Cell Count: 100
       Reference Frame: <Fixed Frame>
       Value: true
-    - Alpha: 1
-      Class: rviz_default_plugins/RobotModel
-      Collision Enabled: false
-      Description File: ""
-      Description Source: Topic
-      Description Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: talos/robot_description
-      Enabled: true
-      Links:
-        All Links Enabled: true
-        Expand Joint Details: false
-        Expand Link Details: false
-        Expand Tree: false
-        Link Tree Style: Links in Alphabetic Order
-      Mass Properties:
-        Inertia: false
-        Mass: false
-      Name: RobotModel
-      TF Prefix: ""
-      Update Interval: 0
-      Value: true
-      Visual Enabled: true
-    - Class: rviz_default_plugins/TF
-      Enabled: false
-      Frame Timeout: 15
-      Frames:
-        All Enabled: true
-      Marker Scale: 0.699999988079071
-      Name: TF
-      Show Arrows: true
-      Show Axes: true
-      Show Names: false
-      Tree:
-        {}
-      Update Interval: 0
-      Value: false
-    - Angle Tolerance: 0.10000000149011612
-      Class: rviz_default_plugins/Odometry
-      Covariance:
-        Orientation:
-          Alpha: 0.5
-          Color: 255; 255; 127
-          Color Style: Unique
-          Frame: Local
-          Offset: 1
-          Scale: 1
-          Value: true
-        Position:
-          Alpha: 0.30000001192092896
-          Color: 204; 51; 204
-          Scale: 1
-          Value: true
-        Value: true
-      Enabled: true
-      Keep: 1
-      Name: Odometry
-      Position Tolerance: 0.10000000149011612
-      Shape:
-        Alpha: 0
-        Axes Length: 1
-        Axes Radius: 0.10000000149011612
-        Color: 255; 25; 0
-        Head Length: 0.30000001192092896
-        Head Radius: 0.10000000149011612
-        Shaft Length: 1
-        Shaft Radius: 0.05000000074505806
-        Value: Arrow
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /talos/odometry/filtered
-      Value: true
-    - Class: rviz_default_plugins/Image
-      Enabled: false
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: Image
-      Normalize Range: true
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /talos/zed2i/zed_node/left/image_rect_gray
-      Value: false
-    - Class: rviz_common/Group
-      Displays:
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_0
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_1
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_2
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_3
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_4
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_5
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_6
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-        - Accept NaN Values: false
-          Alpha: 1
-          Arrow Width: 0.05000000074505806
-          Class: rviz_default_plugins/Wrench
-          Enabled: true
-          Force Arrow Scale: 0.05000000074505806
-          Force Color: 204; 51; 51
-          History Length: 1
-          Name: Wrench
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/thruster_wrenches/thruster_7
-          Torque Arrow Scale: 2
-          Torque Color: 204; 204; 51
-          Value: true
-      Enabled: true
-      Name: wrenches
     - Class: riptide_rviz/DiagnosticOverlay
       Enabled: true
       Name: DiagnosticOverlay
@@ -344,6 +85,291 @@ Visualization Manager:
       ver_alignment: top
       ver_dist: 0
       width: 128
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        buoy_frame:
+          Value: true
+        buoy_glyph_1_frame:
+          Value: true
+        buoy_glyph_2_frame:
+          Value: true
+        earth_glyph_frame:
+          Value: true
+        gate_frame:
+          Value: true
+        map:
+          Value: true
+        odom:
+          Value: false
+        table_frame:
+          Value: false
+        talos/base_inertia:
+          Value: false
+        talos/base_link:
+          Value: true
+        talos/droppers_link:
+          Value: false
+        talos/dvl_link:
+          Value: false
+        talos/imu_link:
+          Value: false
+        talos/imu_revolute_link:
+          Value: false
+        talos/origin:
+          Value: false
+        talos/poker_link:
+          Value: false
+        talos/pose_sensor_link:
+          Value: false
+        talos/pressure_link:
+          Value: false
+        talos/thruster_0:
+          Value: false
+        talos/thruster_1:
+          Value: false
+        talos/thruster_2:
+          Value: false
+        talos/thruster_3:
+          Value: false
+        talos/thruster_4:
+          Value: false
+        talos/thruster_5:
+          Value: false
+        talos/thruster_6:
+          Value: false
+        talos/thruster_7:
+          Value: false
+        talos/torpedo_link:
+          Value: false
+        talos/zed2i/left_link:
+          Value: false
+        talos/zed2i/left_optical:
+          Value: false
+        talos/zed2i/right_link:
+          Value: false
+        talos/zed2i/right_optical:
+          Value: false
+        talos/zed2i_base_link:
+          Value: false
+        torpedo_frame:
+          Value: true
+        torpedo_lower_hole_frame:
+          Value: true
+        torpedo_upper_hole_frame:
+          Value: true
+        world:
+          Value: false
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        world:
+          map:
+            buoy_frame:
+              buoy_glyph_1_frame:
+                {}
+              buoy_glyph_2_frame:
+                {}
+            gate_frame:
+              earth_glyph_frame:
+                {}
+            table_frame:
+              {}
+            torpedo_frame:
+              torpedo_lower_hole_frame:
+                {}
+              torpedo_upper_hole_frame:
+                {}
+          odom:
+            talos/base_link:
+              talos/origin:
+                talos/base_inertia:
+                  {}
+                talos/droppers_link:
+                  {}
+                talos/dvl_link:
+                  {}
+                talos/imu_link:
+                  {}
+                talos/imu_revolute_link:
+                  {}
+                talos/poker_link:
+                  {}
+                talos/pressure_link:
+                  {}
+                talos/thruster_0:
+                  {}
+                talos/thruster_1:
+                  {}
+                talos/thruster_2:
+                  {}
+                talos/thruster_3:
+                  {}
+                talos/thruster_4:
+                  {}
+                talos/thruster_5:
+                  {}
+                talos/thruster_6:
+                  {}
+                talos/thruster_7:
+                  {}
+                talos/torpedo_link:
+                  {}
+                talos/zed2i_base_link:
+                  talos/zed2i/left_link:
+                    talos/zed2i/left_optical:
+                      {}
+                    talos/zed2i/right_link:
+                      talos/zed2i/right_optical:
+                        {}
+              talos/pose_sensor_link:
+                {}
+      Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /talos/robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        talos/base_inertia:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/droppers_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/dvl_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/imu_revolute_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/origin:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/poker_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/pose_sensor_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/pressure_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/torpedo_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/zed2i/left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/zed2i/left_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/zed2i/right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/zed2i/right_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/zed2i_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Mass Properties:
+        Inertia: false
+        Mass: false
+      Name: RobotModel
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray
@@ -358,146 +384,6 @@ Visualization Manager:
       Value: true
     - Class: rviz_common/Group
       Displays:
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Buoy
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/buoy
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: BuoyGlyph1
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/buoy_glyph_1
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: BuoyGlyph2
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/buoy_glyph_2
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: EarthGlyph
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/earth_glyph
-          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -556,7 +442,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Table
+          Name: Earth Glyph
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -566,7 +452,112 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/table
+            Value: /talos/mapping/earth_glyph
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Buoy
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/buoy
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Buoy Glyph 1
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/buoy_glyph_1
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Buoy Glyph 2
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/buoy_glyph_2
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -626,7 +617,42 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoLowerHole
+          Name: Torpedo Upper Hole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/torpedo_upper_hole
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Torpedo Lower Hole
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -661,7 +687,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoUpperHole
+          Name: Table
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -671,294 +697,166 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_upper_hole
+            Value: /talos/mapping/table
           Value: true
       Enabled: true
-      Name: Poses
+      Name: Mapping Objects
     - Class: rviz_common/Group
       Displays:
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Buoy
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/buoy
+            Value: /talos/thruster_wrenches/thruster_0
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: BuoyGlyph1
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/buoy_glyph_1
+            Value: /talos/thruster_wrenches/thruster_1
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: BuoyGlyph2
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/buoy_glyph_2
+            Value: /talos/thruster_wrenches/thruster_2
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: EarthGlyph
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/earth_glyph
+            Value: /talos/thruster_wrenches/thruster_3
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Gate
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/gate
+            Value: /talos/thruster_wrenches/thruster_4
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Torpedo
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo
+            Value: /talos/thruster_wrenches/thruster_5
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: TorpedoLowerHole
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_lower_hole
+            Value: /talos/thruster_wrenches/thruster_6
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
+        - Accept NaN Values: false
+          Alpha: 1
+          Arrow Width: 0.10000000149011612
+          Class: rviz_default_plugins/Wrench
           Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: TorpedoUpperHole
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
+          Force Arrow Scale: 0.10000000149011612
+          Force Color: 204; 51; 51
+          History Length: 1
+          Name: Wrench
           Topic:
             Depth: 5
             Durability Policy: Volatile
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_upper_hole
+            Value: /talos/thruster_wrenches/thruster_7
+          Torque Arrow Scale: 2
+          Torque Color: 204; 204; 51
           Value: true
       Enabled: true
-      Name: DummyDets
+      Name: Thruster Wrenches
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -1005,29 +903,27 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 11.305941581726074
+      Distance: 5.491949081420898
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 2.2777559757232666
-        Y: -3.093425989151001
-        Z: 0.565073549747467
-      Focal Shape Fixed Size: false
+        X: 2.528198480606079
+        Y: 1.2545809745788574
+        Z: -1.3957301378250122
+      Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5997955799102783
+      Pitch: 0.49539822340011597
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.688066005706787
+      Yaw: 4.108583927154541
     Saved: ~
 Window Geometry:
-  Actuators:
-    collapsed: false
   BaggingPanel:
     collapsed: false
   ControlPanel:
@@ -1041,23 +937,21 @@ Window Geometry:
   Height: 1016
   Hide Left Dock: false
   Hide Right Dock: false
-  Image:
-    collapsed: false
   MappingPanel:
     collapsed: false
   MissionPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001f80000037afc020000000dfb0000001200530065006c0065006300740069006f006e000000003d000000fb0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001c005400720061006e00730066006f0072006d006100740069006f006e000000031f000000c10000007b00fffffffb000000180043006f006e00740072006f006c00500061006e0065006c010000003d000002350000022900fffffffb00000012004100630074007500610074006f0072007300000001c4000000800000001500fffffffb0000000c00430061006d00650072006100000002d0000000c70000000000000000fc000002780000013f000001380100001cfa000000020100000004fb0000000e004200720069006e0067007500700000000000ffffffff0000000000000000fb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000000f300fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000017b00fffffffb0000001c005400720061006e00730066006f0072006d006100740069006f006e0000000000000001820000009e00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000240000001770000000000000000000000010000016a0000037afc0200000006fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0049006d006100670065000000003d000000d70000002800fffffffc0000003d0000037a0000016f0100001cfa000000040100000006fb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000008e00fffffffb00000018004d0069007300730069006f006e00500061006e0065006c0000000000ffffffff0000008e00fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff000000ed00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006710000010f0000010000fffffffb0000000a0049006d00610067006501000002d3000000cd0000000000000000fb0000000a0049006d00610067006501000002a8000000f80000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000078000000039fc0100000002fb0000000800540069006d0065010000000000000780000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004120000037a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  ParamPanel:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd00000004000000000000019000000365fc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000180043006f006e00740072006f006c00500061006e0065006c010000003b000002280000020b00fffffffc0000026900000137000001260100001afa000000000100000002fb00000018004d0061007000700069006e006700500061006e0065006c010000000000000190000000eb00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000019000ffffff00000001000001b600000365fc0200000004fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc0000003b0000017a000001570100001afa000000010100000002fb00000018004d0069007300730069006f006e00500061006e0065006c0100000580000001b60000008100fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff000000e400fffffffc000001bb000001e5000000e20100001afa000000000100000005fb000000140050006100720061006d00500061006e0065006c0100000000ffffffff0000007b00fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000014b00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000001c004200720069006e00670075007000570065006200760069006500770100000000ffffffff0000000000000000fb0000000a0056006900650077007301000006270000010f0000010000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073600000037fc0100000002fb0000000800540069006d00650100000000000007360000025300fffffffb0000000800540069006d00650100000000000004500000000000000000000003e40000036500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
     collapsed: false
   Tool Properties:
     collapsed: false
-  Transformation:
-    collapsed: false
   Views:
     collapsed: false
-  Width: 1920
-  X: 1920
-  Y: 0
+  Width: 1846
+  X: 74
+  Y: 27
