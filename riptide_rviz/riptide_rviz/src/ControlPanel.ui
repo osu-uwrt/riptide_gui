@@ -231,89 +231,7 @@ QLabel:!enabled{color: red;}</string>
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_14">
-           <property name="text">
-            <string>X</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Z</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="4">
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>Pitch</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLineEdit" name="cmdCurrZ">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLineEdit:!enabled{color: black;};</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="5">
-          <widget class="QLineEdit" name="cmdCurrYaw">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLineEdit:!enabled{color: black;};</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLineEdit" name="cmdCurrX">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLineEdit:!enabled{color: black;};</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLineEdit" name="cmdCurrR">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLineEdit:!enabled{color: black;};</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QLineEdit" name="cmdCurrY">
            <property name="enabled">
             <bool>false</bool>
@@ -326,27 +244,80 @@ QLabel:!enabled{color: red;}</string>
            </property>
           </widget>
          </item>
+         <item row="3" column="5">
+          <widget class="QLineEdit" name="cmdReqYaw">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QLineEdit" name="cmdReqZ">
+           <property name="text">
+            <string>-1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QLineEdit" name="cmdCurrZ">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit:!enabled{color: black;};</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
-          <widget class="QLabel" name="label_15">
-           <property name="text">
-            <string>Y</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QCheckBox" name="cmdCopyCurrY">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Copy Current Value</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Y</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
-         <item row="0" column="5">
-          <widget class="QLabel" name="label_19">
-           <property name="text">
-            <string>Yaw</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="4">
+         <item row="2" column="4">
           <widget class="QLineEdit" name="cmdCurrP">
            <property name="enabled">
             <bool>false</bool>
@@ -359,33 +330,302 @@ QLabel:!enabled{color: red;}</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
-          <widget class="QLabel" name="label_17">
+         <item row="3" column="3">
+          <widget class="QLineEdit" name="cmdReqR">
            <property name="text">
-            <string>Roll</string>
+            <string>0</string>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
+          </widget>
+         </item>
+         <item row="3" column="4">
+          <widget class="QLineEdit" name="cmdReqP">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="cmdReqY">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QCheckBox" name="cmdCopyCurrX">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Copy Current Value</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>X</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLineEdit" name="cmdReqX">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QLineEdit" name="cmdCurrR">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit:!enabled{color: black;};</string>
+           </property>
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLineEdit" name="cmdReqX"/>
+          <widget class="QLineEdit" name="cmdCurrX">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit:!enabled{color: black;};</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="cmdReqY"/>
+         <item row="0" column="3">
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QCheckBox" name="cmdCopyCurrRoll">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Copy Current Value</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_17">
+             <property name="text">
+              <string>Roll</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
-         <item row="2" column="2">
-          <widget class="QLineEdit" name="cmdReqZ"/>
-         </item>
-         <item row="2" column="3">
-          <widget class="QLineEdit" name="cmdReqR"/>
-         </item>
-         <item row="2" column="4">
-          <widget class="QLineEdit" name="cmdReqP"/>
+         <item row="0" column="2">
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <item>
+            <widget class="QCheckBox" name="cmdCopyCurrZ">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Copy Current Value</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Z</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item row="2" column="5">
-          <widget class="QLineEdit" name="cmdReqYaw"/>
+          <widget class="QLineEdit" name="cmdCurrYaw">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit:!enabled{color: black;};</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QCheckBox" name="cmdCopyCurrPitch">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Copy Current Value</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_18">
+             <property name="text">
+              <string>Pitch</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="5">
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
+           <item>
+            <widget class="QCheckBox" name="cmdCopyCurrYaw">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Copy Current Value</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Yaw</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
@@ -552,6 +792,42 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>ctrlEnable</tabstop>
+  <tabstop>ctrlDisable</tabstop>
+  <tabstop>ctrlModeTele</tabstop>
+  <tabstop>ctrlModePos</tabstop>
+  <tabstop>ctrlModeVel</tabstop>
+  <tabstop>ctrlModeFFD</tabstop>
+  <tabstop>ctrlRequireKill</tabstop>
+  <tabstop>cmdReqX</tabstop>
+  <tabstop>cmdReqY</tabstop>
+  <tabstop>cmdReqZ</tabstop>
+  <tabstop>cmdReqR</tabstop>
+  <tabstop>cmdReqP</tabstop>
+  <tabstop>cmdReqYaw</tabstop>
+  <tabstop>CtrlSendCmd</tabstop>
+  <tabstop>ctrlFwdCurrent</tabstop>
+  <tabstop>cmdCopyCurrX</tabstop>
+  <tabstop>cmdCopyCurrY</tabstop>
+  <tabstop>cmdCopyCurrZ</tabstop>
+  <tabstop>cmdCopyCurrRoll</tabstop>
+  <tabstop>cmdCopyCurrPitch</tabstop>
+  <tabstop>cmdCopyCurrYaw</tabstop>
+  <tabstop>ctrlDiveInPlace</tabstop>
+  <tabstop>cmdCurrX</tabstop>
+  <tabstop>cmdCurrY</tabstop>
+  <tabstop>cmdCurrZ</tabstop>
+  <tabstop>cmdCurrR</tabstop>
+  <tabstop>cmdCurrP</tabstop>
+  <tabstop>cmdCurrYaw</tabstop>
+  <tabstop>ctrlDegOrRad</tabstop>
+  <tabstop>dragStart</tabstop>
+  <tabstop>dragStop</tabstop>
+  <tabstop>dragTrigger</tabstop>
+  <tabstop>dragCalStartAxis</tabstop>
+  <tabstop>calStatus</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

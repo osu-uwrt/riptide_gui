@@ -144,7 +144,7 @@ namespace riptide_rviz
 
         // Free the allocated containers
         delete str;
-        delete configVal; 
+        delete configVal;
 
         // create the timer but hold on starting it as things may not have been fully initialized yet
         uiTimer = new QTimer(this);
@@ -158,7 +158,7 @@ namespace riptide_rviz
         // setup goal_pose sub
         selectPoseSub = node->create_subscription<geometry_msgs::msg::PoseStamped>(
             "goal_pose", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::selectedPose, this, _1)); 
+            std::bind(&ControlPanel::selectedPose, this, _1));
 
         // setup the ROS topics that depend on namespace
         // make publishers
@@ -180,7 +180,7 @@ namespace riptide_rviz
 
         // now we can start the UI refresh timer
         uiTimer->start(100);
-        
+
         // and start the kill switch pub timer
         killPubTimer = node->create_wall_timer(50ms, std::bind(&ControlPanel::sendKillMsgTimer, this));
 
@@ -333,7 +333,7 @@ namespace riptide_rviz
                         { return !i; }))
         {
             RVIZ_COMMON_LOG_ERROR("ControlPanel: Failed to convert current position to floating point");
-            
+
             // set the red stylesheet
             uiPanel->ctrlDiveInPlace->setStyleSheet("QPushButton{color:black; background: red;}");
 
@@ -344,17 +344,17 @@ namespace riptide_rviz
         }
 
         // build the linear control message
-        // auto override the control mode to position 
+        // auto override the control mode to position
         auto linCmd = riptide_msgs2::msg::ControllerCommand();
         linCmd.setpoint_vect.x = x;
         linCmd.setpoint_vect.y = y;
         // automatically go to configured depth below surface
-        linCmd.setpoint_vect.z = tgt_in_place_depth; 
+        linCmd.setpoint_vect.z = tgt_in_place_depth;
         linCmd.mode = riptide_msgs2::msg::ControllerCommand::POSITION;
 
         // check the angle mode button
         if(degreeReadout){
-            yaw *= M_PI / 180.0; 
+            yaw *= M_PI / 180.0;
         }
 
         // convert RPY to quaternion
@@ -397,12 +397,24 @@ namespace riptide_rviz
         yaw = uiPanel->cmdCurrYaw->text();
 
         // take the values and propagate them into the requested values
-        uiPanel->cmdReqX->setText(x);
-        uiPanel->cmdReqY->setText(y);
-        uiPanel->cmdReqZ->setText(z);
-        uiPanel->cmdReqR->setText(roll);
-        uiPanel->cmdReqP->setText(pitch);
-        uiPanel->cmdReqYaw->setText(yaw);
+        if (uiPanel->cmdCopyCurrX->isChecked()) {
+            uiPanel->cmdReqX->setText(x);
+        }
+        if (uiPanel->cmdCopyCurrY->isChecked()) {
+            uiPanel->cmdReqY->setText(y);
+        }
+        if (uiPanel->cmdCopyCurrZ->isChecked()) {
+            uiPanel->cmdReqZ->setText(z);
+        }
+        if (uiPanel->cmdCopyCurrRoll->isChecked()) {
+            uiPanel->cmdReqR->setText(roll);
+        }
+        if (uiPanel->cmdCopyCurrPitch->isChecked()) {
+            uiPanel->cmdReqP->setText(pitch);
+        }
+        if (uiPanel->cmdCopyCurrYaw->isChecked()) {
+            uiPanel->cmdReqYaw->setText(yaw);
+        }
     }
 
     void ControlPanel::handleCommand()
@@ -449,9 +461,9 @@ namespace riptide_rviz
         {
             // check the angle mode button
             if(degreeReadout){
-                roll *= M_PI / 180.0; 
-                pitch *= M_PI / 180.0; 
-                yaw *= M_PI / 180.0; 
+                roll *= M_PI / 180.0;
+                pitch *= M_PI / 180.0;
+                yaw *= M_PI / 180.0;
             }
 
             // convert RPY to quaternion
