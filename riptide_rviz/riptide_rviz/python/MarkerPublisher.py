@@ -19,6 +19,7 @@ CONFIG_FILE = os.path.join(get_package_share_directory("riptide_rviz"), "config"
 LINEAR_CMD_TOPIC = "controller/linear"
 ANGULAR_CMD_TOPIC = "controller/angular"
 ODOMETRY_TOPIC = "odometry/filtered"
+SIM_TOPIC = "simulator/state"
 
 
 def toPoint(v: Vector3) -> Point:
@@ -71,12 +72,14 @@ class MarkerPublisher(Node):
         self.latestLinearCmd = ControllerCommand()
         self.latestAngularCmd = ControllerCommand()
         self.latestOdom = Odometry()
+        self.latestSimPose = Pose()
         
         #configure ros pub subs
         self.markerPub = self.create_publisher(MarkerArray, self.markerTopic, 10)
         self.linearSub = self.create_subscription(ControllerCommand, LINEAR_CMD_TOPIC, self.linearCB, 10)
         self.angularSub = self.create_subscription(ControllerCommand, ANGULAR_CMD_TOPIC, self.angularCB, 10)
         self.odomSub = self.create_subscription(Odometry, ODOMETRY_TOPIC, self.odomCB, 10)
+        self.simSub = self.create_subscription(Pose, SIM_TOPIC, self.simCB, 10)
     
         self.get_logger().info("Marker Publisher node started.")
         
@@ -133,7 +136,9 @@ class MarkerPublisher(Node):
     def angularCB(self, msg):
         self.latestAngularCmd = msg
         
-        
+    def simCB(self, msg):
+        self.latestSimPose = msg
+
     def odomCB(self, msg):
         self.latestOdom = msg
         
@@ -157,8 +162,25 @@ class MarkerPublisher(Node):
             marker.mesh_use_embedded_materials = True
             
             array.markers.append(marker)
-            
-        #publish ghost robot
+        
+
+        #publish ghost talos of sim true position
+        simGhost = Marker()
+        simGhost.header.frame_id = "world"
+        simGhost.header.stamp = self.get_clock().now().to_msg()
+        simGhost.ns = "simGhost"
+        simGhost.id = 0
+        simGhost.type = Marker.MESH_RESOURCE
+        simGhost.scale = Vector3(x=1.0, y=1.0, z=1.0)
+        simGhost.color = ColorRGBA(r=0.0, g=0.0, b=255.0, a=0.5)
+        simGhost.lifetime = Duration().to_msg()
+        simGhost.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, self.robot, "model.dae")
+        simGhost.mesh_use_embedded_materials = False
+        simGhost.action = Marker.MODIFY
+        simGhost.pose = self.latestSimPose
+        
+        array.markers.append(simGhost)
+        #publish ghost robot for odom goal point
         ghost = Marker()
         ghost.header.frame_id = "world"
         ghost.header.stamp = self.get_clock().now().to_msg()
@@ -181,10 +203,12 @@ class MarkerPublisher(Node):
             
         if linearActive:
             ghost.pose.position = toPoint(self.latestLinearCmd.setpoint_vect)
-        
         if angularActive:
             ghost.pose.orientation = self.latestAngularCmd.setpoint_quat
         
+        ghost.pose.position.x = ghost.pose.position.x #- 0.148
+        ghost.pose.position.y = ghost.pose.position.y #+ 0.040
+        ghost.pose.position.z = ghost.pose.position.z #- 0.071
         array.markers.append(ghost)
         self.markerPub.publish(array)
 
