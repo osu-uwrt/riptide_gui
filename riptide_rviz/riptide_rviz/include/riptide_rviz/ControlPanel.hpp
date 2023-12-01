@@ -8,6 +8,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/empty.hpp>
+#include <std_srvs/srv/trigger.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
@@ -24,6 +25,7 @@ namespace riptide_rviz
 
     class ControlPanel : public rviz_common::Panel
     {
+        using Trigger = std_srvs::srv::Trigger;
         using CalibrateDrag = riptide_msgs2::action::CalibrateDragNew;
         using CalibrateDragGH = rclcpp_action::ClientGoalHandle<CalibrateDrag>;
 
@@ -59,6 +61,10 @@ namespace riptide_rviz
         void handleCurrent();
         void handleCommand();
 
+        //slots for parameter relaod buttons
+        void handleReloadSolver();
+        void handleReloadActive();
+
         //slots for drag cal buttons
         void handleStartDragCal();
         void handleStopDragCal();
@@ -69,6 +75,8 @@ namespace riptide_rviz
 
     private:
         void updateCalStatus(const std::string& status);
+        void callTriggerService(rclcpp::Client<Trigger>::SharedPtr client);
+        void waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client);
         void setDragCalRunning(bool running);
         void dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle);
         void dragResultCb(const CalibrateDragGH::WrappedResult &result);
@@ -109,6 +117,15 @@ namespace riptide_rviz
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr steadySub;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr selectPoseSub;
+
+        //service clients
+        rclcpp::Client<Trigger>::SharedPtr 
+            reloadSolverClient,
+            reloadActiveClient;
+        
+        std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;
+        int64_t srvReqId;
+        rclcpp::Time clientSendTime;
 
         // action clients
         rclcpp_action::Client<CalibrateDrag>::SharedPtr calibrateDrag;

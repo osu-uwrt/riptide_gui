@@ -673,28 +673,50 @@ QLabel:!enabled{color: red;}</string>
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="0">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Calibration and Tuning</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
          <string>Status:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="3">
+       <widget class="QPushButton" name="dragTrigger">
+        <property name="text">
+         <string>Trigger</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="dragStop">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {color: white; background:red;}
+
+QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
+        </property>
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>Drag Calibration</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Calibrations:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
          <string>Start Axis:</string>
@@ -705,6 +727,17 @@ QLabel:!enabled{color: red;}</string>
        </widget>
       </item>
       <item row="2" column="1">
+       <widget class="QPushButton" name="dragStart">
+        <property name="styleSheet">
+         <string notr="true">QPushButton {color: white; background: green;}
+QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
        <widget class="QComboBox" name="dragCalStartAxis">
         <item>
          <property name="text">
@@ -738,41 +771,29 @@ QLabel:!enabled{color: red;}</string>
         </item>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="dragStart">
-        <property name="styleSheet">
-         <string notr="true">QPushButton {color: white; background: green;}
-QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
-        </property>
+      <item row="7" column="0" colspan="4">
+       <widget class="QTextBrowser" name="calStatus"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>Start</string>
+         <string>Parameter Reload</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QPushButton" name="dragStop">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {color: white; background:red;}
-
-QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
-        </property>
+       <widget class="QPushButton" name="reloadActive">
         <property name="text">
-         <string>Stop</string>
+         <string>Reload Active</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QPushButton" name="dragTrigger">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="reloadSolver">
         <property name="text">
-         <string>Trigger</string>
+         <string>Reload Solver</string>
         </property>
        </widget>
-      </item>
-      <item row="4" column="0" colspan="4">
-       <widget class="QTextBrowser" name="calStatus"/>
       </item>
      </layout>
     </widget>

@@ -60,12 +60,9 @@ namespace riptide_rviz
     void ControlPanel::onInitialize()
     {
         // Connect UI signals for controlling the riptide vehicle
-        connect(uiPanel->ctrlEnable, &QPushButton::clicked, [this](void)
-                { handleEnable(); });
-        connect(uiPanel->ctrlDisable, &QPushButton::clicked, [this](void)
-                { handleDisable(); });
-        connect(uiPanel->ctrlDegOrRad, &QPushButton::clicked, [this](void)
-                { toggleDegrees(); });
+        connect(uiPanel->ctrlEnable, &QPushButton::clicked, this, &ControlPanel::handleEnable);
+        connect(uiPanel->ctrlDisable, &QPushButton::clicked, this, &ControlPanel::handleDisable);
+        connect(uiPanel->ctrlDegOrRad, &QPushButton::clicked, this, &ControlPanel::toggleDegrees);
 
         // mode seting buttons
         connect(uiPanel->ctrlModePos, &QPushButton::clicked,
@@ -82,20 +79,18 @@ namespace riptide_rviz
                 { RVIZ_COMMON_LOG_INFO("ControlPanel: bad button >:("); });
 
         // command sending buttons
-        connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, [this](void)
-                { handleLocalDive(); });
-        connect(uiPanel->ctrlFwdCurrent, &QPushButton::clicked, [this](void)
-                { handleCurrent(); });
-        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, [this](void)
-                { handleCommand(); });
+        connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, this, &ControlPanel::handleLocalDive);
+        connect(uiPanel->ctrlFwdCurrent, &QPushButton::clicked, this, &ControlPanel::handleCurrent);
+        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, this, &ControlPanel::handleCommand);
+
+        //parameter reload buttons
+        connect(uiPanel->reloadSolver, &QPushButton::clicked, this, &ControlPanel::handleReloadSolver);
+        connect(uiPanel->reloadActive, &QPushButton::clicked, this, &ControlPanel::handleReloadActive);
 
         //drag cal buttons
-        connect(uiPanel->dragStart, &QPushButton::clicked, [this](void)
-                { handleStartDragCal(); });
-        connect(uiPanel->dragStop, &QPushButton::clicked, [this](void)
-                { handleStopDragCal(); });
-        connect(uiPanel->dragTrigger, &QPushButton::clicked, [this](void)
-                { handleTriggerDragCal(); });
+        connect(uiPanel->dragStart, &QPushButton::clicked, this, &ControlPanel::handleStartDragCal);
+        connect(uiPanel->dragStop, &QPushButton::clicked, this, &ControlPanel::handleStopDragCal);
+        connect(uiPanel->dragTrigger, &QPushButton::clicked, this, &ControlPanel::handleTriggerDragCal);
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Initialized panel");
     }
@@ -174,6 +169,10 @@ namespace riptide_rviz
         steadySub = node->create_subscription<std_msgs::msg::Bool>(
             robot_ns + "/controller/steady", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::steadyCallback, this, _1));
+
+        //create service clients
+        reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_ts_params");
+        reloadActiveClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_active_params");
 
         //create action clients
         calibrateDrag = rclcpp_action::create_client<CalibrateDrag>(node, robot_ns + "/calibrate_drag_new");
@@ -574,6 +573,20 @@ namespace riptide_rviz
     }
 
 
+    void ControlPanel::handleReloadSolver()
+    {
+        updateCalStatus("Attempting to invoke solver reload service");
+        callTriggerService(reloadSolverClient);
+    }
+
+
+    void ControlPanel::handleReloadActive()
+    {
+        updateCalStatus("Attempting to invoke active reload service");
+        callTriggerService(reloadActiveClient);
+    }
+
+
     void ControlPanel::handleStartDragCal()
     {
         updateCalStatus("Attempting to start drag calibration");
@@ -616,6 +629,58 @@ namespace riptide_rviz
     }
 
 
+    void ControlPanel::callTriggerService(rclcpp::Client<Trigger>::SharedPtr client)
+    {
+        if(!client->wait_for_service(5s))
+        {
+            updateCalStatus("Service unavailable!");
+            return;
+        }
+
+        Trigger::Request::SharedPtr request = std::make_shared<Trigger::Request>();
+        auto future = client->async_send_request(request);
+        srvReqId = future.request_id;
+        activeClientFuture = future.share();
+        QTimer::singleShot(250, 
+            [this, client] () { ControlPanel::waitForTriggerResponse(client); });
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        clientSendTime = node->get_clock()->now();
+    }
+
+
+    void ControlPanel::waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client)
+    {
+        if(!activeClientFuture.valid())
+        {
+            updateCalStatus("Service result has become invalid!");
+            return;
+        }
+
+        auto futureStatus = activeClientFuture.wait_for(10ms);
+        if(futureStatus != std::future_status::timeout)
+        {
+            //success
+            rclcpp::Client<Trigger>::SharedResponse response = activeClientFuture.get();
+            updateCalStatus(response->message);
+            return;
+        }
+
+        //not ready yet
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        rclcpp::Time currentTime = node->get_clock()->now();
+        if(currentTime - clientSendTime > 5s)
+        {
+            updateCalStatus("Service timed out.");
+            client->remove_pending_request(srvReqId);
+            return;
+        }
+
+        //schedule next check
+        QTimer::singleShot(250, 
+            [this, client] () { ControlPanel::waitForTriggerResponse(client); });
+    }
+
+
     void ControlPanel::setDragCalRunning(bool running)
     {
         uiPanel->dragStart->setEnabled(!running);
@@ -633,7 +698,6 @@ namespace riptide_rviz
             setDragCalRunning(true);
         }
     }
-
 
 
     void ControlPanel::dragResultCb(const CalibrateDragGH::WrappedResult &result)
