@@ -20,6 +20,14 @@
 #include "ui_ControlPanel.h"
 #include <QTimer>
 
+//
+// CONTROLLER SELECTION
+//
+#define OLD (0)
+#define SMC (1)
+#define PID (2)
+#define CONTROLLER_TYPE PID
+
 namespace riptide_rviz
 {
 
@@ -106,7 +114,14 @@ namespace riptide_rviz
         QTimer *uiTimer;
 
         // publishers
-        rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;
+        #if CONTROLLER_TYPE == OLD
+            rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;
+        #elif CONTROLLER_TYPE == SMC
+
+        #elif CONTROLLER_TYPE == PID
+            rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pidSetptPub;
+        #endif
+
         rclcpp::Publisher<riptide_msgs2::msg::KillSwitchReport>::SharedPtr killStatePub;
         rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr dragCalTriggerPub;
 
