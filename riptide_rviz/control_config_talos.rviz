@@ -91,7 +91,25 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        buoy_frame:
+          Value: true
+        buoy_glyph_1_frame:
+          Value: true
+        buoy_glyph_2_frame:
+          Value: true
+        earth_glyph_frame:
+          Value: true
+        estimated_origin_frame:
+          Value: true
+        gate_frame:
+          Value: true
+        map:
+          Value: true
         odom:
+          Value: true
+        table_frame:
+          Value: true
+        tag36h11:0:
           Value: true
         talos/base_inertia:
           Value: false
@@ -141,7 +159,27 @@ Visualization Manager:
           Value: false
         talos/zed2i_base_link:
           Value: true
+        torpedo_frame:
+          Value: true
+        torpedo_lower_hole_frame:
+          Value: true
+        torpedo_upper_hole_frame:
+          Value: true
         world:
+          Value: true
+        zed2i_base_link:
+          Value: true
+        zed2i_camera_center:
+          Value: true
+        zed2i_imu_link:
+          Value: true
+        zed2i_left_camera_frame:
+          Value: true
+        zed2i_left_camera_optical_frame:
+          Value: true
+        zed2i_right_camera_frame:
+          Value: true
+        zed2i_right_camera_optical_frame:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -149,7 +187,79 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        {}
+        world:
+          map:
+            buoy_frame:
+              buoy_glyph_1_frame:
+                {}
+              buoy_glyph_2_frame:
+                {}
+            gate_frame:
+              earth_glyph_frame:
+                {}
+            table_frame:
+              {}
+            torpedo_frame:
+              torpedo_lower_hole_frame:
+                {}
+              torpedo_upper_hole_frame:
+                {}
+          odom:
+            talos/base_link:
+              talos/origin:
+                talos/base_inertia:
+                  {}
+                talos/droppers_link:
+                  {}
+                talos/dvl_link:
+                  {}
+                talos/imu_link:
+                  {}
+                talos/imu_revolute_link:
+                  {}
+                talos/poker_link:
+                  {}
+                talos/pressure_link:
+                  {}
+                talos/thruster_0:
+                  {}
+                talos/thruster_1:
+                  {}
+                talos/thruster_2:
+                  {}
+                talos/thruster_3:
+                  {}
+                talos/thruster_4:
+                  {}
+                talos/thruster_5:
+                  {}
+                talos/thruster_6:
+                  {}
+                talos/thruster_7:
+                  {}
+                talos/torpedo_link:
+                  {}
+                talos/zed2i_base_link:
+                  talos/zed2i/left_link:
+                    talos/zed2i/left_optical:
+                      {}
+                    talos/zed2i/right_link:
+                      talos/zed2i/right_optical:
+                        {}
+                  zed2i_base_link:
+                    zed2i_camera_center:
+                      zed2i_left_camera_frame:
+                        zed2i_imu_link:
+                          {}
+                        zed2i_left_camera_optical_frame:
+                          tag36h11:0:
+                            estimated_origin_frame:
+                              {}
+                      zed2i_right_camera_frame:
+                        zed2i_right_camera_optical_frame:
+                          {}
+              talos/pose_sensor_link:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -295,6 +405,7 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
+        ghost: true
         mapping_markers: true
       Topic:
         Depth: 5
@@ -824,25 +935,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 6.309529781341553
+      Distance: 6.067745208740234
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.323216438293457
-        Y: 2.1361520290374756
-        Z: -1.318871021270752
+        X: 1.5020915269851685
+        Y: -1.1111454963684082
+        Z: 0.6701019406318665
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.49539822340011597
+      Pitch: 0.5265679359436035
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.108583927154541
+      Yaw: 4.260629177093506
     Saved: ~
 Window Geometry:
   BaggingPanel:
@@ -864,7 +975,7 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001ec0000035ffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000180043006f006e00740072006f006c00500061006e0065006c010000003d0000024b0000024b00fffffffb00000018004d0061007000700069006e006700500061006e0065006c010000028e0000010e000000fd00ffffff000000010000017e0000035ffc0200000004fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc0000003d000001d30000016f0100001cfa000000010100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000580000001b60000008e00fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff000000ed00fffffffc0000021600000186000001380100001cfa000000000100000005fb000000140050006100720061006d00500061006e0065006c0100000000ffffffff0000008500fffffffb0000001c004200720069006e00670075007000570065006200760069006500770100000000ffffffff0000000000000000fb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000017b00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006270000010f0000010000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073a00000039fc0100000002fb0000000800540069006d006501000000000000073a000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000003c40000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000022e0000035ffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000180043006f006e00740072006f006c00500061006e0065006c010000003d0000024b0000024b00fffffffb00000018004d0061007000700069006e006700500061006e0065006c010000028e0000010e000000fd00ffffff000000010000017e0000035ffc0200000004fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc0000003d000001d30000016f0100001cfa000000010100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000580000001b60000008e00fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff000000ed00fffffffc0000021600000186000001380100001cfa000000000100000005fb000000140050006100720061006d00500061006e0065006c0100000000ffffffff0000008500fffffffb0000001c004200720069006e00670075007000570065006200760069006500770100000000ffffffff0000000000000000fb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000017b00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006270000010f0000010000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073a00000039fc0100000002fb0000000800540069006d006501000000000000073a000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000003820000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:

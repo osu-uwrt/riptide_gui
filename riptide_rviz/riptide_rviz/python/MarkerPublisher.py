@@ -3,21 +3,36 @@
 import os
 
 import rclpy
-import yaml
+import enum
 from ament_index_python import get_package_share_directory
 from geometry_msgs.msg import Point, Pose, Quaternion, Vector3
 from nav_msgs.msg import Odometry
 from rclpy.duration import Duration
 from rclpy.node import Node
-from riptide_msgs2.msg import ControllerCommand
 from std_msgs.msg import ColorRGBA
 from transforms3d.euler import euler2quat
 from visualization_msgs.msg import Marker, MarkerArray
 
+class ControllerType(enum.Enum):
+    OLD = 1
+    SMC = 2
+    PID = 3
+    
+CONTROLLER_TYPE = ControllerType.PID
+
+# import controller msgs and set topic names
+if CONTROLLER_TYPE == ControllerType.OLD:
+    from riptide_msgs2.msg import ControllerCommand
+    LINEAR_CMD_TOPIC = "controller/linear"
+    ANGULAR_CMD_TOPIC = "controller/angular"
+elif CONTROLLER_TYPE == ControllerType.SMC:
+    pass
+elif CONTROLLER_TYPE == ControllerType.PID:
+    PID_SETPT_TOPIC = "pid/target_position"
+
+    
 
 CONFIG_FILE = os.path.join(get_package_share_directory("riptide_rviz"), "config", "markers.yaml")
-LINEAR_CMD_TOPIC = "controller/linear"
-ANGULAR_CMD_TOPIC = "controller/angular"
 ODOMETRY_TOPIC = "odometry/filtered"
 
 
@@ -67,17 +82,25 @@ class MarkerPublisher(Node):
         
         self.timer = self.create_timer(self.updatePeriod, self.timerCB)
 
-        #configure ghost tempest vars
-        self.latestLinearCmd = ControllerCommand()
-        self.latestAngularCmd = ControllerCommand()
-        self.latestOdom = Odometry()
+        #configure ghost robot vars
+        self.latestOdom = Odometry()        
         
         #configure ros pub subs
         self.markerPub = self.create_publisher(MarkerArray, self.markerTopic, 10)
-        self.linearSub = self.create_subscription(ControllerCommand, LINEAR_CMD_TOPIC, self.linearCB, 10)
-        self.angularSub = self.create_subscription(ControllerCommand, ANGULAR_CMD_TOPIC, self.angularCB, 10)
         self.odomSub = self.create_subscription(Odometry, ODOMETRY_TOPIC, self.odomCB, 10)
-    
+        
+        #controller command subs
+        if CONTROLLER_TYPE == ControllerType.OLD:
+            self.linearSub = self.create_subscription(ControllerCommand, LINEAR_CMD_TOPIC, self.linearCB, 10)
+            self.angularSub = self.create_subscription(ControllerCommand, ANGULAR_CMD_TOPIC, self.angularCB, 10)
+            self.latestLinearCmd = ControllerCommand()
+            self.latestAngularCmd = ControllerCommand()
+        elif CONTROLLER_TYPE == ControllerType.SMC:
+            pass
+        elif CONTROLLER_TYPE == ControllerType.PID:
+            self.setptSub = self.create_subscription(Pose, PID_SETPT_TOPIC, self.setptCb, 10)
+            self.latestSetpt = Pose()
+        
         self.get_logger().info("Marker Publisher node started.")
         
     
@@ -125,13 +148,19 @@ class MarkerPublisher(Node):
         # because of how the while executes, the last marker in self.markers will be bad. delete it
         self.markers.remove(self.markers[-1])
     
-        
-    def linearCB(self, msg):
-        self.latestLinearCmd = msg
-        
-        
-    def angularCB(self, msg):
-        self.latestAngularCmd = msg
+    # setpoint callbacks
+    if CONTROLLER_TYPE == ControllerType.OLD:
+        def linearCB(self, msg):
+            self.latestLinearCmd = msg
+            
+            
+        def angularCB(self, msg):
+            self.latestAngularCmd = msg
+    elif CONTROLLER_TYPE == ControllerType.SMC:
+        pass
+    elif CONTROLLER_TYPE == ControllerType.PID:
+        def setptCb(self, msg):
+            self.latestSetpt = msg
         
         
     def odomCB(self, msg):
@@ -172,18 +201,24 @@ class MarkerPublisher(Node):
         ghost.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, self.robot, "model.dae")
         ghost.mesh_use_embedded_materials = False
         
-        linearActive = self.latestLinearCmd.mode == ControllerCommand.POSITION
-        angularActive = self.latestAngularCmd.mode == ControllerCommand.POSITION
-        if not (linearActive or angularActive):
-            ghost.action = Marker.DELETE
-        else:
-            ghost.action = Marker.MODIFY
+        if CONTROLLER_TYPE == ControllerType.OLD:
+            linearActive = self.latestLinearCmd.mode == ControllerCommand.POSITION
+            angularActive = self.latestAngularCmd.mode == ControllerCommand.POSITION
+            if not (linearActive or angularActive):
+                ghost.action = Marker.DELETE
+            else:
+                ghost.action = Marker.MODIFY
+                
+            if linearActive:
+                ghost.pose.position = toPoint(self.latestLinearCmd.setpoint_vect)
             
-        if linearActive:
-            ghost.pose.position = toPoint(self.latestLinearCmd.setpoint_vect)
-        
-        if angularActive:
-            ghost.pose.orientation = self.latestAngularCmd.setpoint_quat
+            if angularActive:
+                ghost.pose.orientation = self.latestAngularCmd.setpoint_quat
+        elif CONTROLLER_TYPE == ControllerType.SMC:
+            pass
+        elif CONTROLLER_TYPE == ControllerType.PID:
+            ghost.action = Marker.MODIFY
+            ghost.pose = self.latestSetpt
         
         array.markers.append(ghost)
         self.markerPub.publish(array)
