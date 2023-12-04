@@ -1,12 +1,13 @@
 Panels:
   - Class: rviz_common/Displays
-    Help Height: 123
+    Help Height: 0
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.5
-    Tree Height: 296
+    Tree Height: 306
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -93,51 +94,51 @@ Visualization Manager:
         odom:
           Value: true
         talos/base_inertia:
-          Value: true
+          Value: false
         talos/base_link:
           Value: true
         talos/droppers_link:
-          Value: true
+          Value: false
         talos/dvl_link:
-          Value: true
+          Value: false
         talos/imu_link:
-          Value: true
+          Value: false
         talos/imu_revolute_link:
-          Value: true
+          Value: false
         talos/origin:
-          Value: true
+          Value: false
         talos/poker_link:
-          Value: true
+          Value: false
         talos/pose_sensor_link:
-          Value: true
+          Value: false
         talos/pressure_link:
-          Value: true
+          Value: false
         talos/thruster_0:
-          Value: true
+          Value: false
         talos/thruster_1:
-          Value: true
+          Value: false
         talos/thruster_2:
-          Value: true
+          Value: false
         talos/thruster_3:
-          Value: true
+          Value: false
         talos/thruster_4:
-          Value: true
+          Value: false
         talos/thruster_5:
-          Value: true
+          Value: false
         talos/thruster_6:
-          Value: true
+          Value: false
         talos/thruster_7:
-          Value: true
+          Value: false
         talos/torpedo_link:
-          Value: true
+          Value: false
         talos/zed2i/left_link:
-          Value: true
+          Value: false
         talos/zed2i/left_optical:
-          Value: true
+          Value: false
         talos/zed2i/right_link:
-          Value: true
+          Value: false
         talos/zed2i/right_optical:
-          Value: true
+          Value: false
         talos/zed2i_base_link:
           Value: true
         world:
@@ -872,6 +873,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1850
-  X: 70
-  Y: 27
+  Width: 1846
+  X: 1994
+  Y: 307
