@@ -7,20 +7,36 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/empty.hpp>
+#include <std_srvs/srv/trigger.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
 #include <rviz_common/panel.hpp>
 #include <rviz_common/config.hpp>
 
+#include <riptide_msgs2/action/calibrate_drag_new.hpp>
+
 #include "ui_ControlPanel.h"
 #include <QTimer>
+
+//
+// CONTROLLER SELECTION
+//
+#define OLD (0)
+#define SMC (1)
+#define PID (2)
+#define CONTROLLER_TYPE PID
 
 namespace riptide_rviz
 {
 
     class ControlPanel : public rviz_common::Panel
     {
+        using Trigger = std_srvs::srv::Trigger;
+        using CalibrateDrag = riptide_msgs2::action::CalibrateDragNew;
+        using CalibrateDragGH = rclcpp_action::ClientGoalHandle<CalibrateDrag>;
+
         Q_OBJECT public : ControlPanel(QWidget *parent = 0);
         ~ControlPanel();
 
@@ -31,7 +47,7 @@ namespace riptide_rviz
 
         // ROS Subscriber callbacks
         void odomCallback(const nav_msgs::msg::Odometry &msg);
-        void steadyCallback(const std_msgs::msg::Bool & msg);
+        void steadyCallback(const std_msgs::msg::Bool &msg);
         void selectedPose(const geometry_msgs::msg::PoseStamped & msg);
 
         // ROS timer callbacks
@@ -53,10 +69,26 @@ namespace riptide_rviz
         void handleCurrent();
         void handleCommand();
 
+        //slots for parameter relaod buttons
+        void handleReloadSolver();
+        void handleReloadActive();
+
+        //slots for drag cal buttons
+        void handleStartDragCal();
+        void handleStopDragCal();
+        void handleTriggerDragCal();
+
     protected:
         bool event(QEvent *event);
 
     private:
+        void updateCalStatus(const std::string& status);
+        void callTriggerService(rclcpp::Client<Trigger>::SharedPtr client);
+        void waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client);
+        void setDragCalRunning(bool running);
+        void dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle);
+        void dragResultCb(const CalibrateDragGH::WrappedResult &result);
+        
         // UI Panel instance
         Ui_ControlPanel *uiPanel;
 
@@ -82,8 +114,16 @@ namespace riptide_rviz
         QTimer *uiTimer;
 
         // publishers
-        rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;
+        #if CONTROLLER_TYPE == OLD
+            rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;
+        #elif CONTROLLER_TYPE == SMC
+
+        #elif CONTROLLER_TYPE == PID
+            rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pidSetptPub;
+        #endif
+
         rclcpp::Publisher<riptide_msgs2::msg::KillSwitchReport>::SharedPtr killStatePub;
+        rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr dragCalTriggerPub;
 
         // ROS Timers
         rclcpp::TimerBase::SharedPtr killPubTimer;
@@ -92,6 +132,18 @@ namespace riptide_rviz
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr steadySub;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr selectPoseSub;
+
+        //service clients
+        rclcpp::Client<Trigger>::SharedPtr 
+            reloadSolverClient,
+            reloadActiveClient;
+        
+        std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;
+        int64_t srvReqId;
+        rclcpp::Time clientSendTime;
+
+        // action clients
+        rclcpp_action::Client<CalibrateDrag>::SharedPtr calibrateDrag;
     };
 
 } // namespace riptide_rviz

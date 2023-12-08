@@ -15,10 +15,9 @@
         <topic name="/talos/state/kill" type="std_msgs/msg/Bool" qos="system_default"/>
         <topic name="/tf" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
         <topic name="/tf_static" type="tf2_msgs/msg/TFMessage" qos="system_default"/>
-        <topic name="/talos/controller/state" type="sensor_msgs/msg/JointState" qos="system_default"/>
         <topic name="/talos/odometry/filtered" type="nav_msgs/msg/Odometry" qos="system_default"/>
-        <topic name="/talos/controller/linear" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
-        <topic name="/talos/controller/angular" type="riptide_msgs2/msg/ControllerCommand" qos="system_default"/>
+        <topic name="/talos/reqforce" type="std_msgs/msg/Int32MultiArray" qos="system_default"/>
+        <topic name="/talos/dvl/status" type="nortek_dvl_msgs/msg/DvlStatus" qos="sensor_data"/>
     </bag>
 
     <bag name='/mnt/sd/telemetry_data'>

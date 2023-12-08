@@ -20,6 +20,7 @@ find_package(riptide_msgs2 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(chameleon_tf_msgs REQUIRED)
 find_package(vectornav_msgs REQUIRED)
 
@@ -96,6 +97,7 @@ ament_target_dependencies(${PROJECT_NAME}
   tf2_geometry_msgs
   geometry_msgs
   std_msgs
+  std_srvs
   nav_msgs
   launch_msgs
   diagnostic_msgs
@@ -142,9 +144,9 @@ install(
   RUNTIME DESTINATION bin
 )
 
+file(GLOB python_programs python/*.py)
 install(PROGRAMS 
-  python/MarkerPublisher.py
-
+  ${python_programs}
   DESTINATION lib/${PROJECT_NAME}
 )
 

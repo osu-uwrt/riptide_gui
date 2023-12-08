@@ -11,6 +11,7 @@
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
+using std::placeholders::_2;
 
 #include <unistd.h>
 
@@ -59,12 +60,9 @@ namespace riptide_rviz
     void ControlPanel::onInitialize()
     {
         // Connect UI signals for controlling the riptide vehicle
-        connect(uiPanel->ctrlEnable, &QPushButton::clicked, [this](void)
-                { handleEnable(); });
-        connect(uiPanel->ctrlDisable, &QPushButton::clicked, [this](void)
-                { handleDisable(); });
-        connect(uiPanel->ctrlDegOrRad, &QPushButton::clicked, [this](void)
-                { toggleDegrees(); });
+        connect(uiPanel->ctrlEnable, &QPushButton::clicked, this, &ControlPanel::handleEnable);
+        connect(uiPanel->ctrlDisable, &QPushButton::clicked, this, &ControlPanel::handleDisable);
+        connect(uiPanel->ctrlDegOrRad, &QPushButton::clicked, this, &ControlPanel::toggleDegrees);
 
         // mode seting buttons
         connect(uiPanel->ctrlModePos, &QPushButton::clicked,
@@ -81,12 +79,18 @@ namespace riptide_rviz
                 { RVIZ_COMMON_LOG_INFO("ControlPanel: bad button >:("); });
 
         // command sending buttons
-        connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, [this](void)
-                { handleLocalDive(); });
-        connect(uiPanel->ctrlFwdCurrent, &QPushButton::clicked, [this](void)
-                { handleCurrent(); });
-        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, [this](void)
-                { handleCommand(); });
+        connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, this, &ControlPanel::handleLocalDive);
+        connect(uiPanel->ctrlFwdCurrent, &QPushButton::clicked, this, &ControlPanel::handleCurrent);
+        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, this, &ControlPanel::handleCommand);
+
+        //parameter reload buttons
+        connect(uiPanel->reloadSolver, &QPushButton::clicked, this, &ControlPanel::handleReloadSolver);
+        connect(uiPanel->reloadActive, &QPushButton::clicked, this, &ControlPanel::handleReloadActive);
+
+        //drag cal buttons
+        connect(uiPanel->dragStart, &QPushButton::clicked, this, &ControlPanel::handleStartDragCal);
+        connect(uiPanel->dragStop, &QPushButton::clicked, this, &ControlPanel::handleStopDragCal);
+        connect(uiPanel->dragTrigger, &QPushButton::clicked, this, &ControlPanel::handleTriggerDragCal);
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Initialized panel");
     }
@@ -135,7 +139,7 @@ namespace riptide_rviz
 
         // Free the allocated containers
         delete str;
-        delete configVal; 
+        delete configVal;
 
         // create the timer but hold on starting it as things may not have been fully initialized yet
         uiTimer = new QTimer(this);
@@ -149,13 +153,23 @@ namespace riptide_rviz
         // setup goal_pose sub
         selectPoseSub = node->create_subscription<geometry_msgs::msg::PoseStamped>(
             "goal_pose", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::selectedPose, this, _1)); 
+            std::bind(&ControlPanel::selectedPose, this, _1));
 
         // setup the ROS topics that depend on namespace
         // make publishers
         killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
-        ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
-        ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
+        
+        //controller setpoint publishers
+        #if CONTROLLER_TYPE == OLD
+            ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
+            ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
+        #elif CONTROLLER_TYPE == SMC
+
+        #elif CONTROLLER_TYPE == PID
+            pidSetptPub = node->create_publisher<geometry_msgs::msg::Pose>(robot_ns + "/pid/target_position", rclcpp::SystemDefaultsQoS());
+        #endif
+        
+        dragCalTriggerPub = node->create_publisher<std_msgs::msg::Empty>(robot_ns + "/trigger", rclcpp::SystemDefaultsQoS());
 
         // make ROS Subscribers
         odomSub = node->create_subscription<nav_msgs::msg::Odometry>(
@@ -163,11 +177,18 @@ namespace riptide_rviz
             std::bind(&ControlPanel::odomCallback, this, _1));
         steadySub = node->create_subscription<std_msgs::msg::Bool>(
             robot_ns + "/controller/steady", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::steadyCallback, this, _1));  
+            std::bind(&ControlPanel::steadyCallback, this, _1));
+
+        //create service clients
+        reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_ts_params");
+        reloadActiveClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_active_params");
+
+        //create action clients
+        calibrateDrag = rclcpp_action::create_client<CalibrateDrag>(node, robot_ns + "/calibrate_drag_new");
 
         // now we can start the UI refresh timer
         uiTimer->start(100);
-        
+
         // and start the kill switch pub timer
         killPubTimer = node->create_wall_timer(50ms, std::bind(&ControlPanel::sendKillMsgTimer, this));
 
@@ -306,57 +327,14 @@ namespace riptide_rviz
     // slots for sending commands to the vehicle
     void ControlPanel::handleLocalDive()
     {
-        // first take the current readout and hold it
-        // only need xy and yaw, we discard roll and pitch and z
-        double x, y, yaw;
-        bool convOk[3];
+        uiPanel->cmdReqX->setText(uiPanel->cmdCurrX->text());
+        uiPanel->cmdReqY->setText(uiPanel->cmdCurrY->text());
+        uiPanel->cmdReqZ->setText("-0.75");
+        uiPanel->cmdReqR->setText("0");
+        uiPanel->cmdReqP->setText("0");
+        uiPanel->cmdReqYaw->setText(uiPanel->cmdCurrYaw->text());
 
-        // make sure that the conversion goes okay as well
-        x = uiPanel->cmdCurrX->text().toDouble(&convOk[0]);
-        y = uiPanel->cmdCurrY->text().toDouble(&convOk[1]);
-        yaw = uiPanel->cmdCurrX->text().toDouble(&convOk[2]);
-
-        if (std::any_of(std::begin(convOk), std::end(convOk), [](bool i)
-                        { return !i; }))
-        {
-            RVIZ_COMMON_LOG_ERROR("ControlPanel: Failed to convert current position to floating point");
-            
-            // set the red stylesheet
-            uiPanel->ctrlDiveInPlace->setStyleSheet("QPushButton{color:black; background: red;}");
-
-            // create a timer to clear it in 1 second
-            QTimer::singleShot(1000, [this](void)
-                               { uiPanel->ctrlDiveInPlace->setStyleSheet(""); });
-            return;
-        }
-
-        // build the linear control message
-        // auto override the control mode to position 
-        auto linCmd = riptide_msgs2::msg::ControllerCommand();
-        linCmd.setpoint_vect.x = x;
-        linCmd.setpoint_vect.y = y;
-        // automatically go to configured depth below surface
-        linCmd.setpoint_vect.z = tgt_in_place_depth; 
-        linCmd.mode = riptide_msgs2::msg::ControllerCommand::POSITION;
-
-        // check the angle mode button
-        if(degreeReadout){
-            yaw *= M_PI / 180.0; 
-        }
-
-        // convert RPY to quaternion
-        tf2::Quaternion quat;
-        quat.setRPY(0, 0, yaw);
-
-        // build the angular message
-        auto angular = tf2::toMsg(quat);
-        auto angCmd = riptide_msgs2::msg::ControllerCommand();
-        angCmd.setpoint_quat = angular;
-        angCmd.mode = riptide_msgs2::msg::ControllerCommand::POSITION;
-
-        // send the control messages
-        ctrlCmdLinPub->publish(linCmd);
-        ctrlCmdAngPub->publish(angCmd);
+        handleCommand();
     }
 
     void ControlPanel::toggleDegrees()
@@ -384,12 +362,24 @@ namespace riptide_rviz
         yaw = uiPanel->cmdCurrYaw->text();
 
         // take the values and propagate them into the requested values
-        uiPanel->cmdReqX->setText(x);
-        uiPanel->cmdReqY->setText(y);
-        uiPanel->cmdReqZ->setText(z);
-        uiPanel->cmdReqR->setText(roll);
-        uiPanel->cmdReqP->setText(pitch);
-        uiPanel->cmdReqYaw->setText(yaw);
+        if (uiPanel->cmdCopyCurrX->isChecked()) {
+            uiPanel->cmdReqX->setText(x);
+        }
+        if (uiPanel->cmdCopyCurrY->isChecked()) {
+            uiPanel->cmdReqY->setText(y);
+        }
+        if (uiPanel->cmdCopyCurrZ->isChecked()) {
+            uiPanel->cmdReqZ->setText(z);
+        }
+        if (uiPanel->cmdCopyCurrRoll->isChecked()) {
+            uiPanel->cmdReqR->setText(roll);
+        }
+        if (uiPanel->cmdCopyCurrPitch->isChecked()) {
+            uiPanel->cmdReqP->setText(pitch);
+        }
+        if (uiPanel->cmdCopyCurrYaw->isChecked()) {
+            uiPanel->cmdReqYaw->setText(yaw);
+        }
     }
 
     void ControlPanel::handleCommand()
@@ -412,33 +402,36 @@ namespace riptide_rviz
         {
             RVIZ_COMMON_LOG_ERROR("ControlPanel: Failed to convert current position to floating point");
             // set the red stylesheet
-            uiPanel->CtrlSendCmd->setStyleSheet("QPushButton{color:black; background: red;}");
+            QString stylesheet = "QPushButton{color:black; background: red;}";
+            uiPanel->CtrlSendCmd->setStyleSheet(stylesheet);
+            uiPanel->ctrlDiveInPlace->setStyleSheet(stylesheet);
 
             // create a timer to clear it in 1 second
             QTimer::singleShot(1000, [this](void)
-                               { uiPanel->CtrlSendCmd->setStyleSheet(""); });
+                               { uiPanel->CtrlSendCmd->setStyleSheet(""); 
+                                 uiPanel->ctrlDiveInPlace->setStyleSheet(""); });
             return;
         }
 
         // now we can build the command and send it
         // build the linear control message
-        auto linCmd = riptide_msgs2::msg::ControllerCommand();
-        linCmd.setpoint_vect.x = x;
-        linCmd.setpoint_vect.y = y;
-        linCmd.setpoint_vect.z = z;
-        linCmd.mode = ctrlMode;
+        geometry_msgs::msg::Point linear;
+        linear.x = x;
+        linear.y = y;
+        linear.z = z;
+
+        geometry_msgs::msg::Quaternion angularPosition;
+        geometry_msgs::msg::Vector3 angularVelocity;
+        
 
         // if we are in position, we use quat, otherwise use the vector
-        auto angCmd = riptide_msgs2::msg::ControllerCommand();
-        angCmd.mode = ctrlMode;
-
         if (ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
         {
             // check the angle mode button
             if(degreeReadout){
-                roll *= M_PI / 180.0; 
-                pitch *= M_PI / 180.0; 
-                yaw *= M_PI / 180.0; 
+                roll *= M_PI / 180.0;
+                pitch *= M_PI / 180.0;
+                yaw *= M_PI / 180.0;
             }
 
             // convert RPY to quaternion
@@ -446,17 +439,37 @@ namespace riptide_rviz
             quat.setRPY(roll, pitch, yaw);
 
             // build the angular quat for message
-            angCmd.setpoint_quat = tf2::toMsg(quat);
+            angularPosition = tf2::toMsg(quat);
         } else {
             // build the vector
-            angCmd.setpoint_vect.x = roll;
-            angCmd.setpoint_vect.y = pitch;
-            angCmd.setpoint_vect.z = yaw;
+            angularVelocity.x = roll;
+            angularVelocity.y = pitch;
+            angularVelocity.z = yaw;
         }
+    
+        #if CONTROLLER_TYPE == OLD
+            auto linCmd = riptide_msgs2::msg::ControllerCommand();
+            linCmd.setpoint_vect.x = linear.x;
+            linCmd.setpoint_vect.y = linear.y;
+            linCmd.setpoint_vect.z = linear.z;
+            linCmd.mode = ctrlMode;
 
-        // send the control messages
-        ctrlCmdLinPub->publish(linCmd);
-        ctrlCmdAngPub->publish(angCmd);
+            auto angCmd = riptide_msgs2::msg::ControllerCommand();
+            angCmd.mode = ctrlMode;
+            angCmd.setpoint_quat = angularPosition;
+            angCmd.setpoint_vect = angularVelocity;
+
+            // send the control messages
+            ctrlCmdLinPub->publish(linCmd);
+            ctrlCmdAngPub->publish(angCmd);
+        #elif CONTROLLER_TYPE == SMC
+
+        #elif CONTROLLER_TYPE == PID
+            geometry_msgs::msg::Pose setpt;
+            setpt.position = linear;
+            setpt.orientation = angularPosition;
+            pidSetptPub->publish(setpt);
+        #endif
     }
 
     void ControlPanel::odomCallback(const nav_msgs::msg::Odometry &msg)
@@ -546,6 +559,155 @@ namespace riptide_rviz
         killMsg.switch_needs_update = uiPanel->ctrlRequireKill->isChecked();
 
         killStatePub->publish(killMsg);
+    }
+
+
+    void ControlPanel::handleReloadSolver()
+    {
+        updateCalStatus("Attempting to invoke solver reload service");
+        callTriggerService(reloadSolverClient);
+    }
+
+
+    void ControlPanel::handleReloadActive()
+    {
+        updateCalStatus("Attempting to invoke active reload service");
+        callTriggerService(reloadActiveClient);
+    }
+
+
+    void ControlPanel::handleStartDragCal()
+    {
+        updateCalStatus("Attempting to start drag calibration");
+
+        if(!calibrateDrag->wait_for_action_server(1s))
+        {
+            updateCalStatus("Drag calibration action server unavailable!");
+            setDragCalRunning(false);
+            return;
+        }
+
+        CalibrateDrag::Goal goal;
+        goal.start_axis = uiPanel->dragCalStartAxis->currentIndex();
+
+        rclcpp_action::Client<CalibrateDrag>::SendGoalOptions sendgoalOptions;
+        sendgoalOptions.goal_response_callback = std::bind(&ControlPanel::dragGoalResponseCb, this, _1);
+        sendgoalOptions.result_callback = std::bind(&ControlPanel::dragResultCb, this, _1);
+
+        calibrateDrag->async_send_goal(goal, sendgoalOptions);
+        setDragCalRunning(true);
+    }
+
+
+    void ControlPanel::handleStopDragCal()
+    {
+        calibrateDrag->async_cancel_all_goals();
+    }
+
+
+    void ControlPanel::handleTriggerDragCal()
+    {
+        dragCalTriggerPub->publish(std_msgs::msg::Empty());
+    }
+
+
+    void ControlPanel::updateCalStatus(const std::string& status)
+    {
+        RVIZ_COMMON_LOG_INFO(status);
+        uiPanel->calStatus->setText(QString::fromStdString(status));
+    }
+
+
+    void ControlPanel::callTriggerService(rclcpp::Client<Trigger>::SharedPtr client)
+    {
+        if(!client->wait_for_service(5s))
+        {
+            updateCalStatus("Service unavailable!");
+            return;
+        }
+
+        Trigger::Request::SharedPtr request = std::make_shared<Trigger::Request>();
+        auto future = client->async_send_request(request);
+        srvReqId = future.request_id;
+        activeClientFuture = future.share();
+        QTimer::singleShot(250, 
+            [this, client] () { ControlPanel::waitForTriggerResponse(client); });
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        clientSendTime = node->get_clock()->now();
+    }
+
+
+    void ControlPanel::waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client)
+    {
+        if(!activeClientFuture.valid())
+        {
+            updateCalStatus("Service result has become invalid!");
+            return;
+        }
+
+        auto futureStatus = activeClientFuture.wait_for(10ms);
+        if(futureStatus != std::future_status::timeout)
+        {
+            //success
+            rclcpp::Client<Trigger>::SharedResponse response = activeClientFuture.get();
+            updateCalStatus(response->message);
+            return;
+        }
+
+        //not ready yet
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        rclcpp::Time currentTime = node->get_clock()->now();
+        if(currentTime - clientSendTime > 5s)
+        {
+            updateCalStatus("Service timed out.");
+            client->remove_pending_request(srvReqId);
+            return;
+        }
+
+        //schedule next check
+        QTimer::singleShot(250, 
+            [this, client] () { ControlPanel::waitForTriggerResponse(client); });
+    }
+
+
+    void ControlPanel::setDragCalRunning(bool running)
+    {
+        uiPanel->dragStart->setEnabled(!running);
+        uiPanel->dragStop->setEnabled(running);
+    }
+
+
+    void ControlPanel::dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle)
+    {
+        if (!goal_handle) {
+            updateCalStatus("Drag calibration rejected by server!");
+            setDragCalRunning(false);
+        } else {
+            updateCalStatus("Drag calibration in progress");
+            setDragCalRunning(true);
+        }
+    }
+
+
+    void ControlPanel::dragResultCb(const CalibrateDragGH::WrappedResult &result)
+    {
+        switch(result.code)
+        {
+            case rclcpp_action::ResultCode::ABORTED:
+                updateCalStatus("Drag calibration aborted!");
+                break;
+            case rclcpp_action::ResultCode::CANCELED:
+                updateCalStatus("Drag calibration canceled.");
+                break;
+            case rclcpp_action::ResultCode::SUCCEEDED:
+                updateCalStatus("Drag calibration succeeded.");
+                break;
+            case rclcpp_action::ResultCode::UNKNOWN:
+                updateCalStatus("Drag calibration status unknown");
+                break;
+        }
+
+        setDragCalRunning(false);
     }
 
 } // namespace riptide_rviz
