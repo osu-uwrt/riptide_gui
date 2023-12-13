@@ -84,15 +84,13 @@ class MarkerPublisher(Node):
         self.timer = self.create_timer(self.updatePeriod, self.timerCB)
 
         #configure ghost tempest vars
-        self.latestLinearCmd = ControllerCommand()
-        self.latestAngularCmd = ControllerCommand()
         self.latestOdom = Odometry()
         self.latestSimPose = Pose()
         
         #configure ros pub subs
         self.markerPub = self.create_publisher(MarkerArray, self.markerTopic, 10)
         self.odomSub = self.create_subscription(Odometry, ODOMETRY_TOPIC, self.odomCB, 10)
-            self.simSub = self.create_subscription(Pose, SIM_TOPIC, self.simCB, 10)
+        self.simSub = self.create_subscription(Pose, SIM_TOPIC, self.simCB, 10)
     
         #controller command subs
         if CONTROLLER_TYPE == ControllerType.OLD:
