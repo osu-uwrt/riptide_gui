@@ -5,6 +5,7 @@
 #include <chrono>
 #include <algorithm>
 #include <iostream>
+#include <QMessageBox>
 
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -519,10 +520,17 @@ namespace riptide_rviz
         #elif CONTROLLER_TYPE == SMC
 
         #elif CONTROLLER_TYPE == PID
-            geometry_msgs::msg::Pose setpt;
-            setpt.position = linear;
-            setpt.orientation = angularPosition;
-            pidSetptPub->publish(setpt);
+            if(ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
+            {
+                geometry_msgs::msg::Pose setpt;
+                setpt.position = linear;
+                setpt.orientation = angularPosition;
+                pidSetptPub->publish(setpt);
+            } else
+            {
+                QMessageBox::warning(uiPanel->CtrlSendCmd, "Control mode not supported!", "Control mode is not supported by the PID controller!");
+            }
+            
         #endif
 
         if(updateInteractiveMarker)
