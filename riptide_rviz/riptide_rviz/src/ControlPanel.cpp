@@ -81,7 +81,8 @@ namespace riptide_rviz
         // command sending buttons
         connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, this, &ControlPanel::handleLocalDive);
         connect(uiPanel->ctrlFwdCurrent, &QPushButton::clicked, this, &ControlPanel::handleCurrent);
-        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, this, &ControlPanel::handleCommand);
+        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, this, 
+            [this] () { ControlPanel::handleCommand(true); } );
 
         //parameter reload buttons
         connect(uiPanel->reloadSolver, &QPushButton::clicked, this, &ControlPanel::handleReloadSolver);
@@ -186,6 +187,61 @@ namespace riptide_rviz
         //create action clients
         calibrateDrag = rclcpp_action::create_client<CalibrateDrag>(node, robot_ns + "/calibrate_drag_new");
 
+        //interactive marker for setpoint
+        setptServer = std::make_shared<interactive_markers::InteractiveMarkerServer>("interactive_setpoint", node);
+        
+        interactiveSetpointMarker.header.frame_id = "world",
+        interactiveSetpointMarker.header.stamp = node->get_clock()->now();
+        interactiveSetpointMarker.name = "interactive_setpt";
+        interactiveSetpointMarker.description = "Interactive controller setpoint";
+
+        //create controls which will move the setpoint around
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlX;
+        moveCtrlX.name = "moveX";
+        moveCtrlX.always_visible = true;
+        moveCtrlX.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        moveCtrlX.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlX);
+        
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlY;
+        moveCtrlY.name = "moveCtrlY";
+        moveCtrlY.always_visible = true;
+        moveCtrlY.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        moveCtrlY.orientation.z = 1;
+        moveCtrlY.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlY);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlZ;
+        moveCtrlZ.name = "moveCtrlZ";
+        moveCtrlZ.always_visible = true;
+        moveCtrlZ.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        moveCtrlZ.orientation.y = 1;
+        moveCtrlZ.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlZ);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlRoll;
+        moveCtrlRoll.name = "moveCtrlRoll";
+        moveCtrlRoll.always_visible = true;
+        moveCtrlRoll.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
+        moveCtrlRoll.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlRoll);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlPitch;
+        moveCtrlPitch.name = "moveCtrlPitch";
+        moveCtrlPitch.always_visible = true;
+        moveCtrlPitch.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
+        moveCtrlPitch.orientation.z = 1;
+        moveCtrlPitch.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlPitch);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlYaw;
+        moveCtrlYaw.name = "moveCtrlYaw";
+        moveCtrlYaw.always_visible = true;
+        moveCtrlYaw.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
+        moveCtrlYaw.orientation.y = 1;
+        moveCtrlYaw.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlYaw);
+
         // now we can start the UI refresh timer
         uiTimer->start(100);
 
@@ -244,7 +300,7 @@ namespace riptide_rviz
     void ControlPanel::switchMode(uint8_t mode, bool override)
     {
         // check the vehicle is enabled or we are overriding
-        if(vehicleEnabled || override){
+        if(vehicleEnabled || override) {
             ctrlMode = mode;
             switch (ctrlMode)
             {
@@ -254,6 +310,12 @@ namespace riptide_rviz
                 uiPanel->ctrlModePos->setEnabled(false);
                 uiPanel->ctrlModeTele->setEnabled(true);
 
+                //also enable the interactive marker
+                setptServer->insert(interactiveSetpointMarker,
+                    std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
+
+                syncSetptMarkerToTextboxes(false);
+                setptServer->applyChanges();
                 break;
             case riptide_msgs2::msg::ControllerCommand::VELOCITY:
                 uiPanel->ctrlModeFFD->setEnabled(true);
@@ -273,6 +335,9 @@ namespace riptide_rviz
                 uiPanel->ctrlModeVel->setEnabled(true);
                 uiPanel->ctrlModePos->setEnabled(true);
                 uiPanel->ctrlModeTele->setEnabled(true);
+
+                setptServer->erase(interactiveSetpointMarker.name);
+                setptServer->applyChanges();
                 break;
             default:
                 RVIZ_COMMON_LOG_ERROR("ControlPanel: Button not yet operable");
@@ -334,7 +399,7 @@ namespace riptide_rviz
         uiPanel->cmdReqP->setText("0");
         uiPanel->cmdReqYaw->setText(uiPanel->cmdCurrYaw->text());
 
-        handleCommand();
+        handleCommand(true);
     }
 
     void ControlPanel::toggleDegrees()
@@ -382,23 +447,12 @@ namespace riptide_rviz
         }
     }
 
-    void ControlPanel::handleCommand()
+    void ControlPanel::handleCommand(bool updateInteractiveMarker)
     {
         // first take the current readout and hold it
         // only need xy and yaw, we discard roll and pitch and z
-        double x, y, z, roll, pitch, yaw;
-        bool convOk[6];
-
-        // make sure that the conversion goes okay as well
-        x = uiPanel->cmdReqX->text().toDouble(&convOk[0]);
-        y = uiPanel->cmdReqY->text().toDouble(&convOk[1]);
-        z = uiPanel->cmdReqZ->text().toDouble(&convOk[2]);
-        roll = uiPanel->cmdReqR->text().toDouble(&convOk[3]);
-        pitch = uiPanel->cmdReqP->text().toDouble(&convOk[4]);
-        yaw = uiPanel->cmdReqYaw->text().toDouble(&convOk[5]);
-
-        if (std::any_of(std::begin(convOk), std::end(convOk), [](bool i)
-                        { return !i; }))
+        double desiredValues[6];
+        if (!getDesiredSetpointFromTextboxes(desiredValues))
         {
             RVIZ_COMMON_LOG_ERROR("ControlPanel: Failed to convert current position to floating point");
             // set the red stylesheet
@@ -416,9 +470,9 @@ namespace riptide_rviz
         // now we can build the command and send it
         // build the linear control message
         geometry_msgs::msg::Point linear;
-        linear.x = x;
-        linear.y = y;
-        linear.z = z;
+        linear.x = desiredValues[0];
+        linear.y = desiredValues[1];
+        linear.z = desiredValues[2];
 
         geometry_msgs::msg::Quaternion angularPosition;
         geometry_msgs::msg::Vector3 angularVelocity;
@@ -429,22 +483,22 @@ namespace riptide_rviz
         {
             // check the angle mode button
             if(degreeReadout){
-                roll *= M_PI / 180.0;
-                pitch *= M_PI / 180.0;
-                yaw *= M_PI / 180.0;
+                desiredValues[3] *= M_PI / 180.0;
+                desiredValues[4] *= M_PI / 180.0;
+                desiredValues[5] *= M_PI / 180.0;
             }
 
             // convert RPY to quaternion
             tf2::Quaternion quat;
-            quat.setRPY(roll, pitch, yaw);
+            quat.setRPY(desiredValues[3], desiredValues[4], desiredValues[5]);
 
             // build the angular quat for message
             angularPosition = tf2::toMsg(quat);
         } else {
             // build the vector
-            angularVelocity.x = roll;
-            angularVelocity.y = pitch;
-            angularVelocity.z = yaw;
+            angularVelocity.x = desiredValues[3];
+            angularVelocity.y = desiredValues[4];
+            angularVelocity.z = desiredValues[5];
         }
     
         #if CONTROLLER_TYPE == OLD
@@ -470,6 +524,11 @@ namespace riptide_rviz
             setpt.orientation = angularPosition;
             pidSetptPub->publish(setpt);
         #endif
+
+        if(updateInteractiveMarker)
+        {
+            syncSetptMarkerToTextboxes();
+        }
     }
 
     void ControlPanel::odomCallback(const nav_msgs::msg::Odometry &msg)
@@ -608,6 +667,103 @@ namespace riptide_rviz
     void ControlPanel::handleTriggerDragCal()
     {
         dragCalTriggerPub->publish(std_msgs::msg::Empty());
+    }
+
+    /**
+     * Populates the results array with the values of the setpoint number boxes.
+     * Ordered xyzrpw 
+     */
+    bool ControlPanel::getDesiredSetpointFromTextboxes(double results[6])
+    {
+        bool convOk[6];
+
+        // make sure that the conversion goes okay as well
+        results[0] = uiPanel->cmdReqX->text().toDouble(&convOk[0]);
+        results[1] = uiPanel->cmdReqY->text().toDouble(&convOk[1]);
+        results[2] = uiPanel->cmdReqZ->text().toDouble(&convOk[2]);
+        results[3] = uiPanel->cmdReqR->text().toDouble(&convOk[3]);
+        results[4] = uiPanel->cmdReqP->text().toDouble(&convOk[4]);
+        results[5] = uiPanel->cmdReqYaw->text().toDouble(&convOk[5]);
+        
+        //returns false if any of the conversions failed
+        return !(std::any_of(std::begin(convOk), std::end(convOk), [](bool i)
+                        { return !i; }));
+    }
+
+
+    void ControlPanel::syncSetptMarkerToTextboxes(bool applyChanges)
+    {
+        double desired[6];
+
+        if(getDesiredSetpointFromTextboxes(desired))
+        {
+            if(degreeReadout)
+            {
+                desired[3] *= M_PI / 180.0;
+                desired[4] *= M_PI / 180.0;
+                desired[5] *= M_PI / 180.0;
+            }
+
+            //convert the rpy to quat
+            tf2::Quaternion quat;
+            quat.setRPY(desired[3], desired[4], desired[5]);
+
+            //make the pose 
+            geometry_msgs::msg::Pose newMarkerPose;
+            newMarkerPose.position.x = desired[0];
+            newMarkerPose.position.y = desired[1];
+            newMarkerPose.position.z = desired[2];
+            newMarkerPose.orientation = tf2::toMsg(quat);
+
+            //set the pose
+            setptServer->setPose(interactiveSetpointMarker.name, newMarkerPose);
+
+            if(applyChanges)
+            {
+                RVIZ_COMMON_LOG_INFO("Applying marker sync");
+                setptServer->applyChanges();
+            }
+        } else
+        {
+            RVIZ_COMMON_LOG_ERROR("Could not convert the content of the boxes to doubles");
+        }
+    }
+
+
+    /**
+     * @brief invoked when the interactive setpoint marker is moved
+     * @param feedback feedback containing the new pose
+     */
+    void ControlPanel::setptMarkerFeedback(interactive_markers::InteractiveMarkerServer::FeedbackConstSharedPtr feedback)
+    {
+        uiPanel->cmdReqX->setText(QString::number(feedback->pose.position.x, 'f', 2));
+        uiPanel->cmdReqY->setText(QString::number(feedback->pose.position.y, 'f', 2));
+        uiPanel->cmdReqZ->setText(QString::number(feedback->pose.position.z, 'f', 2));
+
+        //convert the quaternion to RPY
+        tf2::Quaternion q (
+            feedback->pose.orientation.x, 
+            feedback->pose.orientation.y,
+            feedback->pose.orientation.z,
+            feedback->pose.orientation.w
+        );
+
+        tf2::Matrix3x3 m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+
+        if (degreeReadout)
+        {
+            roll *= 180.0 / M_PI;
+            pitch *= 180.0 / M_PI;
+            yaw *= 180.0 / M_PI;
+        }
+
+        uiPanel->cmdReqR->setText(QString::number(roll, 'f', 2));
+        uiPanel->cmdReqP->setText(QString::number(pitch, 'f', 2));
+        uiPanel->cmdReqYaw->setText(QString::number(yaw, 'f', 2));
+
+        handleCommand(false);
     }
 
 

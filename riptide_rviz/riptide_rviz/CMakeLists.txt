@@ -23,6 +23,7 @@ find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(chameleon_tf_msgs REQUIRED)
 find_package(vectornav_msgs REQUIRED)
+find_package(interactive_markers REQUIRED)
 
 
 # rviz specific deps
@@ -103,6 +104,7 @@ ament_target_dependencies(${PROJECT_NAME}
   diagnostic_msgs
   chameleon_tf_msgs
   vectornav_msgs
+  interactive_markers
 )
 
 # Link non ament packages

@@ -10,6 +10,8 @@
 #include <std_msgs/msg/empty.hpp>
 #include <std_srvs/srv/trigger.hpp>
 
+#include <interactive_markers/interactive_marker_server.hpp>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
 #include <rviz_common/panel.hpp>
@@ -67,7 +69,7 @@ namespace riptide_rviz
         // slots for sending commands to the vehicle
         void handleLocalDive();
         void handleCurrent();
-        void handleCommand();
+        void handleCommand(bool updateInteractiveMarker);
 
         //slots for parameter relaod buttons
         void handleReloadSolver();
@@ -82,6 +84,9 @@ namespace riptide_rviz
         bool event(QEvent *event);
 
     private:
+        bool getDesiredSetpointFromTextboxes(double results[6]);
+        void syncSetptMarkerToTextboxes(bool applyChanges = true);
+        void setptMarkerFeedback(interactive_markers::InteractiveMarkerServer::FeedbackConstSharedPtr feedback);
         void updateCalStatus(const std::string& status);
         void callTriggerService(rclcpp::Client<Trigger>::SharedPtr client);
         void waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client);
@@ -144,6 +149,10 @@ namespace riptide_rviz
 
         // action clients
         rclcpp_action::Client<CalibrateDrag>::SharedPtr calibrateDrag;
+
+        //interactive marker server
+        std::shared_ptr<interactive_markers::InteractiveMarkerServer> setptServer;
+        visualization_msgs::msg::InteractiveMarker interactiveSetpointMarker;
     };
 
 } // namespace riptide_rviz
