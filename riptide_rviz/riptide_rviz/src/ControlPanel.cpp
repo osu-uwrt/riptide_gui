@@ -279,6 +279,7 @@ namespace riptide_rviz
         //desired orientation
         tf2::Quaternion quat;
         quat.setRPY(desiredValues[3], desiredValues[4], desiredValues[5]);
+        msg.position = linear;
         msg.orientation = tf2::toMsg(quat);
 
         #if CONTROLLER_TYPE == PID
