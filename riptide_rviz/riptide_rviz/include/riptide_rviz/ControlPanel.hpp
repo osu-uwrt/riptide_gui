@@ -80,6 +80,9 @@ namespace riptide_rviz
         void handleStopDragCal();
         void handleTriggerDragCal();
 
+        //publish the current set point
+        void pubCurrentSetpoint();
+
     protected:
         bool event(QEvent *event);
 
@@ -132,6 +135,7 @@ namespace riptide_rviz
 
         // ROS Timers
         rclcpp::TimerBase::SharedPtr killPubTimer;
+        rclcpp::TimerBase::SharedPtr setPointPubTimer;
 
         // ROS Subscribers
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;

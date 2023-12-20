@@ -18,6 +18,8 @@ using std::placeholders::_2;
 
 #define MAX_HOST_LEN 300
 
+#define SETPOINT_REPUB_PERIOD 1s
+
 const std::string get_hostname()
 {
     // retrieve the system hostname in hopefully MAX_HOST_LEN characters -1 for null term
@@ -151,7 +153,6 @@ namespace riptide_rviz
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
-
         // setup goal_pose sub
         selectPoseSub = node->create_subscription<geometry_msgs::msg::PoseStamped>(
             "goal_pose", rclcpp::SystemDefaultsQoS(),
@@ -248,11 +249,43 @@ namespace riptide_rviz
 
         // and start the kill switch pub timer
         killPubTimer = node->create_wall_timer(50ms, std::bind(&ControlPanel::sendKillMsgTimer, this));
+        
+        //add timer to repub the set point every second        
+        setPointPubTimer = node->create_wall_timer(SETPOINT_REPUB_PERIOD, std::bind(&ControlPanel::pubCurrentSetpoint, this));
 
         // save the hostanme for kill instance
         hostname = "rviz_control_" + get_hostname();
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Loading config complete");
+    }
+
+    void ControlPanel::pubCurrentSetpoint(){
+
+        double desiredValues[6];
+        if (!getDesiredSetpointFromTextboxes(desiredValues))
+        {
+            //if the desired set point cannot be found return
+            return;
+        }
+        //pose meessage
+        geometry_msgs::msg::Pose msg;
+        
+        //desired position
+        geometry_msgs::msg::Point linear;
+        linear.x = desiredValues[0];
+        linear.y = desiredValues[1];
+        linear.z = desiredValues[2];
+
+        //desired orientation
+        tf2::Quaternion quat;
+        quat.setRPY(desiredValues[3], desiredValues[4], desiredValues[5]);
+        msg.orientation = tf2::toMsg(quat);
+
+        #if CONTROLLER_TYPE == PID
+            this->pidSetptPub->publish(msg);
+        #else
+            RVIZ_COMMON_LOG_INFO("Not Republishing Set Point: not supported control mode.");
+        #endif
     }
 
     void ControlPanel::save(rviz_common::Config config) const
