@@ -137,6 +137,9 @@ namespace riptide_rviz
         rclcpp::TimerBase::SharedPtr killPubTimer;
         rclcpp::TimerBase::SharedPtr setPointPubTimer;
 
+        //Last Commanded position
+        geometry_msgs::msg::Pose lastCommandedPose;
+
         // ROS Subscribers
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr steadySub;

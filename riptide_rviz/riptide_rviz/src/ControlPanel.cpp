@@ -256,34 +256,23 @@ namespace riptide_rviz
         // save the hostanme for kill instance
         hostname = "rviz_control_" + get_hostname();
 
+        //set a dummy for last commanded pose
+        geometry_msgs::msg::Point linear;
+        tf2::Quaternion quat = tf2::Quaternion(0.0, 0.0, 0.0, 1.0);
+
+        linear.x = 0;
+        linear.y = 0;
+        linear.z = -1;
+
+        this->lastCommandedPose.position = linear;
+        this->lastCommandedPose.orientation = tf2::toMsg(quat);
         RVIZ_COMMON_LOG_INFO("ControlPanel: Loading config complete");
     }
 
     void ControlPanel::pubCurrentSetpoint(){
 
-        double desiredValues[6];
-        if (!getDesiredSetpointFromTextboxes(desiredValues))
-        {
-            //if the desired set point cannot be found return
-            return;
-        }
-        //pose meessage
-        geometry_msgs::msg::Pose msg;
-        
-        //desired position
-        geometry_msgs::msg::Point linear;
-        linear.x = desiredValues[0];
-        linear.y = desiredValues[1];
-        linear.z = desiredValues[2];
-
-        //desired orientation
-        tf2::Quaternion quat;
-        quat.setRPY(desiredValues[3], desiredValues[4], desiredValues[5]);
-        msg.position = linear;
-        msg.orientation = tf2::toMsg(quat);
-
         #if CONTROLLER_TYPE == PID
-            this->pidSetptPub->publish(msg);
+            this->pidSetptPub->publish(this->lastCommandedPose);
         #else
             RVIZ_COMMON_LOG_INFO("Not Republishing Set Point: not supported control mode.");
         #endif
@@ -559,6 +548,9 @@ namespace riptide_rviz
                 geometry_msgs::msg::Pose setpt;
                 setpt.position = linear;
                 setpt.orientation = angularPosition;
+
+                this->lastCommandedPose = setpt;
+
                 pidSetptPub->publish(setpt);
             } else
             {
