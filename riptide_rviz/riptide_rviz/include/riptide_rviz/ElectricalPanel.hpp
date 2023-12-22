@@ -12,7 +12,7 @@
 
 namespace riptide_rviz
 {
-    const static std::string CALIB_ACTION_NAME = "vectornav/mag_cal";
+    const static std::string CALIB_ACTION_NAME = "/vectornav/mag_cal";
 
     class ElectricalPanel : public rviz_common::Panel
     {

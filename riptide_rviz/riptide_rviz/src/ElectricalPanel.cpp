@@ -41,7 +41,7 @@ namespace riptide_rviz
         pub = node->create_publisher<riptide_msgs2::msg::ElectricalCommand>(topicName, 10);
 
         //make the action client for the imu mag cal
-        std::string fullActionName = CALIB_ACTION_NAME;
+        std::string fullActionName = robotNs.toStdString() + CALIB_ACTION_NAME;
         imuCalClient = rclcpp_action::create_client<MagCal>(node, fullActionName);
 
         // Make publisher to write IMU config
