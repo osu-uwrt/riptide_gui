@@ -45,10 +45,10 @@ namespace riptide_rviz
         imuCalClient = rclcpp_action::create_client<MagCal>(node, fullActionName);
 
         // Make publisher to write IMU config
-        writeImuConfig = node->create_publisher<riptide_msgs2::msg::ImuConfig>("vectornav/config/write", 10);
+        writeImuConfig = node->create_publisher<riptide_msgs2::msg::ImuConfig>(robotNs.toStdString() + "/vectornav/config/write", 10);
 
         // Make subscriber to listen for IMU config
-        readImuConfig = node->create_subscription<riptide_msgs2::msg::ImuConfig>("vectornav/config/read", 10, 
+        readImuConfig = node->create_subscription<riptide_msgs2::msg::ImuConfig>(robotNs.toStdString() + "/vectornav/config/read", 10, 
                                     std::bind(&ElectricalPanel::imuConfigCb, this, _1));
 
         requestCurrentImuConfig();
