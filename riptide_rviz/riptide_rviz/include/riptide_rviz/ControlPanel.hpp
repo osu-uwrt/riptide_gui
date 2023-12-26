@@ -25,10 +25,9 @@
 //
 // CONTROLLER SELECTION
 //
-#define OLD (0)
-#define SMC (1)
-#define PID (2)
-#define CONTROLLER_TYPE PID
+#define CONTROLLER_CMD (0)
+#define TARGET_POSITION (1)
+#define CONTROLLER_TYPE TARGET_POSITION
 
 namespace riptide_rviz
 {
@@ -122,11 +121,9 @@ namespace riptide_rviz
         QTimer *uiTimer;
 
         // publishers
-        #if CONTROLLER_TYPE == OLD
+        #if CONTROLLER_TYPE == CONTROLLER_CMD
             rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;
-        #elif CONTROLLER_TYPE == SMC
-
-        #elif CONTROLLER_TYPE == PID
+        #elif CONTROLLER_TYPE == TARGET_POSITION
             rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pidSetptPub;
         #endif
 

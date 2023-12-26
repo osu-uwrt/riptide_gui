@@ -163,13 +163,11 @@ namespace riptide_rviz
         killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
         
         //controller setpoint publishers
-        #if CONTROLLER_TYPE == OLD
+        #if CONTROLLER_TYPE == CONTROLLER_CMD
             ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
             ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
-        #elif CONTROLLER_TYPE == SMC
-
-        #elif CONTROLLER_TYPE == PID
-            pidSetptPub = node->create_publisher<geometry_msgs::msg::Pose>(robot_ns + "/pid/target_position", rclcpp::SystemDefaultsQoS());
+        #elif CONTROLLER_TYPE == TARGET_POSITION
+            pidSetptPub = node->create_publisher<geometry_msgs::msg::Pose>(robot_ns + "/controller/target_position", rclcpp::SystemDefaultsQoS());
         #endif
         
         dragCalTriggerPub = node->create_publisher<std_msgs::msg::Empty>(robot_ns + "/trigger", rclcpp::SystemDefaultsQoS());
@@ -271,7 +269,7 @@ namespace riptide_rviz
 
     void ControlPanel::pubCurrentSetpoint(){
 
-        #if CONTROLLER_TYPE == PID
+        #if CONTROLLER_TYPE == TARGET_POSITION
             this->pidSetptPub->publish(this->lastCommandedPose);
         #else
             RVIZ_COMMON_LOG_INFO("Not Republishing Set Point: not supported control mode.");
@@ -525,7 +523,7 @@ namespace riptide_rviz
             angularVelocity.z = desiredValues[5];
         }
     
-        #if CONTROLLER_TYPE == OLD
+        #if CONTROLLER_TYPE == CONTROLLER_CMD
             auto linCmd = riptide_msgs2::msg::ControllerCommand();
             linCmd.setpoint_vect.x = linear.x;
             linCmd.setpoint_vect.y = linear.y;
@@ -540,9 +538,7 @@ namespace riptide_rviz
             // send the control messages
             ctrlCmdLinPub->publish(linCmd);
             ctrlCmdAngPub->publish(angCmd);
-        #elif CONTROLLER_TYPE == SMC
-
-        #elif CONTROLLER_TYPE == PID
+        #elif CONTROLLER_TYPE == TARGET_POSITION
             if(ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
             {
                 geometry_msgs::msg::Pose setpt;
