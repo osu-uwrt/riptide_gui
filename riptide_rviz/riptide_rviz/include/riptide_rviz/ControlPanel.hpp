@@ -27,7 +27,7 @@
 //
 #define CONTROLLER_CMD (0)
 #define TARGET_POSITION (1)
-#define CONTROLLER_TYPE TARGET_POSITION
+#define CONTROLLER_TYPE CONTROLLER_CMD
 
 namespace riptide_rviz
 {

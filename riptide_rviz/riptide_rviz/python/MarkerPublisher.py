@@ -17,7 +17,7 @@ class ControllerType(enum.Enum):
     CONTROLLER_CMD = 0
     TARGET_POSITION = 1
     
-CONTROLLER_TYPE = ControllerType.TARGET_POSITION
+CONTROLLER_TYPE = ControllerType.CONTROLLER_CMD
 
 # import controller msgs and set topic names
 if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
