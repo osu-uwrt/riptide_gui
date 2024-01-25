@@ -22,7 +22,6 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(chameleon_tf_msgs REQUIRED)
-find_package(vectornav_msgs REQUIRED)
 find_package(interactive_markers REQUIRED)
 
 
@@ -103,7 +102,6 @@ ament_target_dependencies(${PROJECT_NAME}
   launch_msgs
   diagnostic_msgs
   chameleon_tf_msgs
-  vectornav_msgs
   interactive_markers
 )
 
@@ -132,7 +130,6 @@ ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(
   rclcpp
   rclcpp_action
-  launch_msgs
   rviz_ogre_vendor
   resource_retriever
   ament_index_cpp
@@ -157,10 +154,10 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch recipies
+install(DIRECTORY launch recipes
   DESTINATION share/${PROJECT_NAME})
 
-install(DIRECTORY tests/recipies
+install(DIRECTORY tests/recipes
   DESTINATION share/${PROJECT_NAME}/tests)
 
 install(TARGETS recipe_parser_test

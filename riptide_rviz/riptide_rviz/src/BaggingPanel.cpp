@@ -167,7 +167,7 @@ namespace riptide_rviz
         uiPanel->baggingFile->setCurrentIndex(0);
 
         // populate with new files
-        auto bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
+        auto bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipes";
         for (const auto &entry : std::filesystem::directory_iterator(bringupFilesDir))
         {
             std::string file = std::string(entry.path());
@@ -237,7 +237,7 @@ namespace riptide_rviz
             auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
             // hunt down the file location for search
-            auto bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipies";
+            auto bringupFilesDir = ament_index_cpp::get_package_share_directory(RVIZ_PKG) + "/recipes";
 
             // parse the bag file
             auto bags = Bag();

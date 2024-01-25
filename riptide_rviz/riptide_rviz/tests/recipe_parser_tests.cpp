@@ -1047,7 +1047,7 @@ int main() {
     std::cout << "|RECIPE PARSER TESTER|\n";
     std::cout << "+--------------------+\n\n";
 
-    std::string testsRoot = ament_index_cpp::get_package_share_directory(RVIZ_PACKAGE) + "/tests/recipies/";
+    std::string testsRoot = ament_index_cpp::get_package_share_directory(RVIZ_PACKAGE) + "/tests/recipes/";
     std::cout << "testsRoot: " << testsRoot << "\n";
 
     // Run malformed input tests

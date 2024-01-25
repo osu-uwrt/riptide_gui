@@ -24,7 +24,6 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>std_srvs</build_depend>
   <build_depend>chameleon_tf_msgs</build_depend>
-  <build_depend>vectornav_msgs</build_depend>
   <build_depend>interactive_markers</build_depend>
 
   <depend>rviz_common</depend>
