@@ -31,8 +31,7 @@ namespace riptide_rviz {
         RVIZ_COMMON_LOG_INFO("SimulatorPanel: Initialzing");
     }
 
-    bool SimulatorPanel::event(QEvent *event) {
-        return false;
-    }
-
 }
+
+#include <pluginlib/class_list_macros.hpp> // NOLINT
+PLUGINLIB_EXPORT_CLASS(riptide_rviz::SimulatorPanel, rviz_common::Panel);

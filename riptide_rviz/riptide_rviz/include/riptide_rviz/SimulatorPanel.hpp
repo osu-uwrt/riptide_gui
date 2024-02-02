@@ -17,7 +17,6 @@ namespace riptide_rviz {
         void onInitialize() override;
 
     protected:
-        bool event(QEvent *event);
 
     private: 
         Ui_SimulatorPanel *uiPanel;
