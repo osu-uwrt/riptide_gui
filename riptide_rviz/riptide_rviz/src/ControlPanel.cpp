@@ -182,7 +182,8 @@ namespace riptide_rviz
 
         //create service clients
         reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_ts_params");
-        reloadActiveClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_active_params");
+        reloadSmcClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_smc_params");
+        reloadPidClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_pid_params");
 
         //create action clients
         calibrateDrag = rclcpp_action::create_client<CalibrateDrag>(node, robot_ns + "/calibrate_drag_new");
@@ -661,7 +662,8 @@ namespace riptide_rviz
     void ControlPanel::handleReloadActive()
     {
         updateCalStatus("Attempting to invoke active reload service");
-        callTriggerService(reloadActiveClient);
+        callTriggerService(reloadSmcClient);
+        callTriggerService(reloadPidClient);
     }
 
 

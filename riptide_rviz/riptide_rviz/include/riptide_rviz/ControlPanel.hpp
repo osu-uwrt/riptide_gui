@@ -145,7 +145,8 @@ namespace riptide_rviz
         //service clients
         rclcpp::Client<Trigger>::SharedPtr 
             reloadSolverClient,
-            reloadActiveClient;
+            reloadSmcClient,
+            reloadPidClient;
         
         std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;
         int64_t srvReqId;
