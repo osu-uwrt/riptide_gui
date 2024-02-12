@@ -17,6 +17,9 @@
 #include <rviz_common/panel.hpp>
 #include <rviz_common/config.hpp>
 
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+
 #include <riptide_msgs2/action/calibrate_drag_new.hpp>
 
 #include "ui_ControlPanel.h"
@@ -86,6 +89,7 @@ namespace riptide_rviz
         bool event(QEvent *event);
 
     private:
+        bool transformBetweenFrames(geometry_msgs::msg::Pose pose_in, geometry_msgs::msg::Pose& pose_out, const std::string& from_frame, const std::string& to_frame);
         bool getDesiredSetpointFromTextboxes(double results[6]);
         void syncSetptMarkerToTextboxes(bool applyChanges = true);
         void setptMarkerFeedback(interactive_markers::InteractiveMarkerServer::FeedbackConstSharedPtr feedback);
@@ -157,6 +161,10 @@ namespace riptide_rviz
         //interactive marker server
         std::shared_ptr<interactive_markers::InteractiveMarkerServer> setptServer;
         visualization_msgs::msg::InteractiveMarker interactiveSetpointMarker;
+
+        //tf buffer and listener
+        std::shared_ptr<tf2_ros::Buffer> tf_buffer;
+        std::shared_ptr<tf2_ros::TransformListener> tf_listener;
     };
 
 } // namespace riptide_rviz

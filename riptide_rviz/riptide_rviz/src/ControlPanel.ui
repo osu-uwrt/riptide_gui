@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>636</width>
-    <height>583</height>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -176,6 +176,43 @@ QLabel:!enabled{color: red;}</string>
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Frame</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="ctrlFrame">
+         <property name="currentText">
+          <string>map</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>map</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>world</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_9">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>

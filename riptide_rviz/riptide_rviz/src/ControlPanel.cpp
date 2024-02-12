@@ -17,8 +17,8 @@ using std::placeholders::_2;
 #include <unistd.h>
 
 #define MAX_HOST_LEN 300
-
 #define SETPOINT_REPUB_PERIOD 1s
+#define SETPOINT_MARKER_SCALE 1.5
 
 const std::string get_hostname()
 {
@@ -194,6 +194,7 @@ namespace riptide_rviz
         interactiveSetpointMarker.header.stamp = node->get_clock()->now();
         interactiveSetpointMarker.name = "interactive_setpt";
         interactiveSetpointMarker.description = "Interactive controller setpoint";
+        interactiveSetpointMarker.scale = SETPOINT_MARKER_SCALE;
 
         //create controls which will move the setpoint around
         visualization_msgs::msg::InteractiveMarkerControl moveCtrlX;
@@ -241,6 +242,10 @@ namespace riptide_rviz
         moveCtrlYaw.orientation.y = 1;
         moveCtrlYaw.orientation.w = 1;
         interactiveSetpointMarker.controls.push_back(moveCtrlYaw);
+
+        //initialize tf stuff
+        tf_buffer = std::make_shared<tf2_ros::Buffer>(node->get_clock());
+        tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
 
         // now we can start the UI refresh timer
         uiTimer->start(100);
@@ -497,9 +502,8 @@ namespace riptide_rviz
         linear.z = desiredValues[2];
 
         geometry_msgs::msg::Quaternion angularPosition;
-        geometry_msgs::msg::Vector3 angularVelocity;
+        // geometry_msgs::msg::Vector3 angularVelocity;
         
-
         // if we are in position, we use quat, otherwise use the vector
         if (ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
         {
@@ -517,23 +521,38 @@ namespace riptide_rviz
             // build the angular quat for message
             angularPosition = tf2::toMsg(quat);
         } else {
-            // build the vector
-            angularVelocity.x = desiredValues[3];
-            angularVelocity.y = desiredValues[4];
-            angularVelocity.z = desiredValues[5];
+            // // build the vector
+            // angularVelocity.x = desiredValues[3];
+            // angularVelocity.y = desiredValues[4];
+            // angularVelocity.z = desiredValues[5];
+
+            QMessageBox::warning(uiPanel->CtrlSendCmd, "Control mode not supported!", "Control mode is not supported by the controller! It will be removed from the panel soon.");
         }
-    
+
+        //assemble pose to command
+        geometry_msgs::msg::Pose untransformed_command;
+        untransformed_command.position = linear;
+        untransformed_command.orientation = angularPosition;
+
+        //transform command from command frame to world
+        std::string command_frame = uiPanel->ctrlFrame->currentText().toStdString();
+        geometry_msgs::msg::Pose world_command;
+        if(!transformBetweenFrames(untransformed_command, world_command, command_frame, "world"))
+        {
+            return;
+        }
+
         #if CONTROLLER_TYPE == CONTROLLER_CMD
             auto linCmd = riptide_msgs2::msg::ControllerCommand();
-            linCmd.setpoint_vect.x = linear.x;
-            linCmd.setpoint_vect.y = linear.y;
-            linCmd.setpoint_vect.z = linear.z;
+            linCmd.setpoint_vect.x = world_command.position.x;
+            linCmd.setpoint_vect.y = world_command.position.y;
+            linCmd.setpoint_vect.z = world_command.position.z;
             linCmd.mode = ctrlMode;
 
             auto angCmd = riptide_msgs2::msg::ControllerCommand();
             angCmd.mode = ctrlMode;
-            angCmd.setpoint_quat = angularPosition;
-            angCmd.setpoint_vect = angularVelocity;
+            angCmd.setpoint_quat = world_command.orientation;
+            // angCmd.setpoint_vect = angularVelocity;
 
             // send the control messages
             ctrlCmdLinPub->publish(linCmd);
@@ -563,9 +582,19 @@ namespace riptide_rviz
 
     void ControlPanel::odomCallback(const nav_msgs::msg::Odometry &msg)
     {
+        std::string odom_frame = msg.header.frame_id;
+
+        //transform command to command frame
+        std::string command_frame = uiPanel->ctrlFrame->currentText().toStdString();
+        geometry_msgs::msg::Pose frame_coordinates;
+        if(!transformBetweenFrames(msg.pose.pose, frame_coordinates, msg.header.frame_id, command_frame))
+        {
+            return;
+        }
+
         // parse the quaternion to RPY
-        tf2::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y,
-                          msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
+        tf2::Quaternion q(frame_coordinates.orientation.x, frame_coordinates.orientation.y,
+                          frame_coordinates.orientation.z, frame_coordinates.orientation.w);
         tf2::Matrix3x3 m(q);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
@@ -596,9 +625,9 @@ namespace riptide_rviz
         uiPanel->cmdCurrP->setText(QString::number(pitch, 'f', 2));
         uiPanel->cmdCurrYaw->setText(QString::number(yaw, 'f', 2));
 
-        uiPanel->cmdCurrX->setText(QString::number(msg.pose.pose.position.x, 'f', 2));
-        uiPanel->cmdCurrY->setText(QString::number(msg.pose.pose.position.y, 'f', 2));
-        uiPanel->cmdCurrZ->setText(QString::number(msg.pose.pose.position.z, 'f', 2));
+        uiPanel->cmdCurrX->setText(QString::number(frame_coordinates.position.x, 'f', 2));
+        uiPanel->cmdCurrY->setText(QString::number(frame_coordinates.position.y, 'f', 2));
+        uiPanel->cmdCurrZ->setText(QString::number(frame_coordinates.position.z, 'f', 2));
     }
 
     void ControlPanel::selectedPose(const geometry_msgs::msg::PoseStamped & msg){
@@ -699,6 +728,27 @@ namespace riptide_rviz
         dragCalTriggerPub->publish(std_msgs::msg::Empty());
     }
 
+
+    bool ControlPanel::transformBetweenFrames(
+        geometry_msgs::msg::Pose pose_in, 
+        geometry_msgs::msg::Pose& pose_out, 
+        const std::string& from_frame, 
+        const std::string& to_frame)
+    {
+        geometry_msgs::msg::TransformStamped transform;
+        try {
+            transform = tf_buffer->lookupTransform(
+                to_frame, from_frame, tf2::TimePointZero);
+        } catch (const tf2::TransformException & ex) {
+            RVIZ_COMMON_LOG_INFO(
+                "Could not transform " + from_frame + " to " + to_frame + ": " + ex.what());
+            return false;
+        }
+
+        tf2::doTransform(pose_in, pose_out, transform);
+        return true;
+    }
+
     /**
      * Populates the results array with the values of the setpoint number boxes.
      * Ordered xyzrpw 
@@ -745,8 +795,16 @@ namespace riptide_rviz
             newMarkerPose.position.z = desired[2];
             newMarkerPose.orientation = tf2::toMsg(quat);
 
+            //transform new marker pose to world (currently in the selected frame)
+            std::string command_frame = uiPanel->ctrlFrame->currentText().toStdString();
+            geometry_msgs::msg::Pose newMarkerPoseWorld;
+            if(!transformBetweenFrames(newMarkerPose, newMarkerPoseWorld, command_frame, "world"))
+            {
+                return;
+            }
+
             //set the pose
-            setptServer->setPose(interactiveSetpointMarker.name, newMarkerPose);
+            setptServer->setPose(interactiveSetpointMarker.name, newMarkerPoseWorld);
 
             if(applyChanges)
             {
