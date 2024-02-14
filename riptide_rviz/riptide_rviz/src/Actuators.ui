@@ -29,6 +29,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="ctrlArm">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {color: white; background: green;}
 QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
@@ -62,15 +65,18 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       <item row="4" column="1">
        <widget class="QLabel" name="lblTorpedoReady">
         <property name="styleSheet">
-         <string notr="true">color:green</string>
+         <string notr="true">color: gray</string>
         </property>
         <property name="text">
-         <string>Ready</string>
+         <string>Waiting...</string>
         </property>
        </widget>
       </item>
       <item row="7" column="0">
        <widget class="QPushButton" name="ctrlOpenClaw">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Open</string>
         </property>
@@ -78,6 +84,9 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="7" column="1">
        <widget class="QPushButton" name="ctrlFireTorpedo">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Fire</string>
         </property>
@@ -85,6 +94,9 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="8" column="0">
        <widget class="QPushButton" name="ctrlCloseClaw">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Close</string>
         </property>
@@ -93,7 +105,7 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       <item row="3" column="2">
        <widget class="QLabel" name="lblDropperAvailable">
         <property name="text">
-         <string>Available: </string>
+         <string>Available: ???</string>
         </property>
        </widget>
       </item>
@@ -110,15 +122,18 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       <item row="4" column="2">
        <widget class="QLabel" name="lblDropperReady">
         <property name="styleSheet">
-         <string notr="true">color:green</string>
+         <string notr="true">color: gray</string>
         </property>
         <property name="text">
-         <string>Ready</string>
+         <string>Waiting...</string>
         </property>
        </widget>
       </item>
       <item row="7" column="2">
        <widget class="QPushButton" name="ctrlDropMarker">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Drop</string>
         </property>
@@ -127,17 +142,17 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       <item row="4" column="0">
        <widget class="QLabel" name="lblClawReady">
         <property name="styleSheet">
-         <string notr="true">color: green</string>
+         <string notr="true">color:gray</string>
         </property>
         <property name="text">
-         <string>Ready</string>
+         <string>Waiting...</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
        <widget class="QLabel" name="lblTorpAvailable">
         <property name="text">
-         <string>Available: </string>
+         <string>Available: ???</string>
         </property>
        </widget>
       </item>
@@ -163,6 +178,9 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="8" column="1" colspan="2">
        <widget class="QPushButton" name="ctrlReload">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Reload</string>
         </property>
@@ -172,63 +190,81 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_2" native="true">
+    <widget class="QCheckBox" name="servoMgmtTitle">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Servo Management (Advanced)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="servoMgmtGroup" native="true">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="visible">
+      <bool>false</bool>
+     </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="2">
+      <item row="1" column="2">
        <widget class="QPushButton" name="ctrlTorpSetHome">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Set Home</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="0" column="1">
        <widget class="QPushButton" name="ctrlClawGoHome">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Go Home</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="styleSheet">
-         <string notr="true">font-weight: bold</string>
-        </property>
-        <property name="text">
-         <string>Claw</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="ctrlTorpGoHome">
-        <property name="text">
-         <string>Go Home</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
        <widget class="QLabel" name="label_8">
         <property name="styleSheet">
          <string notr="true">font-weight: bold</string>
         </property>
         <property name="text">
-         <string>Torpedo/Dropper</string>
+         <string>Torpedo/Dropper:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="0" column="2">
        <widget class="QPushButton" name="ctrlClawSetHome">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Set Home</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="3">
-       <widget class="QLabel" name="label_9">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_7">
         <property name="styleSheet">
          <string notr="true">font-weight: bold</string>
         </property>
         <property name="text">
-         <string>Servo Management</string>
+         <string>Claw:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="ctrlTorpGoHome">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Go Home</string>
         </property>
        </widget>
       </item>
@@ -264,5 +300,22 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>servoMgmtTitle</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>servoMgmtGroup</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>263</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>266</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

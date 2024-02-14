@@ -198,18 +198,23 @@ namespace riptide_rviz
     {
         //handle arm status
         bool armed = msg->actuators_armed;
-        
+
         //enable or disable controls based on act states
+        // Actuators prohibit reload while moving
+        uiPanel->ctrlReload->setEnabled(msg->claw_state != ActuatorStatus::CLAW_OPENING &&
+                                        msg->claw_state != ActuatorStatus::CLAW_CLOSING &&
+                                        msg->torpedo_state != ActuatorStatus::TORPEDO_FIRING &&
+                                        msg->dropper_state != ActuatorStatus::DROPPER_DROPPING);
         uiPanel->ctrlArm->setEnabled(!armed);
         uiPanel->ctrlDisarm->setEnabled(armed);
-        uiPanel->ctrlOpenClaw->setEnabled(armed && msg->claw_state != ActuatorStatus::CLAW_OPENED && msg->claw_state != ActuatorStatus::CLAW_ERROR);
-        uiPanel->ctrlCloseClaw->setEnabled(armed && msg->claw_state != ActuatorStatus::CLAW_CLOSED && msg->claw_state != ActuatorStatus::CLAW_ERROR);
-        uiPanel->ctrlFireTorpedo->setEnabled(armed && msg->torpedo_state == ActuatorStatus::TORPEDO_CHARGED && msg->torpedo_available_count > 0);
-        uiPanel->ctrlDropMarker->setEnabled(armed && msg->dropper_state == ActuatorStatus::DROPPER_READY && msg->dropper_available_count > 0);
-        uiPanel->ctrlClawGoHome->setEnabled(armed);
-        uiPanel->ctrlClawSetHome->setEnabled(!armed);
-        uiPanel->ctrlTorpGoHome->setEnabled(armed);
-        uiPanel->ctrlTorpSetHome->setEnabled(!armed);
+        uiPanel->ctrlOpenClaw->setEnabled(msg->claw_state == ActuatorStatus::CLAW_CLOSED || msg->claw_state == ActuatorStatus::CLAW_UNKNOWN);
+        uiPanel->ctrlCloseClaw->setEnabled(msg->claw_state == ActuatorStatus::CLAW_OPENED || msg->claw_state == ActuatorStatus::CLAW_UNKNOWN);
+        uiPanel->ctrlFireTorpedo->setEnabled(msg->torpedo_state == ActuatorStatus::TORPEDO_CHARGED);
+        uiPanel->ctrlDropMarker->setEnabled(msg->dropper_state == ActuatorStatus::DROPPER_READY);
+        uiPanel->ctrlClawGoHome->setEnabled(armed);    // Can only go home when armed
+        uiPanel->ctrlClawSetHome->setEnabled(!armed);  // Can only set home while disarmed
+        uiPanel->ctrlTorpGoHome->setEnabled(armed);    // Can only go home when armed
+        uiPanel->ctrlTorpSetHome->setEnabled(!armed);  // Can only set home when disarmed
 
         //handle claw status
         std::clamp<int>(msg->claw_state, 0, sizeof(CLAW_STATUSES)/sizeof(*CLAW_STATUSES) - 1);
@@ -218,20 +223,20 @@ namespace riptide_rviz
         uiPanel->lblClawReady->setStyleSheet((msg->claw_state == ActuatorStatus::CLAW_ERROR ? STATUS_ERROR_STYLESHEET : STATUS_GOOD_STYLESHEET));
 
         //handle torpedo status and available count
-        std::clamp<int>(msg->torpedo_state, 0, sizeof(CLAW_STATUSES)/sizeof(*CLAW_STATUSES) - 1);
+        std::clamp<int>(msg->torpedo_state, 0, sizeof(TORPEDO_STATUSES)/sizeof(*TORPEDO_STATUSES) - 1);
         uiPanel->lblTorpedoReady->setText(QString::fromStdString(TORPEDO_STATUSES[msg->torpedo_state]));
         uiPanel->lblTorpedoReady->setEnabled(msg->torpedo_state != ActuatorStatus::TORPEDO_DISARMED);
         uiPanel->lblTorpedoReady->setStyleSheet((msg->torpedo_state == ActuatorStatus::TORPEDO_ERROR ? STATUS_ERROR_STYLESHEET : STATUS_GOOD_STYLESHEET));
-        
+
         std::string availableString = "Available: " + std::to_string(msg->torpedo_available_count);
         uiPanel->lblTorpAvailable->setText(QString::fromStdString(availableString));
 
         //handle dropper status and available count
-        std::clamp<int>(msg->dropper_state, 0, sizeof(CLAW_STATUSES)/sizeof(*CLAW_STATUSES) - 1);
+        std::clamp<int>(msg->dropper_state, 0, sizeof(DROPPER_STATUSES)/sizeof(*DROPPER_STATUSES) - 1);
         uiPanel->lblDropperReady->setText(QString::fromStdString(DROPPER_STATUSES[msg->dropper_state]));
         uiPanel->lblDropperReady->setEnabled(msg->dropper_state != ActuatorStatus::DROPPER_DISARMED);
         uiPanel->lblDropperReady->setStyleSheet((msg->dropper_state == ActuatorStatus::DROPPER_ERROR ? STATUS_ERROR_STYLESHEET : STATUS_GOOD_STYLESHEET));
-        
+
         availableString = "Available: " + std::to_string(msg->dropper_available_count);
         uiPanel->lblDropperAvailable->setText(QString::fromStdString(availableString));
     }
@@ -243,14 +248,14 @@ namespace riptide_rviz
         uiPanel->statusBrowser->setText(QString::fromStdString(status));
     }
 
-    
+
     void Actuators::callTriggerService(rclcpp::Client<Trigger>::SharedPtr client)
     {
         Trigger::Request::SharedPtr request = std::make_shared<Trigger::Request>();
         callService<Trigger>(client, request, activeTriggerClientFuture);
     }
 
-    
+
     void Actuators::callSetBoolService(rclcpp::Client<SetBool>::SharedPtr client, bool value)
     {
         SetBool::Request::SharedPtr request = std::make_shared<SetBool::Request>();
