@@ -472,6 +472,8 @@ namespace riptide_rviz
         if (uiPanel->cmdCopyCurrYaw->isChecked()) {
             uiPanel->cmdReqYaw->setText(yaw);
         }
+
+        syncSetptMarkerToTextboxes();
     }
 
     void ControlPanel::handleCommand(bool updateInteractiveMarker)
