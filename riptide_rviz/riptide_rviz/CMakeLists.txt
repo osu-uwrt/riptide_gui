@@ -89,10 +89,8 @@ ament_target_dependencies(${PROJECT_NAME}
   rclcpp_action
   ament_index_cpp
   tf2
-
   rviz_common 
   rviz_rendering 
-
   riptide_msgs2
   tf2_geometry_msgs
   geometry_msgs

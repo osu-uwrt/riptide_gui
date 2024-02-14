@@ -19,6 +19,9 @@
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
        <widget class="QLabel" name="label_13">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold</string>
+        </property>
         <property name="text">
          <string>Armed:</string>
         </property>
@@ -54,7 +57,7 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="mainWidget" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <item row="4" column="1">
        <widget class="QLabel" name="lblTorpedoReady">
@@ -96,8 +99,11 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="label_2">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold</string>
+        </property>
         <property name="text">
-         <string>Torpedo</string>
+         <string>Torpedo:</string>
         </property>
        </widget>
       </item>
@@ -137,15 +143,28 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold</string>
+        </property>
         <property name="text">
-         <string>Claw</string>
+         <string>Claw:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="2">
        <widget class="QLabel" name="label_3">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold</string>
+        </property>
         <property name="text">
-         <string>Dropper</string>
+         <string>Dropper:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1" colspan="2">
+       <widget class="QPushButton" name="ctrlReload">
+        <property name="text">
+         <string>Reload</string>
         </property>
        </widget>
       </item>
@@ -171,6 +190,9 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_7">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold</string>
+        </property>
         <property name="text">
          <string>Claw</string>
         </property>
@@ -185,6 +207,9 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_8">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold</string>
+        </property>
         <property name="text">
          <string>Torpedo/Dropper</string>
         </property>
@@ -199,6 +224,9 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
       </item>
       <item row="0" column="0" colspan="3">
        <widget class="QLabel" name="label_9">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold</string>
+        </property>
         <property name="text">
          <string>Servo Management</string>
         </property>
@@ -209,6 +237,9 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
    </item>
    <item>
     <widget class="QLabel" name="label_12">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold</string>
+     </property>
      <property name="text">
       <string>Status:</string>
      </property>
