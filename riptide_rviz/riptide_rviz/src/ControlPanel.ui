@@ -161,16 +161,43 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="cmdSteady">
+        <widget class="QLabel" name="cmdThrustLim">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="styleSheet">
-          <string notr="true">QLabel {color: green;}
-QLabel:!enabled{color: red;}</string>
+          <string notr="true">QLabel {color: red;}
+QLabel:!enabled{color: gray;}</string>
          </property>
          <property name="text">
-          <string>Steady</string>
+          <string>Thrust Lim</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_10">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="cmdSysLim">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {color: red;}
+QLabel:!enabled{color: gray;}</string>
+         </property>
+         <property name="text">
+          <string>Sys Lim</string>
          </property>
         </widget>
        </item>

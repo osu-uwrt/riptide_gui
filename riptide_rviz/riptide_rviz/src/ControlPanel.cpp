@@ -176,9 +176,10 @@ namespace riptide_rviz
         odomSub = node->create_subscription<nav_msgs::msg::Odometry>(
             robot_ns + "/odometry/filtered", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::odomCallback, this, _1));
-        steadySub = node->create_subscription<std_msgs::msg::Bool>(
-            robot_ns + "/controller/steady", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::steadyCallback, this, _1));
+        
+        limitsSub = node->create_subscription<std_msgs::msg::Int8>(
+            robot_ns + "/state/controller/limits", rclcpp::SystemDefaultsQoS(),
+            std::bind(&ControlPanel::limitsCallback, this, _1));
 
         //create service clients
         reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_ts_params");
@@ -631,6 +632,20 @@ namespace riptide_rviz
         uiPanel->cmdCurrZ->setText(QString::number(frame_coordinates.position.z, 'f', 2));
     }
 
+
+    void ControlPanel::limitsCallback(const std_msgs::msg::Int8 &msg)
+    {
+        if(msg.data < 0 || msg.data > 3)
+        {
+            RVIZ_COMMON_LOG_ERROR("Control Panel: Invalid limit status " + std::to_string(msg.data));
+        }
+
+        //yeah I'm doing it the microcontroller way. fight me
+        uiPanel->cmdThrustLim->setEnabled(msg.data & 0b00000001);
+        uiPanel->cmdSysLim->setEnabled(msg.data & 0b00000010);
+    }
+    
+
     void ControlPanel::selectedPose(const geometry_msgs::msg::PoseStamped & msg){
         // check position control mode !!!
         if (ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION){
@@ -663,10 +678,7 @@ namespace riptide_rviz
         }
     }
 
-    void ControlPanel::steadyCallback(const std_msgs::msg::Bool &msg)
-    {
-        uiPanel->cmdSteady->setEnabled(msg.data);
-    }
+    
 
     // ROS timer callbacks
     void ControlPanel::sendKillMsgTimer()
