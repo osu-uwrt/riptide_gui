@@ -638,6 +638,7 @@ namespace riptide_rviz
         if(msg.data < 0 || msg.data > 3)
         {
             RVIZ_COMMON_LOG_ERROR("Control Panel: Invalid limit status " + std::to_string(msg.data));
+            return;
         }
 
         //yeah I'm doing it the microcontroller way. fight me
