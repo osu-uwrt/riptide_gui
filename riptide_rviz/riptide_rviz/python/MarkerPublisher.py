@@ -14,26 +14,24 @@ from transforms3d.euler import euler2quat
 from visualization_msgs.msg import Marker, MarkerArray
 
 class ControllerType(enum.Enum):
-    OLD = 1
-    SMC = 2
-    PID = 3
+    CONTROLLER_CMD = 0
+    TARGET_POSITION = 1
     
-CONTROLLER_TYPE = ControllerType.PID
+CONTROLLER_TYPE = ControllerType.CONTROLLER_CMD
 
 # import controller msgs and set topic names
-if CONTROLLER_TYPE == ControllerType.OLD:
+if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
     from riptide_msgs2.msg import ControllerCommand
     LINEAR_CMD_TOPIC = "controller/linear"
     ANGULAR_CMD_TOPIC = "controller/angular"
-elif CONTROLLER_TYPE == ControllerType.SMC:
-    pass
-elif CONTROLLER_TYPE == ControllerType.PID:
-    PID_SETPT_TOPIC = "pid/target_position"
+elif CONTROLLER_TYPE == ControllerType.TARGET_POSITION:
+    PID_SETPT_TOPIC = "controller/target_position"
 
     
 
 CONFIG_FILE = os.path.join(get_package_share_directory("riptide_rviz"), "config", "markers.yaml")
 ODOMETRY_TOPIC = "odometry/filtered"
+SIM_TOPIC = "simulator/state"
 
 
 def toPoint(v: Vector3) -> Point:
@@ -82,22 +80,22 @@ class MarkerPublisher(Node):
         
         self.timer = self.create_timer(self.updatePeriod, self.timerCB)
 
-        #configure ghost robot vars
-        self.latestOdom = Odometry()        
+        #configure ghost tempest vars
+        self.latestOdom = Odometry()
+        self.latestSimPose = Pose()
         
         #configure ros pub subs
         self.markerPub = self.create_publisher(MarkerArray, self.markerTopic, 10)
         self.odomSub = self.create_subscription(Odometry, ODOMETRY_TOPIC, self.odomCB, 10)
-        
+        self.simSub = self.create_subscription(Pose, SIM_TOPIC, self.simCB, 10)
+    
         #controller command subs
-        if CONTROLLER_TYPE == ControllerType.OLD:
+        if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
             self.linearSub = self.create_subscription(ControllerCommand, LINEAR_CMD_TOPIC, self.linearCB, 10)
             self.angularSub = self.create_subscription(ControllerCommand, ANGULAR_CMD_TOPIC, self.angularCB, 10)
             self.latestLinearCmd = ControllerCommand()
             self.latestAngularCmd = ControllerCommand()
-        elif CONTROLLER_TYPE == ControllerType.SMC:
-            pass
-        elif CONTROLLER_TYPE == ControllerType.PID:
+        elif CONTROLLER_TYPE == ControllerType.TARGET_POSITION:
             self.setptSub = self.create_subscription(Pose, PID_SETPT_TOPIC, self.setptCb, 10)
             self.latestSetpt = Pose()
         
@@ -149,20 +147,20 @@ class MarkerPublisher(Node):
         self.markers.remove(self.markers[-1])
     
     # setpoint callbacks
-    if CONTROLLER_TYPE == ControllerType.OLD:
+    if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
         def linearCB(self, msg):
             self.latestLinearCmd = msg
             
             
         def angularCB(self, msg):
             self.latestAngularCmd = msg
-    elif CONTROLLER_TYPE == ControllerType.SMC:
-        pass
-    elif CONTROLLER_TYPE == ControllerType.PID:
+    elif CONTROLLER_TYPE == ControllerType.TARGET_POSITION:
         def setptCb(self, msg):
             self.latestSetpt = msg
         
-        
+    def simCB(self, msg):
+        self.latestSimPose = msg
+
     def odomCB(self, msg):
         self.latestOdom = msg
         
@@ -186,8 +184,25 @@ class MarkerPublisher(Node):
             marker.mesh_use_embedded_materials = True
             
             array.markers.append(marker)
-            
-        #publish ghost robot
+        
+
+        #publish ghost talos of sim true position
+        simGhost = Marker()
+        simGhost.header.frame_id = "world"
+        simGhost.header.stamp = self.get_clock().now().to_msg()
+        simGhost.ns = "simGhost"
+        simGhost.id = 0
+        simGhost.type = Marker.MESH_RESOURCE
+        simGhost.scale = Vector3(x=1.0, y=1.0, z=1.0)
+        simGhost.color = ColorRGBA(r=0.0, g=0.0, b=255.0, a=0.5)
+        simGhost.lifetime = Duration().to_msg()
+        simGhost.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, self.robot, "model.dae")
+        simGhost.mesh_use_embedded_materials = False
+        simGhost.action = Marker.MODIFY
+        simGhost.pose = self.latestSimPose
+        
+        array.markers.append(simGhost)
+        #publish ghost robot for odom goal point
         ghost = Marker()
         ghost.header.frame_id = "world"
         ghost.header.stamp = self.get_clock().now().to_msg()
@@ -201,7 +216,7 @@ class MarkerPublisher(Node):
         ghost.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, self.robot, "model.dae")
         ghost.mesh_use_embedded_materials = False
         
-        if CONTROLLER_TYPE == ControllerType.OLD:
+        if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
             linearActive = self.latestLinearCmd.mode == ControllerCommand.POSITION
             angularActive = self.latestAngularCmd.mode == ControllerCommand.POSITION
             if not (linearActive or angularActive):
@@ -214,12 +229,13 @@ class MarkerPublisher(Node):
             
             if angularActive:
                 ghost.pose.orientation = self.latestAngularCmd.setpoint_quat
-        elif CONTROLLER_TYPE == ControllerType.SMC:
-            pass
-        elif CONTROLLER_TYPE == ControllerType.PID:
+        elif CONTROLLER_TYPE == ControllerType.TARGET_POSITION:
             ghost.action = Marker.MODIFY
             ghost.pose = self.latestSetpt
         
+        ghost.pose.position.x = ghost.pose.position.x #- 0.148
+        ghost.pose.position.y = ghost.pose.position.y #+ 0.040
+        ghost.pose.position.z = ghost.pose.position.z #- 0.071
         array.markers.append(ghost)
         self.markerPub.publish(array)
 

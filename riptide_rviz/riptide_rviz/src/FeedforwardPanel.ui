@@ -61,6 +61,9 @@
      </item>
      <item row="5" column="1">
       <widget class="QDoubleSpinBox" name="PdoubleSpinBox">
+       <property name="decimals">
+        <number>3</number>
+       </property>
        <property name="minimum">
         <double>-25.000000000000000</double>
        </property>
@@ -68,7 +71,7 @@
         <double>25.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>0.010000000000000</double>
+        <double>0.001000000000000</double>
        </property>
       </widget>
      </item>
@@ -94,14 +97,17 @@
      </item>
      <item row="5" column="2">
       <widget class="QDoubleSpinBox" name="YAWdoubleSpinBox">
+       <property name="decimals">
+        <number>3</number>
+       </property>
        <property name="minimum">
         <double>-25.000000000000000</double>
        </property>
        <property name="maximum">
-        <double>10.000000000000000</double>
+        <double>25.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>0.010000000000000</double>
+        <double>0.001000000000000</double>
        </property>
       </widget>
      </item>
@@ -168,6 +174,9 @@
      </item>
      <item row="5" column="0">
       <widget class="QDoubleSpinBox" name="RdoubleSpinBox">
+       <property name="decimals">
+        <number>3</number>
+       </property>
        <property name="minimum">
         <double>-25.000000000000000</double>
        </property>
@@ -175,7 +184,10 @@
         <double>25.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>0.010000000000000</double>
+        <double>0.001000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
        </property>
       </widget>
      </item>

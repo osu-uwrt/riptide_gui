@@ -5,6 +5,7 @@
 #include <chrono>
 #include <algorithm>
 #include <iostream>
+#include <QMessageBox>
 
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -16,6 +17,8 @@ using std::placeholders::_2;
 #include <unistd.h>
 
 #define MAX_HOST_LEN 300
+#define SETPOINT_REPUB_PERIOD 1s
+#define SETPOINT_MARKER_SCALE 1.5
 
 const std::string get_hostname()
 {
@@ -81,7 +84,8 @@ namespace riptide_rviz
         // command sending buttons
         connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, this, &ControlPanel::handleLocalDive);
         connect(uiPanel->ctrlFwdCurrent, &QPushButton::clicked, this, &ControlPanel::handleCurrent);
-        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, this, &ControlPanel::handleCommand);
+        connect(uiPanel->CtrlSendCmd, &QPushButton::clicked, this, 
+            [this] () { ControlPanel::handleCommand(true); } );
 
         //parameter reload buttons
         connect(uiPanel->reloadSolver, &QPushButton::clicked, this, &ControlPanel::handleReloadSolver);
@@ -149,7 +153,6 @@ namespace riptide_rviz
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
-
         // setup goal_pose sub
         selectPoseSub = node->create_subscription<geometry_msgs::msg::PoseStamped>(
             "goal_pose", rclcpp::SystemDefaultsQoS(),
@@ -160,13 +163,11 @@ namespace riptide_rviz
         killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
         
         //controller setpoint publishers
-        #if CONTROLLER_TYPE == OLD
+        #if CONTROLLER_TYPE == CONTROLLER_CMD
             ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
             ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
-        #elif CONTROLLER_TYPE == SMC
-
-        #elif CONTROLLER_TYPE == PID
-            pidSetptPub = node->create_publisher<geometry_msgs::msg::Pose>(robot_ns + "/pid/target_position", rclcpp::SystemDefaultsQoS());
+        #elif CONTROLLER_TYPE == TARGET_POSITION
+            pidSetptPub = node->create_publisher<geometry_msgs::msg::Pose>(robot_ns + "/controller/target_position", rclcpp::SystemDefaultsQoS());
         #endif
         
         dragCalTriggerPub = node->create_publisher<std_msgs::msg::Empty>(robot_ns + "/trigger", rclcpp::SystemDefaultsQoS());
@@ -186,16 +187,98 @@ namespace riptide_rviz
         //create action clients
         calibrateDrag = rclcpp_action::create_client<CalibrateDrag>(node, robot_ns + "/calibrate_drag_new");
 
+        //interactive marker for setpoint
+        setptServer = std::make_shared<interactive_markers::InteractiveMarkerServer>("interactive_setpoint", node);
+        
+        interactiveSetpointMarker.header.frame_id = "world",
+        interactiveSetpointMarker.header.stamp = node->get_clock()->now();
+        interactiveSetpointMarker.name = "interactive_setpt";
+        interactiveSetpointMarker.description = "Interactive controller setpoint";
+        interactiveSetpointMarker.scale = SETPOINT_MARKER_SCALE;
+
+        //create controls which will move the setpoint around
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlX;
+        moveCtrlX.name = "moveX";
+        moveCtrlX.always_visible = true;
+        moveCtrlX.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        moveCtrlX.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlX);
+        
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlY;
+        moveCtrlY.name = "moveCtrlY";
+        moveCtrlY.always_visible = true;
+        moveCtrlY.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        moveCtrlY.orientation.z = 1;
+        moveCtrlY.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlY);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlZ;
+        moveCtrlZ.name = "moveCtrlZ";
+        moveCtrlZ.always_visible = true;
+        moveCtrlZ.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        moveCtrlZ.orientation.y = 1;
+        moveCtrlZ.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlZ);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlRoll;
+        moveCtrlRoll.name = "moveCtrlRoll";
+        moveCtrlRoll.always_visible = true;
+        moveCtrlRoll.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
+        moveCtrlRoll.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlRoll);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlPitch;
+        moveCtrlPitch.name = "moveCtrlPitch";
+        moveCtrlPitch.always_visible = true;
+        moveCtrlPitch.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
+        moveCtrlPitch.orientation.z = 1;
+        moveCtrlPitch.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlPitch);
+
+        visualization_msgs::msg::InteractiveMarkerControl moveCtrlYaw;
+        moveCtrlYaw.name = "moveCtrlYaw";
+        moveCtrlYaw.always_visible = true;
+        moveCtrlYaw.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
+        moveCtrlYaw.orientation.y = 1;
+        moveCtrlYaw.orientation.w = 1;
+        interactiveSetpointMarker.controls.push_back(moveCtrlYaw);
+
+        //initialize tf stuff
+        tf_buffer = std::make_shared<tf2_ros::Buffer>(node->get_clock());
+        tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
+
         // now we can start the UI refresh timer
         uiTimer->start(100);
 
         // and start the kill switch pub timer
         killPubTimer = node->create_wall_timer(50ms, std::bind(&ControlPanel::sendKillMsgTimer, this));
+        
+        //add timer to repub the set point every second        
+        setPointPubTimer = node->create_wall_timer(SETPOINT_REPUB_PERIOD, std::bind(&ControlPanel::pubCurrentSetpoint, this));
 
         // save the hostanme for kill instance
         hostname = "rviz_control_" + get_hostname();
 
+        //set a dummy for last commanded pose
+        geometry_msgs::msg::Point linear;
+        tf2::Quaternion quat = tf2::Quaternion(0.0, 0.0, 0.0, 1.0);
+
+        linear.x = 0;
+        linear.y = 0;
+        linear.z = -1;
+
+        this->lastCommandedPose.position = linear;
+        this->lastCommandedPose.orientation = tf2::toMsg(quat);
         RVIZ_COMMON_LOG_INFO("ControlPanel: Loading config complete");
+    }
+
+    void ControlPanel::pubCurrentSetpoint(){
+
+        #if CONTROLLER_TYPE == TARGET_POSITION
+            this->pidSetptPub->publish(this->lastCommandedPose);
+        #else
+            RVIZ_COMMON_LOG_INFO("Not Republishing Set Point: not supported control mode.");
+        #endif
     }
 
     void ControlPanel::save(rviz_common::Config config) const
@@ -244,7 +327,7 @@ namespace riptide_rviz
     void ControlPanel::switchMode(uint8_t mode, bool override)
     {
         // check the vehicle is enabled or we are overriding
-        if(vehicleEnabled || override){
+        if(vehicleEnabled || override) {
             ctrlMode = mode;
             switch (ctrlMode)
             {
@@ -254,6 +337,12 @@ namespace riptide_rviz
                 uiPanel->ctrlModePos->setEnabled(false);
                 uiPanel->ctrlModeTele->setEnabled(true);
 
+                //also enable the interactive marker
+                setptServer->insert(interactiveSetpointMarker,
+                    std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
+
+                syncSetptMarkerToTextboxes(false);
+                setptServer->applyChanges();
                 break;
             case riptide_msgs2::msg::ControllerCommand::VELOCITY:
                 uiPanel->ctrlModeFFD->setEnabled(true);
@@ -273,6 +362,9 @@ namespace riptide_rviz
                 uiPanel->ctrlModeVel->setEnabled(true);
                 uiPanel->ctrlModePos->setEnabled(true);
                 uiPanel->ctrlModeTele->setEnabled(true);
+
+                setptServer->erase(interactiveSetpointMarker.name);
+                setptServer->applyChanges();
                 break;
             default:
                 RVIZ_COMMON_LOG_ERROR("ControlPanel: Button not yet operable");
@@ -334,7 +426,7 @@ namespace riptide_rviz
         uiPanel->cmdReqP->setText("0");
         uiPanel->cmdReqYaw->setText(uiPanel->cmdCurrYaw->text());
 
-        handleCommand();
+        handleCommand(true);
     }
 
     void ControlPanel::toggleDegrees()
@@ -382,23 +474,12 @@ namespace riptide_rviz
         }
     }
 
-    void ControlPanel::handleCommand()
+    void ControlPanel::handleCommand(bool updateInteractiveMarker)
     {
         // first take the current readout and hold it
         // only need xy and yaw, we discard roll and pitch and z
-        double x, y, z, roll, pitch, yaw;
-        bool convOk[6];
-
-        // make sure that the conversion goes okay as well
-        x = uiPanel->cmdReqX->text().toDouble(&convOk[0]);
-        y = uiPanel->cmdReqY->text().toDouble(&convOk[1]);
-        z = uiPanel->cmdReqZ->text().toDouble(&convOk[2]);
-        roll = uiPanel->cmdReqR->text().toDouble(&convOk[3]);
-        pitch = uiPanel->cmdReqP->text().toDouble(&convOk[4]);
-        yaw = uiPanel->cmdReqYaw->text().toDouble(&convOk[5]);
-
-        if (std::any_of(std::begin(convOk), std::end(convOk), [](bool i)
-                        { return !i; }))
+        double desiredValues[6];
+        if (!getDesiredSetpointFromTextboxes(desiredValues))
         {
             RVIZ_COMMON_LOG_ERROR("ControlPanel: Failed to convert current position to floating point");
             // set the red stylesheet
@@ -416,67 +497,104 @@ namespace riptide_rviz
         // now we can build the command and send it
         // build the linear control message
         geometry_msgs::msg::Point linear;
-        linear.x = x;
-        linear.y = y;
-        linear.z = z;
+        linear.x = desiredValues[0];
+        linear.y = desiredValues[1];
+        linear.z = desiredValues[2];
 
         geometry_msgs::msg::Quaternion angularPosition;
-        geometry_msgs::msg::Vector3 angularVelocity;
+        // geometry_msgs::msg::Vector3 angularVelocity;
         
-
         // if we are in position, we use quat, otherwise use the vector
         if (ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
         {
             // check the angle mode button
             if(degreeReadout){
-                roll *= M_PI / 180.0;
-                pitch *= M_PI / 180.0;
-                yaw *= M_PI / 180.0;
+                desiredValues[3] *= M_PI / 180.0;
+                desiredValues[4] *= M_PI / 180.0;
+                desiredValues[5] *= M_PI / 180.0;
             }
 
             // convert RPY to quaternion
             tf2::Quaternion quat;
-            quat.setRPY(roll, pitch, yaw);
+            quat.setRPY(desiredValues[3], desiredValues[4], desiredValues[5]);
 
             // build the angular quat for message
             angularPosition = tf2::toMsg(quat);
         } else {
-            // build the vector
-            angularVelocity.x = roll;
-            angularVelocity.y = pitch;
-            angularVelocity.z = yaw;
+            // // build the vector
+            // angularVelocity.x = desiredValues[3];
+            // angularVelocity.y = desiredValues[4];
+            // angularVelocity.z = desiredValues[5];
+
+            QMessageBox::warning(uiPanel->CtrlSendCmd, "Control mode not supported!", "Control mode is not supported by the controller! It will be removed from the panel soon.");
         }
-    
-        #if CONTROLLER_TYPE == OLD
+
+        //assemble pose to command
+        geometry_msgs::msg::Pose untransformed_command;
+        untransformed_command.position = linear;
+        untransformed_command.orientation = angularPosition;
+
+        //transform command from command frame to world
+        std::string command_frame = uiPanel->ctrlFrame->currentText().toStdString();
+        geometry_msgs::msg::Pose world_command;
+        if(!transformBetweenFrames(untransformed_command, world_command, command_frame, "world"))
+        {
+            return;
+        }
+
+        #if CONTROLLER_TYPE == CONTROLLER_CMD
             auto linCmd = riptide_msgs2::msg::ControllerCommand();
-            linCmd.setpoint_vect.x = linear.x;
-            linCmd.setpoint_vect.y = linear.y;
-            linCmd.setpoint_vect.z = linear.z;
+            linCmd.setpoint_vect.x = world_command.position.x;
+            linCmd.setpoint_vect.y = world_command.position.y;
+            linCmd.setpoint_vect.z = world_command.position.z;
             linCmd.mode = ctrlMode;
 
             auto angCmd = riptide_msgs2::msg::ControllerCommand();
             angCmd.mode = ctrlMode;
-            angCmd.setpoint_quat = angularPosition;
-            angCmd.setpoint_vect = angularVelocity;
+            angCmd.setpoint_quat = world_command.orientation;
+            // angCmd.setpoint_vect = angularVelocity;
 
             // send the control messages
             ctrlCmdLinPub->publish(linCmd);
             ctrlCmdAngPub->publish(angCmd);
-        #elif CONTROLLER_TYPE == SMC
+        #elif CONTROLLER_TYPE == TARGET_POSITION
+            if(ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
+            {
+                geometry_msgs::msg::Pose setpt;
+                setpt.position = linear;
+                setpt.orientation = angularPosition;
 
-        #elif CONTROLLER_TYPE == PID
-            geometry_msgs::msg::Pose setpt;
-            setpt.position = linear;
-            setpt.orientation = angularPosition;
-            pidSetptPub->publish(setpt);
+                this->lastCommandedPose = setpt;
+
+                pidSetptPub->publish(setpt);
+            } else
+            {
+                QMessageBox::warning(uiPanel->CtrlSendCmd, "Control mode not supported!", "Control mode is not supported by the PID controller!");
+            }
+            
         #endif
+
+        if(updateInteractiveMarker)
+        {
+            syncSetptMarkerToTextboxes();
+        }
     }
 
     void ControlPanel::odomCallback(const nav_msgs::msg::Odometry &msg)
     {
+        std::string odom_frame = msg.header.frame_id;
+
+        //transform command to command frame
+        std::string command_frame = uiPanel->ctrlFrame->currentText().toStdString();
+        geometry_msgs::msg::Pose frame_coordinates;
+        if(!transformBetweenFrames(msg.pose.pose, frame_coordinates, msg.header.frame_id, command_frame))
+        {
+            return;
+        }
+
         // parse the quaternion to RPY
-        tf2::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y,
-                          msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
+        tf2::Quaternion q(frame_coordinates.orientation.x, frame_coordinates.orientation.y,
+                          frame_coordinates.orientation.z, frame_coordinates.orientation.w);
         tf2::Matrix3x3 m(q);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
@@ -507,9 +625,9 @@ namespace riptide_rviz
         uiPanel->cmdCurrP->setText(QString::number(pitch, 'f', 2));
         uiPanel->cmdCurrYaw->setText(QString::number(yaw, 'f', 2));
 
-        uiPanel->cmdCurrX->setText(QString::number(msg.pose.pose.position.x, 'f', 2));
-        uiPanel->cmdCurrY->setText(QString::number(msg.pose.pose.position.y, 'f', 2));
-        uiPanel->cmdCurrZ->setText(QString::number(msg.pose.pose.position.z, 'f', 2));
+        uiPanel->cmdCurrX->setText(QString::number(frame_coordinates.position.x, 'f', 2));
+        uiPanel->cmdCurrY->setText(QString::number(frame_coordinates.position.y, 'f', 2));
+        uiPanel->cmdCurrZ->setText(QString::number(frame_coordinates.position.z, 'f', 2));
     }
 
     void ControlPanel::selectedPose(const geometry_msgs::msg::PoseStamped & msg){
@@ -608,6 +726,132 @@ namespace riptide_rviz
     void ControlPanel::handleTriggerDragCal()
     {
         dragCalTriggerPub->publish(std_msgs::msg::Empty());
+    }
+
+
+    bool ControlPanel::transformBetweenFrames(
+        geometry_msgs::msg::Pose pose_in, 
+        geometry_msgs::msg::Pose& pose_out, 
+        const std::string& from_frame, 
+        const std::string& to_frame)
+    {
+        geometry_msgs::msg::TransformStamped transform;
+        try {
+            transform = tf_buffer->lookupTransform(
+                to_frame, from_frame, tf2::TimePointZero);
+        } catch (const tf2::TransformException & ex) {
+            RVIZ_COMMON_LOG_INFO(
+                "Could not transform " + from_frame + " to " + to_frame + ": " + ex.what());
+            return false;
+        }
+
+        tf2::doTransform(pose_in, pose_out, transform);
+        return true;
+    }
+
+    /**
+     * Populates the results array with the values of the setpoint number boxes.
+     * Ordered xyzrpw 
+     */
+    bool ControlPanel::getDesiredSetpointFromTextboxes(double results[6])
+    {
+        bool convOk[6];
+
+        // make sure that the conversion goes okay as well
+        results[0] = uiPanel->cmdReqX->text().toDouble(&convOk[0]);
+        results[1] = uiPanel->cmdReqY->text().toDouble(&convOk[1]);
+        results[2] = uiPanel->cmdReqZ->text().toDouble(&convOk[2]);
+        results[3] = uiPanel->cmdReqR->text().toDouble(&convOk[3]);
+        results[4] = uiPanel->cmdReqP->text().toDouble(&convOk[4]);
+        results[5] = uiPanel->cmdReqYaw->text().toDouble(&convOk[5]);
+        
+        //returns false if any of the conversions failed
+        return !(std::any_of(std::begin(convOk), std::end(convOk), [](bool i)
+                        { return !i; }));
+    }
+
+
+    void ControlPanel::syncSetptMarkerToTextboxes(bool applyChanges)
+    {
+        double desired[6];
+
+        if(getDesiredSetpointFromTextboxes(desired))
+        {
+            if(degreeReadout)
+            {
+                desired[3] *= M_PI / 180.0;
+                desired[4] *= M_PI / 180.0;
+                desired[5] *= M_PI / 180.0;
+            }
+
+            //convert the rpy to quat
+            tf2::Quaternion quat;
+            quat.setRPY(desired[3], desired[4], desired[5]);
+
+            //make the pose 
+            geometry_msgs::msg::Pose newMarkerPose;
+            newMarkerPose.position.x = desired[0];
+            newMarkerPose.position.y = desired[1];
+            newMarkerPose.position.z = desired[2];
+            newMarkerPose.orientation = tf2::toMsg(quat);
+
+            //transform new marker pose to world (currently in the selected frame)
+            std::string command_frame = uiPanel->ctrlFrame->currentText().toStdString();
+            geometry_msgs::msg::Pose newMarkerPoseWorld;
+            if(!transformBetweenFrames(newMarkerPose, newMarkerPoseWorld, command_frame, "world"))
+            {
+                return;
+            }
+
+            //set the pose
+            setptServer->setPose(interactiveSetpointMarker.name, newMarkerPoseWorld);
+
+            if(applyChanges)
+            {
+                RVIZ_COMMON_LOG_INFO("Applying marker sync");
+                setptServer->applyChanges();
+            }
+        } else
+        {
+            RVIZ_COMMON_LOG_ERROR("Could not convert the content of the boxes to doubles");
+        }
+    }
+
+
+    /**
+     * @brief invoked when the interactive setpoint marker is moved
+     * @param feedback feedback containing the new pose
+     */
+    void ControlPanel::setptMarkerFeedback(interactive_markers::InteractiveMarkerServer::FeedbackConstSharedPtr feedback)
+    {
+        uiPanel->cmdReqX->setText(QString::number(feedback->pose.position.x, 'f', 2));
+        uiPanel->cmdReqY->setText(QString::number(feedback->pose.position.y, 'f', 2));
+        uiPanel->cmdReqZ->setText(QString::number(feedback->pose.position.z, 'f', 2));
+
+        //convert the quaternion to RPY
+        tf2::Quaternion q (
+            feedback->pose.orientation.x, 
+            feedback->pose.orientation.y,
+            feedback->pose.orientation.z,
+            feedback->pose.orientation.w
+        );
+
+        tf2::Matrix3x3 m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+
+        if (degreeReadout)
+        {
+            roll *= 180.0 / M_PI;
+            pitch *= 180.0 / M_PI;
+            yaw *= 180.0 / M_PI;
+        }
+
+        uiPanel->cmdReqR->setText(QString::number(roll, 'f', 2));
+        uiPanel->cmdReqP->setText(QString::number(pitch, 'f', 2));
+        uiPanel->cmdReqYaw->setText(QString::number(yaw, 'f', 2));
+
+        handleCommand(false);
     }
 
 
