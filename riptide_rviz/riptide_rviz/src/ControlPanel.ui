@@ -846,17 +846,34 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QPushButton" name="reloadActive">
+       <widget class="QPushButton" name="reloadController">
         <property name="text">
-         <string>Reload Active</string>
+         <string>Reload</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QPushButton" name="reloadSolver">
-        <property name="text">
-         <string>Reload Solver</string>
-        </property>
+       <widget class="QComboBox" name="reloadControllerSelect">
+        <item>
+         <property name="text">
+          <string>complete_controller</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>smc</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>pid</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>thruster_solver</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

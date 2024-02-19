@@ -30,7 +30,7 @@
 //
 #define CONTROLLER_CMD (0)
 #define TARGET_POSITION (1)
-#define CONTROLLER_TYPE CONTROLLER_CMD
+#define CONTROLLER_OUTPUT_TYPE CONTROLLER_CMD
 
 namespace riptide_rviz
 {
@@ -74,8 +74,7 @@ namespace riptide_rviz
         void handleCommand(bool updateInteractiveMarker);
 
         //slots for parameter relaod buttons
-        void handleReloadSolver();
-        void handleReloadActive();
+        void handleReloadController();
 
         //slots for drag cal buttons
         void handleStartDragCal();
@@ -150,7 +149,8 @@ namespace riptide_rviz
         rclcpp::Client<Trigger>::SharedPtr 
             reloadSolverClient,
             reloadSmcClient,
-            reloadPidClient;
+            reloadPidClient,
+            reloadCompleteClient;
         
         std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;
         int64_t srvReqId;

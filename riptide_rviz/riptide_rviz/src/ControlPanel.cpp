@@ -88,8 +88,7 @@ namespace riptide_rviz
             [this] () { ControlPanel::handleCommand(true); } );
 
         //parameter reload buttons
-        connect(uiPanel->reloadSolver, &QPushButton::clicked, this, &ControlPanel::handleReloadSolver);
-        connect(uiPanel->reloadActive, &QPushButton::clicked, this, &ControlPanel::handleReloadActive);
+        connect(uiPanel->reloadController, &QPushButton::clicked, this, &ControlPanel::handleReloadController);
 
         //drag cal buttons
         connect(uiPanel->dragStart, &QPushButton::clicked, this, &ControlPanel::handleStartDragCal);
@@ -163,10 +162,10 @@ namespace riptide_rviz
         killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
         
         //controller setpoint publishers
-        #if CONTROLLER_TYPE == CONTROLLER_CMD
+        #if CONTROLLER_OUTPUT_TYPE == CONTROLLER_CMD
             ctrlCmdLinPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/linear", rclcpp::SystemDefaultsQoS());
             ctrlCmdAngPub = node->create_publisher<riptide_msgs2::msg::ControllerCommand>(robot_ns + "/controller/angular", rclcpp::SystemDefaultsQoS());
-        #elif CONTROLLER_TYPE == TARGET_POSITION
+        #elif CONTROLLER_OUTPUT_TYPE == TARGET_POSITION
             pidSetptPub = node->create_publisher<geometry_msgs::msg::Pose>(robot_ns + "/controller/target_position", rclcpp::SystemDefaultsQoS());
         #endif
         
@@ -182,9 +181,10 @@ namespace riptide_rviz
             std::bind(&ControlPanel::limitsCallback, this, _1));
 
         //create service clients
-        reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_ts_params");
+        reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_thruster_solver_params");
         reloadSmcClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_smc_params");
         reloadPidClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_pid_params");
+        reloadCompleteClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_complete_controller_params");
 
         //create action clients
         calibrateDrag = rclcpp_action::create_client<CalibrateDrag>(node, robot_ns + "/calibrate_drag_new");
@@ -276,7 +276,7 @@ namespace riptide_rviz
 
     void ControlPanel::pubCurrentSetpoint(){
 
-        #if CONTROLLER_TYPE == TARGET_POSITION
+        #if CONTROLLER_OUTPUT_TYPE == TARGET_POSITION
             this->pidSetptPub->publish(this->lastCommandedPose);
         #else
             RVIZ_COMMON_LOG_INFO("Not Republishing Set Point: not supported control mode.");
@@ -544,7 +544,7 @@ namespace riptide_rviz
             return;
         }
 
-        #if CONTROLLER_TYPE == CONTROLLER_CMD
+        #if CONTROLLER_OUTPUT_TYPE == CONTROLLER_CMD
             auto linCmd = riptide_msgs2::msg::ControllerCommand();
             linCmd.setpoint_vect.x = world_command.position.x;
             linCmd.setpoint_vect.y = world_command.position.y;
@@ -559,7 +559,7 @@ namespace riptide_rviz
             // send the control messages
             ctrlCmdLinPub->publish(linCmd);
             ctrlCmdAngPub->publish(angCmd);
-        #elif CONTROLLER_TYPE == TARGET_POSITION
+        #elif CONTROLLER_OUTPUT_TYPE == TARGET_POSITION
             if(ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
             {
                 geometry_msgs::msg::Pose setpt;
@@ -694,18 +694,26 @@ namespace riptide_rviz
     }
 
 
-    void ControlPanel::handleReloadSolver()
+    void ControlPanel::handleReloadController()
     {
-        updateCalStatus("Attempting to invoke solver reload service");
-        callTriggerService(reloadSolverClient);
-    }
-
-
-    void ControlPanel::handleReloadActive()
-    {
-        updateCalStatus("Attempting to invoke active reload service");
-        callTriggerService(reloadSmcClient);
-        callTriggerService(reloadPidClient);
+        std::string model_type = uiPanel->reloadControllerSelect->currentText().toStdString();
+        updateCalStatus("Attempting to invoke " + model_type + " reload service");
+        switch(uiPanel->reloadControllerSelect->currentIndex())
+        {
+            case 0:
+                callTriggerService(reloadCompleteClient);
+                break;
+            case 1:
+                callTriggerService(reloadSmcClient);
+                break;
+            case 2:
+                callTriggerService(reloadPidClient);
+                break;
+            case 3:
+                callTriggerService(reloadSolverClient);
+                break;
+        }
+        
     }
 
 
