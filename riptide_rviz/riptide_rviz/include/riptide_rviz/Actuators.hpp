@@ -1,30 +1,21 @@
 #pragma once
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp_action/rclcpp_action.hpp>
-
-// #include <riptide_msgs2/action/arm_torpedo_dropper.hpp>
-// #include <riptide_msgs2/action/change_claw_state.hpp>
-// #include <riptide_msgs2/action/actuate_torpedos.hpp>
-// #include <riptide_msgs2/action/actuate_droppers.hpp>
-
-#include <ament_index_cpp/get_package_share_directory.hpp>
-#include <ament_index_cpp/get_package_prefix.hpp>
 #include <rviz_common/panel.hpp>
 #include <rviz_common/config.hpp>
-
-#include "ui_Actuators.h"
 #include <QTimer>
+#include <QMessageBox>
+#include <std_srvs/srv/set_bool.hpp>
+#include <std_srvs/srv/trigger.hpp>
+#include <riptide_msgs2/msg/actuator_status.hpp>
+#include "ui_Actuators.h"
+
+using namespace std::chrono_literals;
 
 namespace riptide_rviz
 {
-    // using ArmTorpedoDropper = riptide_msgs2::action::ArmTorpedoDropper;
-    // using GHArmTorpedoDropper = rclcpp_action::ClientGoalHandle<ArmTorpedoDropper>;
-    // using ChangeClawState = riptide_msgs2::action::ChangeClawState;
-    // using GHChangeClawState = rclcpp_action::ClientGoalHandle<ChangeClawState>;
-    // using ActuateTorpedos = riptide_msgs2::action::ActuateTorpedos;
-    // using GHActuateTorpedos = rclcpp_action::ClientGoalHandle<ActuateTorpedos>;
-    // using ActuateDroppers = riptide_msgs2::action::ActuateDroppers;
-    // using GHActuateDropper = rclcpp_action::ClientGoalHandle<ActuateDroppers>;
+    using Trigger = std_srvs::srv::Trigger;
+    using SetBool = std_srvs::srv::SetBool;
+    using ActuatorStatus = riptide_msgs2::msg::ActuatorStatus;
 
     class Actuators : public rviz_common::Panel
     {
@@ -36,45 +27,123 @@ namespace riptide_rviz
 
         void onInitialize() override;
 
-    protected Q_SLOTS:
-        // QT slots (function callbacks)
-        
-
-    protected:
-        bool event(QEvent *event);
-        
-        // void armTaskStartCb(const GHArmTorpedoDropper::SharedPtr &goalHandle);
-        // void armTaskCompleteCb(const GHArmTorpedoDropper::WrappedResult &result);
-        // void armTaskFeedbackCb(GHArmTorpedoDropper::SharedPtr goalHandle, 
-        //                        ArmTorpedoDropper::Feedback::ConstSharedPtr feedback);
-        // void clawTaskStartCb(const GHChangeClawState::SharedPtr &goalHandle);
-        // void clawTaskCompleteCb(const GHChangeClawState::WrappedResult &result);
-        
-        // void dropperTaskStartCb(const GHActuateDropper::SharedPtr &goalHandle);
-        // void dropperTaskCompleteCb(const GHActuateDropper::WrappedResult &result);
-        
-        // void torpedoTaskStartCb(const GHActuateTorpedos::SharedPtr &goalHandle);
-        // void torpedoTaskCompleteCb(const GHActuateTorpedos::WrappedResult &result);
-        
-        void handleArming(bool arm_torpedos, bool arm_droppers);
-        void handleDroppers(int dropper_id);
-        void handleTorpedos(int torpedo_id);
-        void handleClaw(bool claw_open);
+    private slots:
+        void handleArm();
+        void handleDisarm();
+        void handleOpenClaw();
+        void handleCloseClaw();
+        void handleFireTorpedo();
+        void handleDropMarker();
+        void handleReload();
+        void handleClawGoHome();
+        void handleClawSetHome();
+        void handleTorpGoHome();
+        void handleTorpSetHome();
 
     private:
+        void statusCallback(const riptide_msgs2::msg::ActuatorStatus::SharedPtr msg);
+        void updateStatus(const std::string& status);
+        void callTriggerService(rclcpp::Client<Trigger>::SharedPtr client);
+        void callSetBoolService(rclcpp::Client<SetBool>::SharedPtr client, bool value);
+
+        template<typename SrvType>
+        void callService(typename rclcpp::Client<SrvType>::SharedPtr client, typename SrvType::Request::SharedPtr request, typename std::shared_future<typename SrvType::Response::SharedPtr>& shared_future)
+        {
+            if(srvReqId >= 0)
+            {
+                QMessageBox::warning(uiPanel->mainWidget, "Service call in progress!", "A service call is already in progess. Please try again later.");
+                return;
+            }
+
+            srvReqId = 0;
+
+            std::string srvName = client->get_service_name();
+            updateStatus("Waiting for service " + srvName);
+            if(!client->wait_for_service(1s))
+            {
+                updateStatus("Service unavailable!");
+                srvReqId = -1; //we allowed to call services again
+                return;
+            }
+
+            updateStatus("Making call to service " + srvName);
+            auto future = client->async_send_request(request);
+            srvReqId = future.request_id;
+            shared_future = future.share();
+            //this is how we wait for a service result
+            QTimer::singleShot(250,
+                [this, client, &shared_future] () { this->waitForService<SrvType>(client, shared_future); });
+            auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+            clientSendTime = node->get_clock()->now();
+        }
+
+
+        template<typename SrvType>
+        void waitForService(typename rclcpp::Client<SrvType>::SharedPtr client, typename std::shared_future<typename SrvType::Response::SharedPtr>& future)
+        {
+            if(!future.valid())
+            {
+                updateStatus("Service result has become invalid!");
+                srvReqId = -1;
+                return;
+            }
+
+            auto futureStatus = future.wait_for(10ms);
+            if(futureStatus != std::future_status::timeout)
+            {
+                //success
+                typename rclcpp::Client<SrvType>::SharedResponse response = future.get();
+                std::string 
+                    srvName = client->get_service_name(),
+                    successStr = (response->success ? "Succeeded" : "Failed");
+
+                updateStatus("Call to " + srvName + " " + successStr + "; " + response->message);
+                srvReqId = -1;
+                return;
+            }
+
+            //not ready yet
+            auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+            rclcpp::Time currentTime = node->get_clock()->now();
+            if(currentTime - clientSendTime > 5s)
+            {
+                updateStatus("Service timed out.");
+                client->remove_pending_request(srvReqId);
+                srvReqId = -1;
+                return;
+            }
+
+            //schedule next check
+            QTimer::singleShot(250,
+                [this, client, &future] () { this->waitForService<SrvType>(client, future); });
+        }
+
         // UI Panel instance
         Ui_Actuators *uiPanel;
 
-        //action clients
-        // rclcpp_action::Client<ArmTorpedoDropper>::SharedPtr armTorpedoDropper;
-        // rclcpp_action::Client<ChangeClawState>::SharedPtr changeClawState;
-        // rclcpp_action::Client<ActuateTorpedos>::SharedPtr actuateTorpedos;
-        // rclcpp_action::Client<ActuateDroppers>::SharedPtr actuateDroppers;
-
         //process vars
-        bool armed_flag;
-        std::string robot_ns;
+        std::string robotNs;
 
+        //status subscriber
+        rclcpp::Subscription<ActuatorStatus>::SharedPtr statusSub;
+
+        //service clients
+        rclcpp::Client<Trigger>::SharedPtr
+            dropperClient,
+            torpedoClient,
+            reloadClient,
+            torpMarkerGoHomeClient,
+            torpMarkerSetHomeClient;
+
+        rclcpp::Client<SetBool>::SharedPtr
+            armClient,
+            clawClient;
+        
+        //service tracking
+        std::shared_future<Trigger::Response::SharedPtr> activeTriggerClientFuture;
+        std::shared_future<SetBool::Response::SharedPtr> activeSetBoolClientFuture;
+        int64_t srvReqId;
+        rclcpp::Time clientSendTime;
     };
 
 } // namespace riptide_rviz
