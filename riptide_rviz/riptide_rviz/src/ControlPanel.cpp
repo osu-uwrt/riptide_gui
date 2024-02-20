@@ -322,6 +322,12 @@ namespace riptide_rviz
 
         // clear the controller command mode
         switchMode(riptide_msgs2::msg::ControllerCommand::DISABLED, true);
+
+        //disable controllers
+        riptide_msgs2::msg::ControllerCommand disableCmd;
+        disableCmd.mode = riptide_msgs2::msg::ControllerCommand::DISABLED;
+        ctrlCmdLinPub->publish(disableCmd);
+        ctrlCmdAngPub->publish(disableCmd);
     }
 
     void ControlPanel::switchMode(uint8_t mode, bool override)
