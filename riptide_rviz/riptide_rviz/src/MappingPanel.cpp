@@ -1,3 +1,5 @@
+#include <QMessageBox>
+
 #include "riptide_rviz/MappingPanel.hpp"
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -80,6 +82,10 @@ namespace riptide_rviz
 
         // Connect UI signals for controlling the riptide vehicle
         connect(ui->calibButton, &QPushButton::clicked, this, &MappingPanel::calibMapFrame);
+        connect(ui->zedSvoStart, &QPushButton::clicked, this, &MappingPanel::zedSvoStart);
+        connect(ui->zedSvoStop, &QPushButton::clicked, this, &MappingPanel::zedSvoStop);
+        connect(ui->dfcRecordingStart, &QPushButton::clicked, this, &MappingPanel::dfcRecordStart);
+        connect(ui->dfcRecordingStop, &QPushButton::clicked, this, &MappingPanel::dfcRecordStop);
     }
 
 
@@ -87,7 +93,7 @@ namespace riptide_rviz
     {   
         if(!loaded)
         {
-            setCalibStatus("Panel not loaded! Please save your config and restart RViz.", "FF0000");
+            setStatus("Panel not loaded! Please save your config and restart RViz.", "FF0000");
             return;
         }
 
@@ -95,7 +101,7 @@ namespace riptide_rviz
         if(calibrationInProgress)
         {
             calibClient->async_cancel_all_goals();
-            setCalibStatus("Canceling calibration...", "000000");
+            setStatus("Canceling calibration...", "000000");
             return;
         }
 
@@ -104,7 +110,7 @@ namespace riptide_rviz
         if(!calibClient->wait_for_action_server(1s))
         {
             RVIZ_COMMON_LOG_ERROR("MappingPanel: Map calibration action server not available!");
-            setCalibStatus("Action server not available!", "FF0000");
+            setStatus("Action server not available!", "FF0000");
             return;
         }
 
@@ -121,14 +127,46 @@ namespace riptide_rviz
         options.feedback_callback       = std::bind(&MappingPanel::feedbackCb, this, _1, _2);
         options.result_callback         = std::bind(&MappingPanel::resultCb, this, _1);
 
-        setCalibStatus("Sending goal...", "000000");
+        setStatus("Sending goal...", "000000");
         calibClient->async_send_goal(calibGoal, options);
 
         ui->calibButton->setText("Cancel");
     }
 
 
-    void MappingPanel::setCalibStatus(const QString& text, const QString& color)
+    void MappingPanel::zedSvoStart()
+    {
+        #ifdef USE_ZED_INTERFACES
+            QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+        #else
+            QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
+        #endif
+    }
+
+
+    void MappingPanel::zedSvoStop()
+    {
+        #ifdef USE_ZED_INTERFACES
+            QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+        #else
+            QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
+        #endif
+    }
+
+
+    void MappingPanel::dfcRecordStart()
+    {
+        QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+    }
+
+
+    void MappingPanel::dfcRecordStop()
+    {
+        QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+    }
+
+
+    void MappingPanel::setStatus(const QString& text, const QString& color)
     {
         ui->calibStatus->setText(text);
         ui->calibStatus->setStyleSheet(tr("QLabel { color: #%1; }").arg(color));
@@ -142,18 +180,18 @@ namespace riptide_rviz
             switch(goalHandle->get_status())
             {
                 case GOAL_STATE_ACCEPTED:
-                    setCalibStatus("Calibrating map frame...", "000000");
+                    setStatus("Calibrating map frame...", "000000");
                     break;
                 case GOAL_STATE_CANCELING:
-                    setCalibStatus("Canceling calibration...", "000000");
+                    setStatus("Canceling calibration...", "000000");
                     break;
                 default:
-                    setCalibStatus("Unknown goal state", "000000");
+                    setStatus("Unknown goal state", "000000");
                     break;
             }
         } else
         {
-            setCalibStatus("Calibration request rejected!", "FF0000");
+            setStatus("Calibration request rejected!", "FF0000");
         }   
     }
 
@@ -163,7 +201,7 @@ namespace riptide_rviz
         const std::shared_ptr<const ModelFrame::Feedback> feedback)
     {
         ui->calibProgress->setValue(feedback->sample_count);
-        setCalibStatus(
+        setStatus(
             tr("Calibrating map frame (%1/%2)...").arg(
                 QString::number(feedback->sample_count),
                 QString::number(ui->calibProgress->maximum())),
@@ -179,26 +217,26 @@ namespace riptide_rviz
             case rclcpp_action::ResultCode::SUCCEEDED:
                 if(result.result->success)
                 {
-                    setCalibStatus("Calibration Complete.", "000000");
+                    setStatus("Calibration Complete.", "000000");
                 } else 
                 {
-                    setCalibStatus(
+                    setStatus(
                         tr("Calibration failed (%1)").arg(QString::fromStdString(result.result->err_msg)),
                         "FF0000"
                     );
                 }
                 break;
             case rclcpp_action::ResultCode::ABORTED:
-                setCalibStatus(
+                setStatus(
                         tr("Calibration aborted (%1)").arg(QString::fromStdString(result.result->err_msg)),
                         "FF0000"
                     );
                 break;
             case rclcpp_action::ResultCode::CANCELED:
-                setCalibStatus("Calibration canceled!", "0000FF");
+                setStatus("Calibration canceled!", "0000FF");
                 break;
             case rclcpp_action::ResultCode::UNKNOWN:
-                setCalibStatus("Calibration unknown!", "0000FF");
+                setStatus("Calibration unknown!", "0000FF");
                 break;
         }
 
