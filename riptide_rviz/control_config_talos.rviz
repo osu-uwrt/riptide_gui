@@ -6,16 +6,9 @@ Panels:
       Expanded:
         - /TF1/Frames1
         - /MarkerArray1/Namespaces1
+        - /Dummy Detections1/TorpedoOpenHole1/Status1
       Splitter Ratio: 0.6578249335289001
-    Tree Height: 228
-  - Class: rviz_common/Selection
-    Name: Selection
-  - Class: rviz_common/Tool Properties
-    Expanded:
-      - /2D Goal Pose1
-      - /Publish Point1
-    Name: Tool Properties
-    Splitter Ratio: 0.5886790156364441
+    Tree Height: 386
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -51,6 +44,9 @@ Panels:
     Name: BaggingPanel
   - Class: riptide_rviz/ParamPanel
     Name: ParamPanel
+    robot_namespace: /talos
+  - Class: riptide_rviz/Actuators
+    Name: Actuators
     robot_namespace: /talos
 Visualization Manager:
   Class: ""
@@ -91,41 +87,17 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        bt_testing/base_link:
-          Value: true
-        bt_testing/computeframealign_13_goalpose:
-          Value: true
-        bt_testing/computeframealign_14_goalpose:
-          Value: true
-        bt_testing/computeframealign_15_goalpose:
-          Value: true
-        bt_testing/computeframealign_16_goalpose:
-          Value: true
-        bt_testing/computeframealign_17_goalpose:
-          Value: true
-        bt_testing/computeframealign_18_goalpose:
-          Value: true
-        bt_testing/computeframealign_19_goalpose:
-          Value: true
-        bt_testing/computeframealign_20_goalpose:
-          Value: true
-        bt_testing/computeframealign_21_goalpose:
-          Value: true
-        bt_testing/computeframealign_22_goalpose:
-          Value: true
-        bt_testing/testlinkgoal:
-          Value: true
         buoy_frame:
-          Value: true
+          Value: false
         buoy_glyph_1_frame:
           Value: true
         buoy_glyph_2_frame:
           Value: true
+        buoy_glyph_3_frame:
+          Value: true
+        buoy_glyph_4_frame:
+          Value: true
         earth_glyph_frame:
-          Value: true
-        eval_base_link:
-          Value: true
-        eval_link:
           Value: true
         gate_frame:
           Value: true
@@ -133,86 +105,28 @@ Visualization Manager:
           Value: true
         odom:
           Value: false
+        offset:
+          Value: true
         prequal_gate_frame:
-          Value: true
+          Value: false
         prequal_pole_frame:
-          Value: true
-        some_child_link:
-          Value: true
-        some_goal_frame:
-          Value: true
+          Value: false
         table_frame:
-          Value: true
+          Value: false
         talos/base_inertia:
           Value: false
         talos/base_link:
-          Value: true
-        talos/computeframealign_10407_goalpose:
-          Value: true
-        talos/computeframealign_10578_goalpose:
-          Value: true
-        talos/computeframealign_10663_goalpose:
-          Value: true
-        talos/computeframealign_10834_goalpose:
-          Value: true
-        talos/computeframealign_13017_goalpose:
-          Value: true
-        talos/computeframealign_13188_goalpose:
-          Value: true
-        talos/computeframealign_13273_goalpose:
-          Value: true
-        talos/computeframealign_13444_goalpose:
-          Value: true
-        talos/computeframealign_15627_goalpose:
-          Value: true
-        talos/computeframealign_15798_goalpose:
-          Value: true
-        talos/computeframealign_15883_goalpose:
-          Value: true
-        talos/computeframealign_16054_goalpose:
-          Value: true
-        talos/computeframealign_1689_goalpose:
-          Value: true
-        talos/computeframealign_1862_goalpose:
-          Value: true
-        talos/computeframealign_2093_goalpose:
-          Value: true
-        talos/computeframealign_2266_goalpose:
-          Value: true
-        talos/computeframealign_30395_goalpose:
-          Value: true
-        talos/computeframealign_30565_goalpose:
-          Value: true
-        talos/computeframealign_30651_goalpose:
-          Value: true
-        talos/computeframealign_30821_goalpose:
-          Value: true
-        talos/computeframealign_33005_goalpose:
-          Value: true
-        talos/computeframealign_33175_goalpose:
-          Value: true
-        talos/computeframealign_33261_goalpose:
-          Value: true
-        talos/computeframealign_33431_goalpose:
-          Value: true
-        talos/computeframealign_35614_goalpose:
-          Value: true
-        talos/computeframealign_35787_goalpose:
-          Value: true
-        talos/computeframealign_36018_goalpose:
-          Value: true
-        talos/computeframealign_36191_goalpose:
-          Value: true
-        talos/computeframealign_4595_goalpose:
-          Value: true
-        talos/computeframealign_7501_goalpose:
-          Value: true
-        talos/computeframealign_7674_goalpose:
-          Value: true
-        talos/computeframealign_7905_goalpose:
-          Value: true
-        talos/computeframealign_8078_goalpose:
-          Value: true
+          Value: false
+        talos/downwards_camera/left_link:
+          Value: false
+        talos/downwards_camera/left_optical:
+          Value: false
+        talos/downwards_camera/right_link:
+          Value: false
+        talos/downwards_camera/right_optical:
+          Value: false
+        talos/downwards_camera_base_link:
+          Value: false
         talos/droppers_link:
           Value: false
         talos/dvl_link:
@@ -224,7 +138,7 @@ Visualization Manager:
         talos/origin:
           Value: false
         talos/poker_link:
-          Value: true
+          Value: false
         talos/pose_sensor_link:
           Value: false
         talos/pressure_link:
@@ -247,23 +161,19 @@ Visualization Manager:
           Value: false
         talos/torpedo_link:
           Value: false
-        talos/zed_camera_link_base_link:
-          Value: true
+        talos/zed_base_link:
+          Value: false
         torpedoGman_frame:
-          Value: true
+          Value: false
         torpedoHole_frame:
+          Value: false
+        torpedo_closed_frame:
           Value: true
-        torpedo_frame:
+        torpedo_closed_hole_frame:
           Value: true
-        torpedo_lower_hole_frame:
+        torpedo_open_frame:
           Value: true
-        torpedo_upper_hole_frame:
-          Value: true
-        transA:
-          Value: true
-        transB:
-          Value: true
-        transC:
+        torpedo_open_hole_frame:
           Value: true
         world:
           Value: false
@@ -273,42 +183,47 @@ Visualization Manager:
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: false
+      Show Names: true
       Tree:
-        map:
-          buoy_frame:
-            buoy_glyph_1_frame:
-              {}
-            buoy_glyph_2_frame:
-              {}
-          gate_frame:
-            earth_glyph_frame:
-              {}
-          prequal_gate_frame:
-            {}
-          prequal_pole_frame:
-            {}
-          table_frame:
-            {}
-          torpedo_frame:
-            torpedo_lower_hole_frame:
-              {}
-            torpedo_upper_hole_frame:
-              {}
         world:
-          bt_testing/base_link:
-            some_child_link:
-              {}
-          bt_testing/testlinkgoal:
-            {}
-          eval_base_link:
-            eval_link:
-              {}
+          map:
+            offset:
+              buoy_frame:
+                buoy_glyph_1_frame:
+                  {}
+                buoy_glyph_2_frame:
+                  {}
+                buoy_glyph_3_frame:
+                  {}
+                buoy_glyph_4_frame:
+                  {}
+              gate_frame:
+                earth_glyph_frame:
+                  {}
+              prequal_gate_frame:
+                {}
+              prequal_pole_frame:
+                {}
+              table_frame:
+                {}
+              torpedo_closed_frame:
+                torpedo_closed_hole_frame:
+                  {}
+              torpedo_open_frame:
+                torpedo_open_hole_frame:
+                  {}
           odom:
             talos/base_link:
               talos/origin:
                 talos/base_inertia:
                   {}
+                talos/downwards_camera_base_link:
+                  talos/downwards_camera/left_link:
+                    talos/downwards_camera/left_optical:
+                      {}
+                    talos/downwards_camera/right_link:
+                      talos/downwards_camera/right_optical:
+                        {}
                 talos/droppers_link:
                   {}
                 talos/dvl_link:
@@ -339,104 +254,11 @@ Visualization Manager:
                   {}
                 talos/torpedo_link:
                   {}
-                talos/zed_camera_link_base_link:
-                  {}
-                zed_camera_link:
-                  {}
+                talos/zed_base_link:
+                  zed_camera_link:
+                    {}
               talos/pose_sensor_link:
                 {}
-          some_goal_frame:
-            bt_testing/computeframealign_13_goalpose:
-              {}
-            bt_testing/computeframealign_14_goalpose:
-              {}
-            bt_testing/computeframealign_15_goalpose:
-              {}
-            bt_testing/computeframealign_16_goalpose:
-              {}
-            bt_testing/computeframealign_17_goalpose:
-              {}
-            bt_testing/computeframealign_18_goalpose:
-              {}
-            bt_testing/computeframealign_19_goalpose:
-              {}
-            bt_testing/computeframealign_20_goalpose:
-              {}
-            bt_testing/computeframealign_21_goalpose:
-              {}
-            bt_testing/computeframealign_22_goalpose:
-              {}
-          talos/computeframealign_10407_goalpose:
-            {}
-          talos/computeframealign_10578_goalpose:
-            {}
-          talos/computeframealign_10663_goalpose:
-            {}
-          talos/computeframealign_10834_goalpose:
-            {}
-          talos/computeframealign_13017_goalpose:
-            {}
-          talos/computeframealign_13188_goalpose:
-            {}
-          talos/computeframealign_13273_goalpose:
-            {}
-          talos/computeframealign_13444_goalpose:
-            {}
-          talos/computeframealign_15627_goalpose:
-            {}
-          talos/computeframealign_15798_goalpose:
-            {}
-          talos/computeframealign_15883_goalpose:
-            {}
-          talos/computeframealign_16054_goalpose:
-            {}
-          talos/computeframealign_1689_goalpose:
-            {}
-          talos/computeframealign_1862_goalpose:
-            {}
-          talos/computeframealign_2093_goalpose:
-            {}
-          talos/computeframealign_2266_goalpose:
-            {}
-          talos/computeframealign_30395_goalpose:
-            {}
-          talos/computeframealign_30565_goalpose:
-            {}
-          talos/computeframealign_30651_goalpose:
-            {}
-          talos/computeframealign_30821_goalpose:
-            {}
-          talos/computeframealign_33005_goalpose:
-            {}
-          talos/computeframealign_33175_goalpose:
-            {}
-          talos/computeframealign_33261_goalpose:
-            {}
-          talos/computeframealign_33431_goalpose:
-            {}
-          talos/computeframealign_35614_goalpose:
-            {}
-          talos/computeframealign_35787_goalpose:
-            {}
-          talos/computeframealign_36018_goalpose:
-            {}
-          talos/computeframealign_36191_goalpose:
-            {}
-          talos/computeframealign_4595_goalpose:
-            {}
-          talos/computeframealign_7501_goalpose:
-            {}
-          talos/computeframealign_7674_goalpose:
-            {}
-          talos/computeframealign_7905_goalpose:
-            {}
-          talos/computeframealign_8078_goalpose:
-            {}
-          transA:
-            transC:
-              {}
-          transB:
-            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -465,6 +287,29 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        talos/downwards_camera/left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/downwards_camera/left_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/downwards_camera/right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/downwards_camera/right_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/downwards_camera_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         talos/droppers_link:
           Alpha: 1
           Show Axes: false
@@ -547,7 +392,7 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        talos/zed_camera_link_base_link:
+        talos/zed_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -556,6 +401,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -787,7 +633,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo
+          Name: Torpedo Open
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -797,7 +643,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo
+            Value: /talos/mapping/torpedo_open
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -822,7 +668,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo Upper Hole
+          Name: Torpedo Open Hole
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -832,7 +678,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_upper_hole
+            Value: /talos/mapping/torpedo_open_hole
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -857,7 +703,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo Lower Hole
+          Name: Torpedo Closed
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -867,7 +713,42 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_lower_hole
+            Value: /talos/mapping/torpedo_closed
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Torpedo Closed Hole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/torpedo_closed_hole
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1262,7 +1143,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo
+          Name: TorpedoOpen
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1272,7 +1153,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo
+            Value: /talos/dummydetections/torpedo_open
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1297,7 +1178,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoLowerHole
+          Name: TorpedoOpenHole
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1307,7 +1188,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_lower_hole
+            Value: /talos/dummydetections/torpedo_open_hole
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1332,7 +1213,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoUpperHole
+          Name: TorpedoClosed
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1342,7 +1223,42 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_upper_hole
+            Value: /talos/dummydetections/torpedo_closed
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: TorpedoClosedHole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/torpedo_closed_hole
           Value: true
       Enabled: true
       Name: Dummy Detections
@@ -1392,27 +1308,29 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 10.000482559204102
+      Distance: 14.726518630981445
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.7095856666564941
-        Y: -1.7588906288146973
-        Z: -2.6626133918762207
+        X: -0.23416918516159058
+        Y: 0.5124905109405518
+        Z: 0.8251045346260071
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.814795732498169
+      Pitch: 0.6447976231575012
       Target Frame: talos/base_link
       Value: Orbit (rviz)
-      Yaw: 2.0780842304229736
+      Yaw: 3.5681302547454834
     Saved: ~
 Window Geometry:
+  Actuators:
+    collapsed: false
   BaggingPanel:
     collapsed: false
   ControlPanel:
@@ -1423,7 +1341,7 @@ Window Geometry:
     collapsed: false
   FeedforwardPanel:
     collapsed: false
-  Height: 1016
+  Height: 1043
   Hide Left Dock: false
   Hide Right Dock: false
   MappingPanel:
@@ -1432,15 +1350,11 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001ec0000035ffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000180043006f006e00740072006f006c00500061006e0065006c010000003d0000025c0000024b00fffffffb00000018004d0061007000700069006e006700500061006e0065006c010000029f000000fd000000fd00ffffff000000010000017b0000035ffc0200000004fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc0000003d0000021b0000016f0100001cfa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000580000001b60000008e00fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffc0000025e0000013e000001380100001cfa000000030100000005fb000000140050006100720061006d00500061006e0065006c0100000000ffffffff0000008500fffffffb0000001c004200720069006e00670075007000570065006200760069006500770100000000ffffffff0000000000000000fb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000017b00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a0056006900650077007301000006270000010f0000010000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073a00000039fc0100000002fb0000000800540069006d006501000000000000073a000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000003c70000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
-  Selection:
-    collapsed: false
+  QMainWindow State: 000000ff00000000fd0000000300000000000001ec0000037afc0200000004fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fb000000180043006f006e00740072006f006c00500061006e0065006c010000003d0000026a0000024b00fffffffb00000018004d0061007000700069006e006700500061006e0065006c01000002ad0000010a000000fd00ffffff000000010000016a0000037afc0200000002fc0000003d00000198000001840100001cfa000000000100000004fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000010e00fffffffb00000012004100630074007500610074006f0072007301000005bf0000017b0000013000fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffc000001db000001dc000000e60100001cfa000000020100000004fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff000000fd00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000078000000039fc0100000001fb0000000800540069006d0065010000000000000780000002fb00ffffff0000041e0000037a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
-    collapsed: false
-  Tool Properties:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1850
-  X: 70
-  Y: 27
+  Width: 1920
+  X: 1920
+  Y: 0
