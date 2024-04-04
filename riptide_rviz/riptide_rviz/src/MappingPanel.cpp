@@ -52,11 +52,21 @@ namespace riptide_rviz
         ui->worldFrame->setText(QString::fromStdString(getFromConfig(config, "worldFrameName", "world")));
         ui->tagFrame->setText(QString::fromStdString(getFromConfig(config, "tagFrameName", "tag_36h11")));
         ui->numSamples->setValue(std::stoi(getFromConfig(config, "mapCalibNumSamples", "10")));
-
-        std::string fullActionName = robotNs + "/" + CALIB_ACTION_NAME;
+        
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        
+        // initialize tag cal stuff
+        std::string fullActionName = robotNs + "/" + CALIB_ACTION_NAME;
         calibClient = rclcpp_action::create_client<ModelFrame>(node, fullActionName);
         RVIZ_COMMON_LOG_INFO("Created action client for server with name \"" + fullActionName + "\"");
+
+        // initialize mapping target stuff
+        mappingTargetInfoSub = node->create_subscription<riptide_msgs2::msg::MappingTargetInfo>(robotNs + "/state/mapping", 10,
+            std::bind(&MappingPanel::mappingStatusCb, this, _1));
+        
+        mappingTargetClient = std::make_shared<GuiSrvClient<MappingTarget>>(node, robotNs + "/mapping_target",
+            std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::mappingTargetResultCb, this, _1, _2));
+
         loaded = true;
     }
 
@@ -82,10 +92,11 @@ namespace riptide_rviz
 
         // Connect UI signals for controlling the riptide vehicle
         connect(ui->calibButton, &QPushButton::clicked, this, &MappingPanel::calibMapFrame);
-        connect(ui->zedSvoStart, &QPushButton::clicked, this, &MappingPanel::zedSvoStart);
-        connect(ui->zedSvoStop, &QPushButton::clicked, this, &MappingPanel::zedSvoStop);
-        connect(ui->dfcRecordingStart, &QPushButton::clicked, this, &MappingPanel::dfcRecordStart);
-        connect(ui->dfcRecordingStop, &QPushButton::clicked, this, &MappingPanel::dfcRecordStop);
+        connect(ui->setMappingTargetButton, &QPushButton::clicked, this, &MappingPanel::setMappingTarget);
+        connect(ui->zedSvoStartButton, &QPushButton::clicked, this, &MappingPanel::zedSvoStart);
+        connect(ui->zedSvoStopButton, &QPushButton::clicked, this, &MappingPanel::zedSvoStop);
+        connect(ui->dfcRecordingStartButton, &QPushButton::clicked, this, &MappingPanel::dfcRecordStart);
+        connect(ui->dfcRecordingStopButton, &QPushButton::clicked, this, &MappingPanel::dfcRecordStop);
     }
 
 
@@ -134,6 +145,19 @@ namespace riptide_rviz
     }
 
 
+    void MappingPanel::setMappingTarget()
+    {
+        std::string desiredTarget = ui->desiredTargetObject->text().toStdString();
+        bool desiredLock = ui->desiredLocked->isChecked();
+
+        MappingTarget::Request::SharedPtr targetReq = std::make_shared<MappingTarget::Request>();
+        targetReq->target_info.target_object = desiredTarget;
+        targetReq->target_info.lock_map = desiredLock;
+
+        mappingTargetClient->callService(targetReq);
+    }
+
+
     void MappingPanel::zedSvoStart()
     {
         #ifdef USE_ZED_INTERFACES
@@ -166,7 +190,7 @@ namespace riptide_rviz
     }
 
 
-    void MappingPanel::setStatus(const QString& text, const QString& color)
+    void MappingPanel::setStatus(const QString& text, const QString &color)
     {
         ui->calibStatus->setText(text);
         ui->calibStatus->setStyleSheet(tr("QLabel { color: #%1; }").arg(color));
@@ -242,6 +266,22 @@ namespace riptide_rviz
 
         calibrationInProgress = false;
         ui->calibButton->setText("Calibrate");
+    }
+
+
+    void MappingPanel::mappingStatusCb(const riptide_msgs2::msg::MappingTargetInfo::SharedPtr msg)
+    {
+        std::string target = (msg->target_object == "" ? "..." : msg->target_object);
+        ui->mappingTargetObject->setText(QString::fromStdString(target));
+        ui->mappingLocked->setChecked(msg->lock_map);
+    }
+
+
+    void MappingPanel::mappingTargetResultCb(const std::string& srvName, rclcpp::Client<MappingTarget>::SharedResponse response)
+    {
+        (void) srvName;
+        (void) response;
+        setStatus("Mapping target updated.", "000000");
     }
 }
 

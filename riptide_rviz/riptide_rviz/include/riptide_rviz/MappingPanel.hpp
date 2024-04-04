@@ -9,8 +9,12 @@
     #include <zed_interfaces/srv/StartSvoRec.hpp>
 #endif
 #include <std_srvs/srv/trigger.hpp>
+#include <riptide_msgs2/msg/mapping_target_info.hpp>
+#include <riptide_msgs2/srv/mapping_target.hpp>
 
 #include "ui_MappingPanel.h"
+
+#include "riptide_rviz/GuiSrvClient.hpp"
 
 namespace riptide_rviz
 {
@@ -19,6 +23,8 @@ namespace riptide_rviz
         using ModelFrame = chameleon_tf_msgs::action::ModelFrame;
         using SendGoalOptions = rclcpp_action::Client<ModelFrame>::SendGoalOptions;
         using CalibGoalHandle = rclcpp_action::Client<ModelFrame>::GoalHandle;
+
+        using MappingTarget = riptide_msgs2::srv::MappingTarget;
         #ifdef USE_ZED_INTERFACES
             using StartSvoRec = zed_interfaces::srv::StartSvoRec;
         #endif
@@ -35,18 +41,25 @@ namespace riptide_rviz
 
         private Q_SLOTS:
         void calibMapFrame();
+        void setMappingTarget();
         void zedSvoStart();
         void zedSvoStop();
         void dfcRecordStart();
         void dfcRecordStop();
 
         private:
-        void setStatus(const QString& text, const QString& color);
+        void setStatus(const QString& text, const QString &color);
+
+        // tag cal stuff
         void goalResponseCb(const CalibGoalHandle::SharedPtr & goal_handle);
         void feedbackCb(
             CalibGoalHandle::SharedPtr,
             const std::shared_ptr<const ModelFrame::Feedback> feedback);
-        void resultCb(const CalibGoalHandle::WrappedResult & result);
+        void resultCb(const CalibGoalHandle::WrappedResult & result);        
+
+        // mappingtarget stuff
+        void mappingStatusCb(const riptide_msgs2::msg::MappingTargetInfo::SharedPtr msg);
+        void mappingTargetResultCb(const std::string& srvName, rclcpp::Client<MappingTarget>::SharedResponse response);
 
         Ui_MappingPanel *ui;
         std::string robotNs;
@@ -54,10 +67,12 @@ namespace riptide_rviz
             loaded = false;
         
         rclcpp_action::Client<chameleon_tf_msgs::action::ModelFrame>::SharedPtr calibClient;
-        
+        rclcpp::Subscription<riptide_msgs2::msg::MappingTargetInfo>::SharedPtr mappingTargetInfoSub;
+        GuiSrvClient<MappingTarget>::SharedPtr mappingTargetClient;
+
         #ifdef USE_ZED_INTERFACES
-            rclcpp::Client<StartSvoRec> startSvoClient;
-            rclcpp::Client<Trigger> stopSvoClient;
+            GuiSrvClient<StartSvoRec>::SharedPtr startSvoClient;
+            GuiSrvClient<Trigger>::SharedPtr stopSvoClient;
         #endif
 
         //TODO add dfc clients
