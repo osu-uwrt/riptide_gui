@@ -4,6 +4,7 @@
 #include <riptide_msgs2/srv/list_trees.hpp>
 #include <riptide_msgs2/action/execute_tree.hpp>
 #include <riptide_msgs2/msg/tree_stack.hpp>
+#include <riptide_msgs2/msg/led_command.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
@@ -47,21 +48,32 @@ namespace riptide_rviz
         void taskFeedbackCb(GHExecuteTree::SharedPtr goalHandle,
                             ExecuteTree::Feedback::ConstSharedPtr feedback);
 
-        //subscriber callabck on the tree stack
+        //subscriber callback on the tree stack
         void stackCb(const riptide_msgs2::msg::TreeStack & stack);
+
+        //subscriber callback for led commands
+        void ledCb(const riptide_msgs2::msg::LedCommand & cmd);
 
         // timer callabck for refresh future
         void waitForRefresh(void);
 
     private:
+        void updateLedReadout(void);
+
         Ui_MissionPanel *uiPanel;
 
         // tree view item model
         QStandardItemModel * model;
 
+        // stack
         std::vector<std::string> treeList;
 
+        // led command
+        riptide_msgs2::msg::LedCommand lastLedCommand;
+        rclcpp::TimerBase::SharedPtr ledTimer;
+
         rclcpp::Subscription<riptide_msgs2::msg::TreeStack>::SharedPtr stackSub;
+        rclcpp::Subscription<riptide_msgs2::msg::LedCommand>::SharedPtr ledSub;
 
         // refresh request info
         rclcpp::Client<riptide_msgs2::srv::ListTrees>::SharedPtr refreshClient;
@@ -69,7 +81,6 @@ namespace riptide_rviz
         int64_t refreshFutureid = -1;
 
         int timerTick = -1;
-
 
         rclcpp_action::Client<ExecuteTree>::SharedPtr actionServer;
         

@@ -57,12 +57,17 @@ namespace riptide_rviz
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
+        ledTimer = node->create_wall_timer(50ms, std::bind(&MissionPanel::updateLedReadout, this));
+
         actionServer = rclcpp_action::create_client<ExecuteTree>(node, robot_ns + "/autonomy/run_tree");
     
         stackSub = node->create_subscription<riptide_msgs2::msg::TreeStack>(
             robot_ns + "/autonomy/tree_stack", rclcpp::SystemDefaultsQoS(),
-            std::bind(&MissionPanel::stackCb, this, _1)
-        );
+            std::bind(&MissionPanel::stackCb, this, _1));
+
+        ledSub = node->create_subscription<riptide_msgs2::msg::LedCommand>(
+            robot_ns + "/command/led", rclcpp::SystemDefaultsQoS(),
+            std::bind(&MissionPanel::ledCb, this, _1));
 
         refreshClient = node->create_client<riptide_msgs2::srv::ListTrees>(robot_ns + "/autonomy/list_trees");
 
@@ -263,7 +268,7 @@ namespace riptide_rviz
     void MissionPanel::taskFeedbackCb(GHExecuteTree::SharedPtr goalHandle,
                                       ExecuteTree::Feedback::ConstSharedPtr feedback)
     {
-        //TODO figure out how to render the stack
+        // anything we want to do if autonomy gives feedback
     }
 
     void MissionPanel::cancelAccept(const action_msgs::srv::CancelGoal::Response::SharedPtr resp){
@@ -285,9 +290,51 @@ namespace riptide_rviz
         }
     }
 
+    void MissionPanel::ledCb(const riptide_msgs2::msg::LedCommand & cmd)
+    {
+        lastLedCommand = cmd;
+    }
+
     void MissionPanel::cancelTask()
     {
         actionServer->async_cancel_all_goals(std::bind(&MissionPanel::cancelAccept, this, _1));
+    }
+
+    //TODO: UPDATE LED READOUT FOR BOTH CAGES
+    void MissionPanel::updateLedReadout(void)
+    {
+        float brightness = 0;
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        double current_time_seconds = node->get_clock()->now().seconds();
+        switch(lastLedCommand.mode)
+        {
+            case riptide_msgs2::msg::LedCommand::MODE_SOLID:
+                brightness = 1;
+                break;
+            case riptide_msgs2::msg::LedCommand::MODE_SLOW_FLASH:
+                brightness = (fmod(current_time_seconds, 2) < 1 ? 0 : 1);
+                break;
+            case riptide_msgs2::msg::LedCommand::MODE_FAST_FLASH:
+                brightness = (fmod(current_time_seconds, 0.5) < 0.25 ? 0 : 1);
+                break;
+            case riptide_msgs2::msg::LedCommand::MODE_BREATH:
+                brightness = (sin(fmod(current_time_seconds, 3) * 2 * M_PI / 3) + 1) / 2;
+                break;
+            default:
+                brightness = 0;
+        }
+
+        double
+            bgRed = lastLedCommand.red * brightness,
+            bgGreen = lastLedCommand.green * brightness,
+            bgBlue = lastLedCommand.blue * brightness,
+            avg = (bgRed + bgGreen + bgBlue) / 3,
+            fgMono = (avg > 128 ? 0 : 255);
+        
+        QString new_stylesheet = QString("QLabel {color: rgb(%1, %1, %1); background-color: rgb(%2, %3, %4)}")
+                                    .arg(fgMono).arg(bgRed).arg(bgGreen).arg(bgBlue);
+
+        uiPanel->status_label->setStyleSheet(new_stylesheet);
     }
 
 } // namespace riptide_rviz
