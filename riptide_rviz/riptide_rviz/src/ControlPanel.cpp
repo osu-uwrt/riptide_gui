@@ -397,9 +397,6 @@ namespace riptide_rviz
 
                 if(!vehicleEnabled)
                     RVIZ_COMMON_LOG_WARNING("ControlPanel: vehicle disabled! disabling local control buttons");
-
-                // disable the vehicle
-                handleDisable();
             }
 
             // also disable command sending
