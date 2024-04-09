@@ -9,6 +9,7 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_srvs/srv/trigger.hpp>
+#include <std_srvs/srv/set_bool.hpp>
 
 #include <interactive_markers/interactive_marker_server.hpp>
 
@@ -30,7 +31,7 @@
 //
 #define CONTROLLER_CMD (0)
 #define TARGET_POSITION (1)
-#define CONTROLLER_TYPE CONTROLLER_CMD
+#define CONTROLLER_TYPE CONTROLLER_CMD 
 
 namespace riptide_rviz
 {
@@ -38,6 +39,7 @@ namespace riptide_rviz
     class ControlPanel : public rviz_common::Panel
     {
         using Trigger = std_srvs::srv::Trigger;
+        using SetBool = std_srvs::srv::SetBool;
         using CalibrateDrag = riptide_msgs2::action::CalibrateDragNew;
         using CalibrateDragGH = rclcpp_action::ClientGoalHandle<CalibrateDrag>;
 
@@ -56,6 +58,8 @@ namespace riptide_rviz
 
         // ROS timer callbacks
         void sendKillMsgTimer();
+
+        enum control_modes {DISABLED, FEEDFORWARD, POSITION, VELOCITY, TELEOP = 255};
 
     protected Q_SLOTS:
         // QT slots (function callbacks)
@@ -95,7 +99,9 @@ namespace riptide_rviz
         void setptMarkerFeedback(interactive_markers::InteractiveMarkerServer::FeedbackConstSharedPtr feedback);
         void updateCalStatus(const std::string& status);
         void callTriggerService(rclcpp::Client<Trigger>::SharedPtr client);
+        void callSetBoolService(rclcpp::Client<SetBool>::SharedPtr client, bool value);
         void waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client);
+        void waitForSetBoolResponse(rclcpp::Client<SetBool>::SharedPtr client);
         void setDragCalRunning(bool running);
         void dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle);
         void dragResultCb(const CalibrateDragGH::WrappedResult &result);
@@ -150,8 +156,10 @@ namespace riptide_rviz
         rclcpp::Client<Trigger>::SharedPtr 
             reloadSolverClient,
             reloadActiveClient;
+        rclcpp::Client<SetBool>::SharedPtr setTeleopClient;
         
         std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;
+        std::shared_future<SetBool::Response::SharedPtr> activeSetBoolClientFuture;
         int64_t srvReqId;
         rclcpp::Time clientSendTime;
 
