@@ -386,7 +386,7 @@ namespace riptide_rviz
                 uiPanel->ctrlModeFFD->setEnabled(true);
                 uiPanel->ctrlModeVel->setEnabled(true);
                 uiPanel->ctrlModePos->setEnabled(true);
-                uiPanel->ctrlModeTele->setEnabled(true);
+                uiPanel->ctrlModeTele->setEnabled(false);
 
                 setptServer->erase(interactiveSetpointMarker.name);
                 setptServer->applyChanges();
