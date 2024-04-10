@@ -66,7 +66,7 @@ namespace riptide_rviz
             std::bind(&MissionPanel::stackCb, this, _1));
 
         ledSub = node->create_subscription<riptide_msgs2::msg::LedCommand>(
-            robot_ns + "/command/led", rclcpp::SystemDefaultsQoS(),
+            robot_ns + "/command/led", 10,
             std::bind(&MissionPanel::ledCb, this, _1));
 
         refreshClient = node->create_client<riptide_msgs2::srv::ListTrees>(robot_ns + "/autonomy/list_trees");
