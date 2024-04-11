@@ -528,7 +528,7 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
             </layout>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit">
+            <widget class="QLineEdit" name="lineEditX">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -576,7 +576,7 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
             </layout>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_4">
+            <widget class="QLineEdit" name="lineEditY">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -627,7 +627,7 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
             </layout>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_5">
+            <widget class="QLineEdit" name="lineEditZ">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -675,7 +675,7 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
             </layout>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_3">
+            <widget class="QLineEdit" name="lineEditRoll">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -723,7 +723,7 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
             </layout>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_6">
+            <widget class="QLineEdit" name="lineEditPitch">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -771,7 +771,7 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
             </layout>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_2">
+            <widget class="QLineEdit" name="lineEditYaw">
              <property name="enabled">
               <bool>false</bool>
              </property>
