@@ -17,6 +17,7 @@ find_package(tinyxml2_vendor REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(launch_msgs REQUIRED)
 find_package(riptide_msgs2 REQUIRED)
+find_package(robot_localization REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -103,6 +104,7 @@ ament_target_dependencies(${PROJECT_NAME}
   diagnostic_msgs
   chameleon_tf_msgs
   vectornav_msgs
+  robot_localization
 )
 
 # Link non ament packages
