@@ -2,6 +2,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <diagnostic_msgs/msg/key_value.hpp>
 #include <chrono>
 #include <algorithm>
 #include <iostream>
@@ -179,6 +180,9 @@ namespace riptide_rviz
         steadySub = node->create_subscription<std_msgs::msg::Bool>(
             robot_ns + "/controller/steady", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::steadyCallback, this, _1));
+        diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+            "/diagnostics", rclcpp::SystemDefaultsQoS(),
+            std::bind(&ControlPanel::diagCallback, this, _1));
 
         //create service clients
         reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_ts_params");
@@ -708,6 +712,51 @@ namespace riptide_rviz
         uiPanel->cmdSteady->setEnabled(msg.data);
     }
 
+    void ControlPanel::diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg){
+        
+        //add in color changing for boxes...
+        
+        
+        if(sizeof(msg.status) != 0 ){
+
+            if(msg.status[0].name.find("ekf") != std::string::npos){
+                //pull status from ekf message
+
+                for(int i = 0; i < (sizeof(msg.status[1].values) / 6); i++){
+
+                    //odom frequency
+                    if(msg.status[1].values[i].key.find("Actual frequency") != std::string::npos){
+                        uiPanel->OdomDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
+                    }
+                }
+            }else if(msg.status[0].name.find("Controller") != std::string::npos){
+
+                for(int i = 0; i < (sizeof(msg.status[0].values) / 6); i++){
+
+                    //active control frequency
+                    if(msg.status[0].values[i].key.find("Active Control") != std::string::npos){
+                        uiPanel->ACDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //thruster flip rate
+                    if(msg.status[0].values[i].key.find("Flips Frequency") != std::string::npos){
+                        uiPanel->FlipDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //system limit saturation
+                    if(msg.status[0].values[i].key.find("System Limit") != std::string::npos){
+                        uiPanel->SLDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //individual limit saturation
+                    if(msg.status[0].values[i].key.find("Individual Limit") != std::string::npos){
+                        uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+            
+                }         
+            }         
+        }
+    }
     // ROS timer callbacks
     void ControlPanel::sendKillMsgTimer()
     {

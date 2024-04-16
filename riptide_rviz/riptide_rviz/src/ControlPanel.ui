@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>636</width>
-    <height>589</height>
+    <width>634</width>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -710,17 +710,10 @@ QLabel:!enabled{color: red;}</string>
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Calibration and Tuning</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Status:</string>
+         <string>Drag Calibration</string>
         </property>
        </widget>
       </item>
@@ -731,26 +724,24 @@ QLabel:!enabled{color: red;}</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QPushButton" name="dragStop">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {color: white; background:red;}
-
-QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
-        </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>Stop</string>
+         <string>Parameter Reload</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_5">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="reloadSolver">
         <property name="text">
-         <string>Drag Calibration</string>
+         <string>Reload Solver</string>
         </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QStackedWidget" name="stackedWidget">
+        <widget class="QWidget" name="page"/>
+        <widget class="QWidget" name="page_2"/>
        </widget>
       </item>
       <item row="5" column="0">
@@ -763,6 +754,20 @@ QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
         </property>
        </widget>
       </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="reloadActive">
+        <property name="text">
+         <string>Reload Active</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Calibration and Tuning</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="1">
        <widget class="QPushButton" name="dragStart">
         <property name="styleSheet">
@@ -771,6 +776,13 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
         </property>
         <property name="text">
          <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Status:</string>
         </property>
        </widget>
       </item>
@@ -808,27 +820,18 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
         </item>
        </widget>
       </item>
-      <item row="7" column="0" colspan="4">
-       <widget class="QTextBrowser" name="calStatus"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string>Parameter Reload</string>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="dragStop">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="reloadActive">
-        <property name="text">
-         <string>Reload Active</string>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {color: white; background:red;}
+
+QPushButton:!enabled{color:white; background: rgb(140, 100, 100)}</string>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="reloadSolver">
         <property name="text">
-         <string>Reload Solver</string>
+         <string>Stop</string>
         </property>
        </widget>
       </item>
@@ -836,17 +839,151 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>134</height>
-      </size>
-     </property>
-    </spacer>
+     <widget class="QWidget" name="Status">
+      <attribute name="title">
+       <string>Status</string>
+      </attribute>
+      <widget class="QTextBrowser" name="calStatus">
+       <property name="geometry">
+        <rect>
+         <x>-10</x>
+         <y>-10</y>
+         <width>618</width>
+         <height>136</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="ControllerDiagnostics">
+      <attribute name="title">
+       <string>Controller Dianostics</string>
+      </attribute>
+      <widget class="QWidget" name="horizontalLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>7</y>
+         <width>591</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Active Control Rate</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="ACDiagnostics">
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Odometry Rate</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="OdomDiagnostics">
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>Flip Rate</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="FlipDiagnostics">
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>System Limit</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="SLDiagnostics">
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetFixedSize</enum>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Individual Limit</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="ILDiagnostics">
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -884,7 +1021,6 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
   <tabstop>dragStop</tabstop>
   <tabstop>dragTrigger</tabstop>
   <tabstop>dragCalStartAxis</tabstop>
-  <tabstop>calStatus</tabstop>
  </tabstops>
  <resources/>
  <connections/>

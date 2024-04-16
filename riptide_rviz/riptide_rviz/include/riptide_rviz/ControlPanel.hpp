@@ -10,6 +10,7 @@
 #include <std_msgs/msg/empty.hpp>
 #include <std_srvs/srv/trigger.hpp>
 #include <std_srvs/srv/set_bool.hpp>
+#include <diagnostic_msgs/msg/diagnostic_array.hpp>
 
 #include <interactive_markers/interactive_marker_server.hpp>
 
@@ -54,6 +55,7 @@ namespace riptide_rviz
         // ROS Subscriber callbacks
         void odomCallback(const nav_msgs::msg::Odometry &msg);
         void steadyCallback(const std_msgs::msg::Bool &msg);
+        void diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg);
         void selectedPose(const geometry_msgs::msg::PoseStamped & msg);
 
         // ROS timer callbacks
@@ -150,6 +152,7 @@ namespace riptide_rviz
         // ROS Subscribers
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr steadySub;
+        rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagSub;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr selectPoseSub;
 
         //service clients
