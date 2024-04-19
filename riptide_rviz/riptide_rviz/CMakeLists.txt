@@ -103,7 +103,6 @@ ament_target_dependencies(${PROJECT_NAME}
   launch_msgs
   diagnostic_msgs
   chameleon_tf_msgs
-  vectornav_msgs
   robot_localization
   interactive_markers
   riptide_meshes
@@ -113,8 +112,8 @@ if(zed_interfaces_FOUND)
   ament_target_dependencies(${PROJECT_NAME}
     zed_interfaces)
   
-  target_compile_definitions(${PROJECT_NAME} PUBLIC
-    USE_ZED_INTERFACES)
+#  target_compile_definitions(${PROJECT_NAME} PUBLIC
+#    USE_ZED_INTERFACES)
 endif()
 
 # Link non ament packages
