@@ -6,14 +6,19 @@
 #include <riptide_msgs2/msg/kill_switch_report.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
-#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/int8.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_srvs/srv/trigger.hpp>
+
+#include <interactive_markers/interactive_marker_server.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
 #include <rviz_common/panel.hpp>
 #include <rviz_common/config.hpp>
+
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 
 #include <riptide_msgs2/action/calibrate_drag_new.hpp>
 
@@ -23,10 +28,9 @@
 //
 // CONTROLLER SELECTION
 //
-#define OLD (0)
-#define SMC (1)
-#define PID (2)
-#define CONTROLLER_TYPE PID
+#define CONTROLLER_CMD (0)
+#define TARGET_POSITION (1)
+#define CONTROLLER_OUTPUT_TYPE CONTROLLER_CMD
 
 namespace riptide_rviz
 {
@@ -47,7 +51,7 @@ namespace riptide_rviz
 
         // ROS Subscriber callbacks
         void odomCallback(const nav_msgs::msg::Odometry &msg);
-        void steadyCallback(const std_msgs::msg::Bool &msg);
+        void limitsCallback(const std_msgs::msg::Int8 &msg);
         void selectedPose(const geometry_msgs::msg::PoseStamped & msg);
 
         // ROS timer callbacks
@@ -67,21 +71,27 @@ namespace riptide_rviz
         // slots for sending commands to the vehicle
         void handleLocalDive();
         void handleCurrent();
-        void handleCommand();
+        void handleCommand(bool updateInteractiveMarker);
 
         //slots for parameter relaod buttons
-        void handleReloadSolver();
-        void handleReloadActive();
+        void handleReloadController();
 
         //slots for drag cal buttons
         void handleStartDragCal();
         void handleStopDragCal();
         void handleTriggerDragCal();
 
+        //publish the current set point
+        void pubCurrentSetpoint();
+
     protected:
         bool event(QEvent *event);
 
     private:
+        bool transformBetweenFrames(geometry_msgs::msg::Pose pose_in, geometry_msgs::msg::Pose& pose_out, const std::string& from_frame, const std::string& to_frame);
+        bool getDesiredSetpointFromTextboxes(double results[6]);
+        void syncSetptMarkerToTextboxes(bool applyChanges = true);
+        void setptMarkerFeedback(interactive_markers::InteractiveMarkerServer::FeedbackConstSharedPtr feedback);
         void updateCalStatus(const std::string& status);
         void callTriggerService(rclcpp::Client<Trigger>::SharedPtr client);
         void waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client);
@@ -114,11 +124,9 @@ namespace riptide_rviz
         QTimer *uiTimer;
 
         // publishers
-        #if CONTROLLER_TYPE == OLD
+        #if CONTROLLER_TYPE == CONTROLLER_CMD
             rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;
-        #elif CONTROLLER_TYPE == SMC
-
-        #elif CONTROLLER_TYPE == PID
+        #elif CONTROLLER_TYPE == TARGET_POSITION
             rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pidSetptPub;
         #endif
 
@@ -127,16 +135,22 @@ namespace riptide_rviz
 
         // ROS Timers
         rclcpp::TimerBase::SharedPtr killPubTimer;
+        rclcpp::TimerBase::SharedPtr setPointPubTimer;
+
+        //Last Commanded position
+        geometry_msgs::msg::Pose lastCommandedPose;
 
         // ROS Subscribers
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
-        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr steadySub;
+        rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr limitsSub;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr selectPoseSub;
 
         //service clients
         rclcpp::Client<Trigger>::SharedPtr 
             reloadSolverClient,
-            reloadActiveClient;
+            reloadSmcClient,
+            reloadPidClient,
+            reloadCompleteClient;
         
         std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;
         int64_t srvReqId;
@@ -144,6 +158,14 @@ namespace riptide_rviz
 
         // action clients
         rclcpp_action::Client<CalibrateDrag>::SharedPtr calibrateDrag;
+
+        //interactive marker server
+        std::shared_ptr<interactive_markers::InteractiveMarkerServer> setptServer;
+        visualization_msgs::msg::InteractiveMarker interactiveSetpointMarker;
+
+        //tf buffer and listener
+        std::shared_ptr<tf2_ros::Buffer> tf_buffer;
+        std::shared_ptr<tf2_ros::TransformListener> tf_listener;
     };
 
 } // namespace riptide_rviz

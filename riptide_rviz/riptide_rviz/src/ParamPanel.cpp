@@ -163,9 +163,7 @@ namespace riptide_rviz
 
     }
 
-    void ParamPanel::createParams(std::vector<rclcpp::Parameter> params){
-        
-        
+    void ParamPanel::createParams(std::vector<rclcpp::Parameter> params){ 
         for(rclcpp::Parameter param : params){
 
             QHBoxLayout* hBox = new QHBoxLayout();
@@ -380,7 +378,7 @@ namespace riptide_rviz
             params.push_back(label->text().toStdString());
         }
 
-        std::vector<rclcpp::ParameterType> paramType = this->param_client->get_parameter_types(params);
+        std::vector<rclcpp::ParameterType> paramType = this->param_client->get_parameter_types(params, 1s);
 
         std::vector<rclcpp::Parameter> newParams;
 
@@ -511,7 +509,7 @@ namespace riptide_rviz
 
             }
 
-            this->param_client->set_parameters(newParams);
+            this->param_client->set_parameters(newParams, 1s);
 
         }
 

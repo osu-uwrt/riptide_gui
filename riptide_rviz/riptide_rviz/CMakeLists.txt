@@ -23,8 +23,10 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(chameleon_tf_msgs REQUIRED)
-find_package(vectornav_msgs REQUIRED)
+find_package(interactive_markers REQUIRED)
+find_package(riptide_meshes REQUIRED)
 
+find_package(zed_interfaces QUIET) #not required because we will handle it if we cant find this. Its only installed on certain computers
 
 # rviz specific deps
 find_package(rviz_common REQUIRED)
@@ -90,10 +92,8 @@ ament_target_dependencies(${PROJECT_NAME}
   rclcpp_action
   ament_index_cpp
   tf2
-
   rviz_common 
   rviz_rendering 
-
   riptide_msgs2
   tf2_geometry_msgs
   geometry_msgs
@@ -105,7 +105,17 @@ ament_target_dependencies(${PROJECT_NAME}
   chameleon_tf_msgs
   vectornav_msgs
   robot_localization
+  interactive_markers
+  riptide_meshes
 )
+
+if(zed_interfaces_FOUND)
+  ament_target_dependencies(${PROJECT_NAME}
+    zed_interfaces)
+  
+  target_compile_definitions(${PROJECT_NAME} PUBLIC
+    USE_ZED_INTERFACES)
+endif()
 
 # Link non ament packages
 target_link_libraries(${PROJECT_NAME} 
@@ -132,7 +142,6 @@ ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(
   rclcpp
   rclcpp_action
-  launch_msgs
   rviz_ogre_vendor
   resource_retriever
   ament_index_cpp
@@ -157,10 +166,10 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch recipies
+install(DIRECTORY launch recipes
   DESTINATION share/${PROJECT_NAME})
 
-install(DIRECTORY tests/recipies
+install(DIRECTORY tests/recipes
   DESTINATION share/${PROJECT_NAME}/tests)
 
 install(TARGETS recipe_parser_test
