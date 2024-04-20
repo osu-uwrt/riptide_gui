@@ -312,9 +312,6 @@
            <property name="enabled">
             <bool>true</bool>
            </property>
-           <property name="markdown">
-            <string/>
-           </property>
           </widget>
          </item>
         </layout>

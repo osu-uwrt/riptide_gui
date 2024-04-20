@@ -4,13 +4,18 @@ import os
 
 import rclpy
 import enum
+import numpy
+from math import atan2
 from ament_index_python import get_package_share_directory
-from geometry_msgs.msg import Point, Pose, Quaternion, Vector3
+from geometry_msgs.msg import Point, Pose, Quaternion, Vector3, PoseStamped, PoseWithCovarianceStamped
+from vision_msgs.msg import Detection3DArray
 from nav_msgs.msg import Odometry
 from rclpy.duration import Duration
 from rclpy.node import Node
 from std_msgs.msg import ColorRGBA
+from tf2_ros import Buffer, TransformListener
 from transforms3d.euler import euler2quat
+from transforms3d.quaternions import qmult
 from visualization_msgs.msg import Marker, MarkerArray
 
 class ControllerType(enum.Enum):
@@ -18,6 +23,10 @@ class ControllerType(enum.Enum):
     TARGET_POSITION = 1
     
 CONTROLLER_TYPE = ControllerType.CONTROLLER_CMD
+
+STALE_TIME = 0.25
+STALE_SECONDS = int(STALE_TIME)
+STALE_NSECONDS = (STALE_TIME - STALE_SECONDS) * 1e9
 
 # import controller msgs and set topic names
 if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
@@ -32,6 +41,9 @@ elif CONTROLLER_TYPE == ControllerType.TARGET_POSITION:
 CONFIG_FILE = os.path.join(get_package_share_directory("riptide_rviz"), "config", "markers.yaml")
 ODOMETRY_TOPIC = "odometry/filtered"
 SIM_TOPIC = "simulator/state"
+DET_TOPIC = "detected_objects"
+
+OPTICAL_TO_NORMAL_ROT = [0.0, -1.5707, 1.5707]
 
 
 def toPoint(v: Vector3) -> Point:
@@ -63,11 +75,12 @@ def poseFromArr(d) -> Pose:
 
 
 class MarkerInfo:
-    def __init__(self, mesh: str, frame: str, scale: float, pose: 'list[float]'):
+    def __init__(self, mesh: str, frame: str, scale: 'list[float]', pose: 'list[float]', color: 'list[float]'):
         self.mesh   = mesh
         self.frame  = frame
         self.scale  = scale
         self.pose   = pose
+        self.color  = color
     
 
 class MarkerPublisher(Node):
@@ -83,12 +96,14 @@ class MarkerPublisher(Node):
         #configure ghost tempest vars
         self.latestOdom = Odometry()
         self.latestSimPose = Pose()
+        self.latestDetections: dict[str, PoseStamped] = {} #use dict instead of list to easily match detections by object
         
         #configure ros pub subs
         self.markerPub = self.create_publisher(MarkerArray, self.markerTopic, 10)
         self.odomSub = self.create_subscription(Odometry, ODOMETRY_TOPIC, self.odomCB, 10)
         self.simSub = self.create_subscription(Pose, SIM_TOPIC, self.simCB, 10)
-    
+        self.detSub = self.create_subscription(Detection3DArray, DET_TOPIC, self.detectionCB, 10)
+       
         #controller command subs
         if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
             self.linearSub = self.create_subscription(ControllerCommand, LINEAR_CMD_TOPIC, self.linearCB, 10)
@@ -96,11 +111,11 @@ class MarkerPublisher(Node):
             self.latestLinearCmd = ControllerCommand()
             self.latestAngularCmd = ControllerCommand()
         elif CONTROLLER_TYPE == ControllerType.TARGET_POSITION:
-            self.setptSub = self.create_subscription(Pose, PID_SETPT_TOPIC, self.setptCb, 10)
+            self.setptSub = self.create_subscription(PoseWithCovarianceStamped, PID_SETPT_TOPIC, self.setptCb, 10)
             self.latestSetpt = Pose()
         
         self.get_logger().info("Marker Publisher node started.")
-        
+                
     
     def declareAndReceiveParam(self, name: str, default):
         self.declare_parameter(name, default)
@@ -110,8 +125,7 @@ class MarkerPublisher(Node):
     def hasParametersForMarker(self, idx):
         return \
             self.markers[idx].mesh != "" and \
-            self.markers[idx].frame != "" and \
-            self.markers[idx].scale > 0
+            self.markers[idx].frame != ""
     
     
     def readParameters(self):
@@ -127,8 +141,9 @@ class MarkerPublisher(Node):
             MarkerInfo(
                 self.declareAndReceiveParam("markers.marker0.mesh", ""),
                 self.declareAndReceiveParam("markers.marker0.frame", ""),
-                self.declareAndReceiveParam("markers.marker0.scale", 0.0),
-                self.declareAndReceiveParam("markers.marker0.pose", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+                self.declareAndReceiveParam("markers.marker0.scale", [1.0, 1.0, 1.0]),
+                self.declareAndReceiveParam("markers.marker0.pose", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                self.declareAndReceiveParam("markers.marker0.color", [0.0, 0.0, 0.0, 0.0])
             )
         ]
         
@@ -138,8 +153,9 @@ class MarkerPublisher(Node):
                 MarkerInfo(
                     self.declareAndReceiveParam(f"markers.marker{markerIdx}.mesh", ""),
                     self.declareAndReceiveParam(f"markers.marker{markerIdx}.frame", ""),
-                    self.declareAndReceiveParam(f"markers.marker{markerIdx}.scale", 0.0),
-                    self.declareAndReceiveParam(f"markers.marker{markerIdx}.pose", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+                    self.declareAndReceiveParam(f"markers.marker{markerIdx}.scale", [1.0, 1.0, 1.0]),
+                    self.declareAndReceiveParam(f"markers.marker{markerIdx}.pose", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                    self.declareAndReceiveParam(f"markers.marker{markerIdx}.color", [0.0, 0.0, 0.0, 0.0])
                 )
             )
 
@@ -151,7 +167,6 @@ class MarkerPublisher(Node):
         def linearCB(self, msg):
             self.latestLinearCmd = msg
             
-            
         def angularCB(self, msg):
             self.latestAngularCmd = msg
     elif CONTROLLER_TYPE == ControllerType.TARGET_POSITION:
@@ -161,9 +176,35 @@ class MarkerPublisher(Node):
     def simCB(self, msg):
         self.latestSimPose = msg
 
-    def odomCB(self, msg):
+    def odomCB(self, msg: Odometry):
         self.latestOdom = msg
-        
+    
+    def detectionCB(self, msg: Detection3DArray):
+        for detection in msg.detections:
+            result = detection.results[0]
+            
+            if not result.hypothesis.class_id in self.latestDetections:
+                self.latestDetections[result.hypothesis.class_id] = PoseStamped()
+                
+            self.latestDetections[result.hypothesis.class_id].header = detection.header
+            self.latestDetections[result.hypothesis.class_id].pose.position = result.pose.pose.position
+            
+            #there are two things we need to address about this orientation. First, it is reported in a "z-out" frame
+            #so we need to apply a rotation in the yaw in order for the arrow to point in the right direction (without
+            #a rotation, the arrow reports the roll). To fix, need to switch x and z axes of quaternion and negate one
+            #of them for handedness, then rotate quaternion so arrow points in the right direction.
+            
+            #this axis flip thing was brought to you by chatgpt :)
+            originalOrientation = [result.pose.pose.orientation.w, result.pose.pose.orientation.z,
+                                result.pose.pose.orientation.y, -result.pose.pose.orientation.x]
+            
+            rotationQuat = euler2quat(OPTICAL_TO_NORMAL_ROT[0], OPTICAL_TO_NORMAL_ROT[1], OPTICAL_TO_NORMAL_ROT[2])
+            
+            rotatedOrientation = qmult(rotationQuat, originalOrientation)
+            
+            self.latestDetections[result.hypothesis.class_id].pose.orientation = Quaternion(w=rotatedOrientation[0], x=rotatedOrientation[1],
+                                                                                            y=rotatedOrientation[2], z=rotatedOrientation[3])
+                        
         
     def timerCB(self):
         array = MarkerArray()
@@ -174,17 +215,54 @@ class MarkerPublisher(Node):
             marker.header.stamp = self.get_clock().now().to_msg()
             marker.ns = "mapping_markers"
             marker.id = i
-            marker.type = Marker.MESH_RESOURCE
             marker.action = Marker.MODIFY
             marker.pose = poseFromArr(markerInfo.pose)
-            marker.scale = Vector3(x=markerInfo.scale, y=markerInfo.scale, z=markerInfo.scale)
+            marker.scale = Vector3(x=markerInfo.scale[0], y=markerInfo.scale[1], z=markerInfo.scale[2])
+            marker.color.r = markerInfo.color[0]
+            marker.color.g = markerInfo.color[1]
+            marker.color.b = markerInfo.color[2]
+            marker.color.a = markerInfo.color[3]
             marker.lifetime = Duration().to_msg() #forever
             marker.frame_locked = True
-            marker.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, markerInfo.mesh, "model.dae")
-            marker.mesh_use_embedded_materials = True
+            
+            if markerInfo.mesh == "arrow":
+                marker.type = Marker.ARROW
+            elif markerInfo.mesh == "sphere":
+                marker.type = Marker.SPHERE
+            elif markerInfo.mesh == "cube":
+                marker.type = Marker.CUBE
+            else:
+                marker.type = Marker.MESH_RESOURCE
+                marker.mesh_resource = "file://" + os.path.join(get_package_share_directory(self.meshPkg), self.meshDir, markerInfo.mesh, "model.dae")
+                marker.mesh_use_embedded_materials = True
             
             array.markers.append(marker)
-        
+            
+        #publish green arrows for recent detections
+        detectionNames = list(self.latestDetections.keys())
+        for i in range(0, len(detectionNames)):
+            pose = self.latestDetections[detectionNames[i]]
+            marker = Marker()
+            marker.header = pose.header
+            marker.ns = "detections"
+            marker.id = i
+            marker.type = Marker.ARROW
+            marker.scale = Vector3(x=1.0, y=0.05, z=0.05)
+            marker.color = ColorRGBA(r=0.0, g=1.0, b=0.0, a=1.0)
+            marker.lifetime = Duration(seconds=STALE_SECONDS, nanoseconds=STALE_NSECONDS).to_msg()
+            
+            current_time = self.get_clock().now()
+            elapsed_nanoseconds = current_time.nanoseconds - (pose.header.stamp.sec * 1e9) - pose.header.stamp.nanosec
+            elapsed_seconds = elapsed_nanoseconds / float(1e9)
+            
+            if elapsed_seconds < STALE_TIME: 
+                marker.action = Marker.MODIFY
+            else:
+                marker.action = Marker.DELETE
+            
+            marker.pose = pose.pose
+            array.markers.append(marker)
+
 
         #publish ghost talos of sim true position
         simGhost = Marker()
