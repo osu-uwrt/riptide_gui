@@ -6,7 +6,7 @@
 #include <riptide_msgs2/msg/kill_switch_report.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
-#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/int8.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_srvs/srv/trigger.hpp>
 #include <std_srvs/srv/set_bool.hpp>
@@ -32,7 +32,7 @@
 //
 #define CONTROLLER_CMD (0)
 #define TARGET_POSITION (1)
-#define CONTROLLER_TYPE CONTROLLER_CMD 
+#define CONTROLLER_OUTPUT_TYPE CONTROLLER_CMD
 
 namespace riptide_rviz
 {
@@ -80,8 +80,7 @@ namespace riptide_rviz
         void handleCommand(bool updateInteractiveMarker);
 
         //slots for parameter relaod buttons
-        void handleReloadSolver();
-        void handleReloadActive();
+        void handleReloadController();
 
         //slots for drag cal buttons
         void handleStartDragCal();
@@ -158,7 +157,10 @@ namespace riptide_rviz
         //service clients
         rclcpp::Client<Trigger>::SharedPtr 
             reloadSolverClient,
-            reloadActiveClient;
+            reloadSmcClient,
+            reloadPidClient,
+            reloadCompleteClient;
+
         rclcpp::Client<SetBool>::SharedPtr setTeleopClient;
         
         std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;

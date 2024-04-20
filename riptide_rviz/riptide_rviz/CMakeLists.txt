@@ -23,6 +23,7 @@ find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(chameleon_tf_msgs REQUIRED)
 find_package(interactive_markers REQUIRED)
+find_package(riptide_meshes REQUIRED)
 
 
 # rviz specific deps
@@ -101,6 +102,7 @@ ament_target_dependencies(${PROJECT_NAME}
   diagnostic_msgs
   chameleon_tf_msgs
   interactive_markers
+  riptide_meshes
 )
 
 # Link non ament packages

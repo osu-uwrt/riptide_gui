@@ -6,8 +6,9 @@ Panels:
       Expanded:
         - /TF1/Frames1
         - /MarkerArray1/Namespaces1
+        - /Dummy Detections1/TorpedoOpenHole1/Status1
       Splitter Ratio: 0.6578249335289001
-    Tree Height: 419
+    Tree Height: 386
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -152,11 +153,12 @@ Visualization Manager:
           Value: true
         zed_camera_link:
           Value: true
+
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: false
+      Show Names: true
       Tree:
         map:
           buoy_frame:
@@ -213,7 +215,7 @@ Visualization Manager:
                 talos/zed_camera_link_base_link:
                   {}
                 zed_camera_link:
-                  {}
+                  {
               talos/pose_sensor_link:
                 {}
       Update Interval: 0
@@ -326,7 +328,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        talos/zed_camera_link_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -347,6 +348,7 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
+        ghost: true
         mapping_markers: true
         simGhost: true
       Topic:
@@ -565,7 +567,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo
+          Name: Torpedo Open
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -575,7 +577,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo
+            Value: /talos/mapping/torpedo_open
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -600,7 +602,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo Upper Hole
+          Name: Torpedo Open Hole
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -610,7 +612,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_upper_hole
+            Value: /talos/mapping/torpedo_open_hole
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -635,7 +637,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo Lower Hole
+          Name: Torpedo Closed
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -645,7 +647,42 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_lower_hole
+            Value: /talos/mapping/torpedo_closed
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Torpedo Closed Hole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/torpedo_closed_hole
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1040,7 +1077,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo
+          Name: TorpedoOpen
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1050,7 +1087,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo
+            Value: /talos/dummydetections/torpedo_open
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1075,7 +1112,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoLowerHole
+          Name: TorpedoOpenHole
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1085,7 +1122,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_lower_hole
+            Value: /talos/dummydetections/torpedo_open_hole
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1110,7 +1147,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoUpperHole
+          Name: TorpedoClosed
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1120,7 +1157,42 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_upper_hole
+            Value: /talos/dummydetections/torpedo_closed
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: TorpedoClosedHole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/torpedo_closed_hole
           Value: true
       Enabled: true
       Name: Dummy Detections
