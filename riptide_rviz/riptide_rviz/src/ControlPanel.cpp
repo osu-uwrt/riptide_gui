@@ -2,6 +2,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <diagnostic_msgs/msg/key_value.hpp>
 #include <chrono>
 #include <algorithm>
 #include <iostream>
@@ -55,7 +56,7 @@ namespace riptide_rviz
         uiPanel->setupUi(this);
 
         // create the default message
-        ctrlMode = riptide_msgs2::msg::ControllerCommand::DISABLED;
+        ctrlMode = riptide_rviz::ControlPanel::control_modes::DISABLED;
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Constructed control panel");
     }
@@ -70,16 +71,16 @@ namespace riptide_rviz
         // mode seting buttons
         connect(uiPanel->ctrlModePos, &QPushButton::clicked,
                 [this](void)
-                { switchMode(riptide_msgs2::msg::ControllerCommand::POSITION); });
+                { switchMode(riptide_rviz::ControlPanel::control_modes::POSITION); });
         connect(uiPanel->ctrlModeVel, &QPushButton::clicked,
                 [this](void)
-                { switchMode(riptide_msgs2::msg::ControllerCommand::VELOCITY); });
+                { switchMode(riptide_rviz::ControlPanel::control_modes::VELOCITY); });
         connect(uiPanel->ctrlModeFFD, &QPushButton::clicked,
                 [this](void)
-                { switchMode(riptide_msgs2::msg::ControllerCommand::FEEDFORWARD); });
+                { switchMode(riptide_rviz::ControlPanel::control_modes::FEEDFORWARD); });
         connect(uiPanel->ctrlModeTele, &QPushButton::clicked,
                 [this](void)
-                { RVIZ_COMMON_LOG_INFO("ControlPanel: bad button >:("); });
+                { switchMode(riptide_rviz::ControlPanel::control_modes::TELEOP); });
 
         // command sending buttons
         connect(uiPanel->ctrlDiveInPlace, &QPushButton::clicked, this, &ControlPanel::handleLocalDive);
@@ -175,10 +176,9 @@ namespace riptide_rviz
         odomSub = node->create_subscription<nav_msgs::msg::Odometry>(
             robot_ns + "/odometry/filtered", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::odomCallback, this, _1));
-        
-        limitsSub = node->create_subscription<std_msgs::msg::Int8>(
-            robot_ns + "/state/controller/limits", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::limitsCallback, this, _1));
+        diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+            "/diagnostics", rclcpp::SystemDefaultsQoS(),
+            std::bind(&ControlPanel::diagCallback, this, _1));        
 
         //create service clients
         reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_thruster_solver_params");
@@ -191,6 +191,9 @@ namespace riptide_rviz
 
         //interactive marker for setpoint
         setptServer = std::make_shared<interactive_markers::InteractiveMarkerServer>("interactive_setpoint", node);
+
+        //initialize telop server
+        setTeleopClient = node->create_client<SetBool>(robot_ns + "/setTeleop");
         
         interactiveSetpointMarker.header.frame_id = "world",
         interactiveSetpointMarker.header.stamp = node->get_clock()->now();
@@ -323,11 +326,11 @@ namespace riptide_rviz
         uiPanel->ctrlDisable->setEnabled(false);
 
         // clear the controller command mode
-        switchMode(riptide_msgs2::msg::ControllerCommand::DISABLED, true);
+        switchMode(riptide_rviz::ControlPanel::control_modes::DISABLED, true);
 
         //disable controllers
         riptide_msgs2::msg::ControllerCommand disableCmd;
-        disableCmd.mode = riptide_msgs2::msg::ControllerCommand::DISABLED;
+        disableCmd.mode = riptide_rviz::ControlPanel::control_modes::DISABLED;
         ctrlCmdLinPub->publish(disableCmd);
         ctrlCmdAngPub->publish(disableCmd);
     }
@@ -337,9 +340,14 @@ namespace riptide_rviz
         // check the vehicle is enabled or we are overriding
         if(vehicleEnabled || override) {
             ctrlMode = mode;
+            visualization_msgs::msg::InteractiveMarker testMarker;
+
+
             switch (ctrlMode)
             {
-            case riptide_msgs2::msg::ControllerCommand::POSITION:
+            case riptide_rviz::ControlPanel::control_modes::POSITION:
+                RVIZ_COMMON_LOG_INFO("ControlPanel: Starting Position Control");
+
                 uiPanel->ctrlModeFFD->setEnabled(true);
                 uiPanel->ctrlModeVel->setEnabled(true);
                 uiPanel->ctrlModePos->setEnabled(false);
@@ -351,21 +359,45 @@ namespace riptide_rviz
 
                 syncSetptMarkerToTextboxes(false);
                 setptServer->applyChanges();
+
+                callSetBoolService(this->setTeleopClient, false);
                 break;
-            case riptide_msgs2::msg::ControllerCommand::VELOCITY:
+            case riptide_rviz::ControlPanel::control_modes::VELOCITY:
                 uiPanel->ctrlModeFFD->setEnabled(true);
                 uiPanel->ctrlModeVel->setEnabled(false);
                 uiPanel->ctrlModePos->setEnabled(true);
                 uiPanel->ctrlModeTele->setEnabled(true);
 
+                callSetBoolService(this->setTeleopClient, false);
                 break;
-            case riptide_msgs2::msg::ControllerCommand::FEEDFORWARD:
+            case riptide_rviz::ControlPanel::control_modes::FEEDFORWARD:
                 uiPanel->ctrlModeFFD->setEnabled(false);
                 uiPanel->ctrlModeVel->setEnabled(true);
                 uiPanel->ctrlModePos->setEnabled(true);
                 uiPanel->ctrlModeTele->setEnabled(true);
+
+                callSetBoolService(this->setTeleopClient, false);
                 break;
-            case riptide_msgs2::msg::ControllerCommand::DISABLED:
+
+            case riptide_rviz::ControlPanel::control_modes::TELEOP:
+                //call service to enable teleop
+                RVIZ_COMMON_LOG_INFO("ControlPanel: Starting Teleop");
+
+                callSetBoolService(this->setTeleopClient, true);
+
+                uiPanel->ctrlModeFFD->setEnabled(true);
+                uiPanel->ctrlModeVel->setEnabled(true);
+                uiPanel->ctrlModePos->setEnabled(true);
+                uiPanel->ctrlModeTele->setEnabled(false);
+
+                setptServer->erase(interactiveSetpointMarker.name);
+                setptServer->applyChanges();
+                break;
+
+            case riptide_rviz::ControlPanel::control_modes::DISABLED:
+
+                RVIZ_COMMON_LOG_INFO("ControlPanel: Disabled Control");
+
                 uiPanel->ctrlModeFFD->setEnabled(true);
                 uiPanel->ctrlModeVel->setEnabled(true);
                 uiPanel->ctrlModePos->setEnabled(true);
@@ -374,6 +406,7 @@ namespace riptide_rviz
                 setptServer->erase(interactiveSetpointMarker.name);
                 setptServer->applyChanges();
                 break;
+
             default:
                 RVIZ_COMMON_LOG_ERROR("ControlPanel: Button not yet operable");
                 break;
@@ -515,7 +548,7 @@ namespace riptide_rviz
         // geometry_msgs::msg::Vector3 angularVelocity;
         
         // if we are in position, we use quat, otherwise use the vector
-        if (ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
+        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION)
         {
             // check the angle mode button
             if(degreeReadout){
@@ -567,8 +600,9 @@ namespace riptide_rviz
             // send the control messages
             ctrlCmdLinPub->publish(linCmd);
             ctrlCmdAngPub->publish(angCmd);
+
         #elif CONTROLLER_OUTPUT_TYPE == TARGET_POSITION
-            if(ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION)
+            if(ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION)
             {
                 geometry_msgs::msg::Pose setpt;
                 setpt.position = linear;
@@ -639,25 +673,11 @@ namespace riptide_rviz
         uiPanel->cmdCurrY->setText(QString::number(frame_coordinates.position.y, 'f', 2));
         uiPanel->cmdCurrZ->setText(QString::number(frame_coordinates.position.z, 'f', 2));
     }
-
-
-    void ControlPanel::limitsCallback(const std_msgs::msg::Int8 &msg)
-    {
-        if(msg.data < 0 || msg.data > 3)
-        {
-            RVIZ_COMMON_LOG_ERROR("Control Panel: Invalid limit status " + std::to_string(msg.data));
-            return;
-        }
-
-        //yeah I'm doing it the microcontroller way. fight me
-        uiPanel->cmdThrustLim->setEnabled(msg.data & 0b00000001);
-        uiPanel->cmdSysLim->setEnabled(msg.data & 0b00000010);
-    }
     
 
     void ControlPanel::selectedPose(const geometry_msgs::msg::PoseStamped & msg){
         // check position control mode !!!
-        if (ctrlMode == riptide_msgs2::msg::ControllerCommand::POSITION){
+        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION){
             // use z depth from odom
             auto z = uiPanel->cmdCurrZ->text();
             // update the values set by the selected pose
@@ -689,6 +709,51 @@ namespace riptide_rviz
 
     
 
+    void ControlPanel::diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg){
+        
+        //add in color changing for boxes...
+        
+        
+        if(sizeof(msg.status) != 0 ){
+
+            if(msg.status[0].name.find("ekf") != std::string::npos){
+                //pull status from ekf message
+
+                for(int i = 0; i < (sizeof(msg.status[1].values) / 6); i++){
+
+                    //odom frequency
+                    if(msg.status[1].values[i].key.find("Actual frequency") != std::string::npos){
+                        uiPanel->OdomDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
+                    }
+                }
+            }else if(msg.status[0].name.find("Controller") != std::string::npos){
+
+                for(int i = 0; i < (sizeof(msg.status[0].values) / 6); i++){
+
+                    //active control frequency
+                    if(msg.status[0].values[i].key.find("Active Control") != std::string::npos){
+                        uiPanel->ACDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //thruster flip rate
+                    if(msg.status[0].values[i].key.find("Flips Frequency") != std::string::npos){
+                        uiPanel->FlipDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //system limit saturation
+                    if(msg.status[0].values[i].key.find("System Limit") != std::string::npos){
+                        uiPanel->SLDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //individual limit saturation
+                    if(msg.status[0].values[i].key.find("Individual Limit") != std::string::npos){
+                        uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+            
+                }         
+            }         
+        }
+    }
     // ROS timer callbacks
     void ControlPanel::sendKillMsgTimer()
     {
@@ -911,12 +976,33 @@ namespace riptide_rviz
         clientSendTime = node->get_clock()->now();
     }
 
+    void ControlPanel::callSetBoolService(rclcpp::Client<SetBool>::SharedPtr client, bool value){
+        //check to ensure service is availabl
+        if(!client->wait_for_service(5s)){
+            return;
+        }
+
+        SetBool::Request::SharedPtr request = std::make_shared<SetBool::Request>();
+
+        //fill out request
+        request->data = value;
+
+        //send request
+        auto future = client->async_send_request(request);
+        srvReqId = future.request_id;
+        activeSetBoolClientFuture = future.share();
+        QTimer::singleShot(250, 
+            [this, client] () { ControlPanel::waitForSetBoolResponse(client); });
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        clientSendTime = node->get_clock()->now();
+    }
+
 
     void ControlPanel::waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client)
     {
         if(!activeClientFuture.valid())
         {
-            updateCalStatus("Service result has become invalid!");
+            //updateCalStatus("Service result has become invalid!");
             return;
         }
 
@@ -934,7 +1020,7 @@ namespace riptide_rviz
         rclcpp::Time currentTime = node->get_clock()->now();
         if(currentTime - clientSendTime > 5s)
         {
-            updateCalStatus("Service timed out.");
+            //updateCalStatus("Service timed out.");
             client->remove_pending_request(srvReqId);
             return;
         }
@@ -942,6 +1028,37 @@ namespace riptide_rviz
         //schedule next check
         QTimer::singleShot(250, 
             [this, client] () { ControlPanel::waitForTriggerResponse(client); });
+    }
+
+    void ControlPanel::waitForSetBoolResponse(rclcpp::Client<SetBool>::SharedPtr client){
+        if(!activeSetBoolClientFuture.valid())
+        {
+            updateCalStatus("Service result has become invalid!");
+            return;
+        }
+
+        auto futureStatus = activeSetBoolClientFuture.wait_for(10ms);
+        if(futureStatus != std::future_status::timeout)
+        {
+            //success
+            rclcpp::Client<SetBool>::SharedResponse response = activeSetBoolClientFuture.get();
+            updateCalStatus(response->message);
+            return;
+        }
+
+        //not ready yet
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        rclcpp::Time currentTime = node->get_clock()->now();
+        if(currentTime - clientSendTime > 5s)
+        {
+            updateCalStatus("Service timed out.");
+            client->remove_pending_request(srvReqId);
+            return;
+        }
+
+        //schedule next check
+        QTimer::singleShot(250, 
+            [this, client] () { ControlPanel::waitForSetBoolResponse(client); });
     }
 
 
