@@ -4,11 +4,11 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
         - /TF1/Frames1
         - /MarkerArray1/Namespaces1
-        - /Dummy Detections1/TorpedoOpenHole1/Status1
       Splitter Ratio: 0.6578249335289001
-    Tree Height: 386
+    Tree Height: 298
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -90,29 +90,43 @@ Visualization Manager:
         buoy_frame:
           Value: false
         buoy_glyph_1_frame:
-          Value: true
+          Value: false
         buoy_glyph_2_frame:
-          Value: true
+          Value: false
         buoy_glyph_3_frame:
-          Value: true
+          Value: false
         buoy_glyph_4_frame:
-          Value: true
+          Value: false
         earth_glyph_frame:
+          Value: false
+        estimated_origin_frame:
           Value: true
         gate_frame:
-          Value: true
+          Value: false
         map:
-          Value: true
+          Value: false
         odom:
           Value: false
         offset:
-          Value: true
+          Value: false
         prequal_gate_frame:
           Value: false
         prequal_pole_frame:
           Value: false
+        simulator/buoy:
+          Value: true
+        simulator/gate:
+          Value: true
+        simulator/talos/base_link:
+          Value: true
+        simulator/talos/zed2i/left_optical:
+          Value: true
+        simulator/torpedo:
+          Value: true
         table_frame:
           Value: false
+        tag36h11:0:
+          Value: true
         talos/base_inertia:
           Value: false
         talos/base_link:
@@ -160,13 +174,25 @@ Visualization Manager:
         talos/thruster_7:
           Value: false
         talos/torpedo_link:
-          Value: false
-        talos/zed_base_link:
-          Value: false
+          Value: true
+        talos/zed_camera_base_link:
+          Value: true
+        talos/zed_camera_center:
+          Value: true
+        talos/zed_camera_link:
+          Value: true
+        talos/zed_left_camera_frame:
+          Value: true
+        talos/zed_left_camera_optical_frame:
+          Value: true
+        talos/zed_right_camera_frame:
+          Value: true
+        talos/zed_right_camera_optical_frame:
+          Value: true
         torpedoGman_frame:
-          Value: false
+          Value: true
         torpedoHole_frame:
-          Value: false
+          Value: true
         torpedo_closed_frame:
           Value: true
         torpedo_closed_hole_frame:
@@ -177,13 +203,11 @@ Visualization Manager:
           Value: true
         world:
           Value: false
-        zed_camera_link:
-          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: true
+      Show Names: false
       Tree:
         world:
           map:
@@ -207,12 +231,17 @@ Visualization Manager:
               table_frame:
                 {}
               torpedo_closed_frame:
-                torpedo_closed_hole_frame:
-                  {}
+                {}
+              torpedo_closed_hole_frame:
+                {}
               torpedo_open_frame:
-                torpedo_open_hole_frame:
-                  {}
+                {}
+              torpedo_open_hole_frame:
+                {}
           odom:
+            simulator/talos/base_link:
+              simulator/talos/zed2i/left_optical:
+                {}
             talos/base_link:
               talos/origin:
                 talos/base_inertia:
@@ -254,11 +283,23 @@ Visualization Manager:
                   {}
                 talos/torpedo_link:
                   {}
-                talos/zed_base_link:
-                  zed_camera_link:
-                    {}
+                talos/zed_camera_base_link:
+                  talos/zed_camera_link:
+                    talos/zed_camera_center:
+                      talos/zed_left_camera_frame:
+                        talos/zed_left_camera_optical_frame:
+                          {}
+                      talos/zed_right_camera_frame:
+                        talos/zed_right_camera_optical_frame:
+                          {}
               talos/pose_sensor_link:
                 {}
+          simulator/buoy:
+            {}
+          simulator/gate:
+            {}
+          simulator/torpedo:
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -274,134 +315,36 @@ Visualization Manager:
         Value: /talos/robot_description
       Enabled: true
       Links:
-        All Links Enabled: true
+        All Links Enabled:
+          {}
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        talos/base_inertia:
+        talos/zed_camera_center:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        talos/base_link:
+        talos/zed_camera_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        talos/downwards_camera/left_link:
+        talos/zed_left_camera_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        talos/downwards_camera/left_optical:
+        talos/zed_left_camera_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        talos/downwards_camera/right_link:
+        talos/zed_right_camera_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        talos/downwards_camera/right_optical:
+        talos/zed_right_camera_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        talos/downwards_camera_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/droppers_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/dvl_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/imu_revolute_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/origin:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/poker_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/pose_sensor_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/pressure_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_0:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_5:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_6:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_7:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/torpedo_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/zed_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        zed_camera_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -414,7 +357,6 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        ghost: true
         mapping_markers: true
         simGhost: true
       Topic:
@@ -1262,6 +1204,52 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: Dummy Detections
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /talos/point_cloud
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: false
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /talos/visualization_marker_array
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -1308,25 +1296,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 14.726518630981445
+      Distance: 4.081712245941162
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.23416918516159058
-        Y: 0.5124905109405518
-        Z: 0.8251045346260071
+        X: 1.9667527675628662
+        Y: -1.7229670286178589
+        Z: -1.7927477359771729
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6447976231575012
-      Target Frame: talos/base_link
+      Pitch: 0.45979630947113037
+      Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.5681302547454834
+      Yaw: 4.88630485534668
     Saved: ~
 Window Geometry:
   Actuators:
@@ -1341,7 +1329,7 @@ Window Geometry:
     collapsed: false
   FeedforwardPanel:
     collapsed: false
-  Height: 1043
+  Height: 986
   Hide Left Dock: false
   Hide Right Dock: false
   MappingPanel:
@@ -1350,11 +1338,11 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000300000000000001ec0000037afc0200000004fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fb000000180043006f006e00740072006f006c00500061006e0065006c010000003d0000026a0000024b00fffffffb00000018004d0061007000700069006e006700500061006e0065006c01000002ad0000010a000000fd00ffffff000000010000016a0000037afc0200000002fc0000003d00000198000001840100001cfa000000000100000004fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000010e00fffffffb00000012004100630074007500610074006f0072007301000005bf0000017b0000013000fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffc000001db000001dc000000e60100001cfa000000020100000004fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff000000fd00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000078000000039fc0100000001fb0000000800540069006d0065010000000000000780000002fb00ffffff0000041e0000037a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000003000000000000021900000341fc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d00000341000002680100001cfa000000000100000002fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000021900fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000017000ffffff000000010000016a00000341fc0200000002fc0000003d000001b7000001090100001cfa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff000000fd00fffffffc000001fa00000184000001840100001cfa000000030100000005fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000011400fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000064800000039fc0100000001fb0000000800540069006d0065010000000000000648000002eb00ffffff000002b90000034100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1920
-  X: 1920
-  Y: 0
+  Width: 1608
+  X: 72
+  Y: 27

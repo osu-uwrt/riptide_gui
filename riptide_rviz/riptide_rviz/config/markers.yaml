@@ -1,28 +1,44 @@
 /**/marker_publisher:
   ros__parameters:
-    update_period: 0.01
+    update_period: 0.025
     mesh_pkg: riptide_meshes
     mesh_directory: meshes
     marker_topic: mapping_markers
     robot: talos
     markers:
       marker0:
-        mesh: gate
+        mesh: gate  # NOTE: if this is "arrow", "sphere", or "cube", the builtin message support for those shapes will be used instead of a mesh file
         frame: gate_frame
-        scale: 1.0
-        pose: [0.0, -1.5, 0.0, 0.0, 0.0, 0.0]
+        scale: [1.0, 1.0, 1.0]
+        pose: [0.0, -1.5, 0.0, 0.0, 0.0, 0.0] # xyzrpw
+        color: [0.0, 0.0, 0.0, 0.0]           # rgba
       marker1:
         mesh: earth
         frame: earth_glyph_frame
-        scale: 1.0
+        scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        color: [0.0, 0.0, 0.0, 0.0]
       marker2:
         mesh: buoy
         frame: buoy_frame
-        scale: 1.0
+        scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        color: [0.0, 0.0, 0.0, 0.0]
       marker3:
         mesh: torpedo
         frame: torpedo_frame
-        scale: 1.0
+        scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        color: [0.0, 0.0, 0.0, 0.0]
+      marker4:
+        mesh: arrow
+        frame: simulator/torpedo
+        scale: [1.0, 0.05, 0.05]
+        pose: [0.0, 0.0, 0.3048, 0.0, 0.0, 0.0]
+        color: [0.0, 0.0, 1.0, 1.0]
+      marker5:
+        mesh: arrow
+        frame: simulator/torpedo
+        scale: [1.0, 0.05, 0.05]
+        pose: [0.0, 0.0, -0.3048, 0.0, 0.0, 0.0]
+        color: [0.0, 0.0, 1.0, 1.0]
