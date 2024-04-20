@@ -176,15 +176,9 @@ namespace riptide_rviz
         odomSub = node->create_subscription<nav_msgs::msg::Odometry>(
             robot_ns + "/odometry/filtered", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::odomCallback, this, _1));
-        steadySub = node->create_subscription<std_msgs::msg::Bool>(
-            robot_ns + "/controller/steady", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::steadyCallback, this, _1));
         diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics", rclcpp::SystemDefaultsQoS(),
             std::bind(&ControlPanel::diagCallback, this, _1));        
-        limitsSub = node->create_subscription<std_msgs::msg::Int8>(
-            robot_ns + "/state/controller/limits", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::limitsCallback, this, _1));
 
         //create service clients
         reloadSolverClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_thruster_solver_params");
@@ -679,20 +673,6 @@ namespace riptide_rviz
         uiPanel->cmdCurrY->setText(QString::number(frame_coordinates.position.y, 'f', 2));
         uiPanel->cmdCurrZ->setText(QString::number(frame_coordinates.position.z, 'f', 2));
     }
-
-
-    void ControlPanel::limitsCallback(const std_msgs::msg::Int8 &msg)
-    {
-        if(msg.data < 0 || msg.data > 3)
-        {
-            RVIZ_COMMON_LOG_ERROR("Control Panel: Invalid limit status " + std::to_string(msg.data));
-            return;
-        }
-
-        //yeah I'm doing it the microcontroller way. fight me
-        uiPanel->cmdThrustLim->setEnabled(msg.data & 0b00000001);
-        uiPanel->cmdSysLim->setEnabled(msg.data & 0b00000010);
-    }
     
 
     void ControlPanel::selectedPose(const geometry_msgs::msg::PoseStamped & msg){
@@ -1031,7 +1011,7 @@ namespace riptide_rviz
         {
             //success
             rclcpp::Client<Trigger>::SharedResponse response = activeClientFuture.get();
-            //updateCalStatus(response->message);
+            updateCalStatus(response->message);
             return;
         }
 
