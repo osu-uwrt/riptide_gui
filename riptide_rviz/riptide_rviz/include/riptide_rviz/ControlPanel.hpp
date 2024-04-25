@@ -60,7 +60,7 @@ namespace riptide_rviz
         // ROS timer callbacks
         void sendKillMsgTimer();
 
-        enum control_modes {DISABLED, FEEDFORWARD, POSITION, VELOCITY, TELEOP = 255};
+        enum control_modes {DISABLED, FEEDFORWARD, VELOCITY, POSITION, TELEOP = 255};
 
     protected Q_SLOTS:
         // QT slots (function callbacks)
