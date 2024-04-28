@@ -6,7 +6,7 @@
 
 #include <chameleon_tf_msgs/action/model_frame.hpp>
 #ifdef USE_ZED_INTERFACES
-    #include <zed_interfaces/srv/StartSvoRec.hpp>
+    #include <zed_interfaces/srv/start_svo_rec.hpp>
 #endif
 #include <std_srvs/srv/trigger.hpp>
 #include <riptide_msgs2/msg/mapping_target_info.hpp>
@@ -49,6 +49,16 @@ namespace riptide_rviz
 
         private:
         void setStatus(const QString& text, const QString &color);
+
+        template<typename T>
+        void serviceResponseCb(const std::string& srvName, typename rclcpp::Client<T>::SharedResponse response)
+        {
+            std::string successStr = (response->success ? "Succeeded" : "Failed");
+
+            setStatus(QString::fromStdString("Call to %1 %2; %3").arg(
+                QString::fromStdString(srvName), QString::fromStdString(successStr), QString::fromStdString(response->message)),
+                (response->success ? "000000" : "FF0000"));
+        }
 
         // tag cal stuff
         void goalResponseCb(const CalibGoalHandle::SharedPtr & goal_handle);

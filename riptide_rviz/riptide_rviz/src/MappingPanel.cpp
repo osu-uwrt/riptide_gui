@@ -60,6 +60,14 @@ namespace riptide_rviz
         calibClient = rclcpp_action::create_client<ModelFrame>(node, fullActionName);
         RVIZ_COMMON_LOG_INFO("Created action client for server with name \"" + fullActionName + "\"");
 
+        #if USE_ZED_INTERFACES
+            startSvoClient = std::make_shared<GuiSrvClient<StartSvoRec>>(node, robotNs + "/zed/zed_node/start_svo_rec", 
+                std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::serviceResponseCb<StartSvoRec>, this, _1, _2));
+
+            stopSvoClient = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/zed/zed_node/stop_svo_rec", 
+                std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::serviceResponseCb<Trigger>, this, _1, _2));
+        #endif
+
         // initialize mapping target stuff
         mappingTargetInfoSub = node->create_subscription<riptide_msgs2::msg::MappingTargetInfo>(robotNs + "/state/mapping", 10,
             std::bind(&MappingPanel::mappingStatusCb, this, _1));
@@ -161,7 +169,17 @@ namespace riptide_rviz
     void MappingPanel::zedSvoStart()
     {
         #ifdef USE_ZED_INTERFACES
-            QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+            QString rec_location = ui->recordDst->text();
+            if(!rec_location.endsWith(".svo"))
+            {
+                rec_location = rec_location + ".svo";
+            }
+
+            setStatus(QString("Recording SVO to %1").arg(rec_location), "000000");
+
+            auto request = std::make_shared<zed_interfaces::srv::StartSvoRec::Request>();
+            request->svo_filename = rec_location.toStdString();
+            startSvoClient->callService(request);
         #else
             QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
         #endif
@@ -171,7 +189,7 @@ namespace riptide_rviz
     void MappingPanel::zedSvoStop()
     {
         #ifdef USE_ZED_INTERFACES
-            QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+            stopSvoClient->callService(std::make_shared<std_srvs::srv::Trigger::Request>());
         #else
             QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
         #endif
@@ -192,6 +210,7 @@ namespace riptide_rviz
 
     void MappingPanel::setStatus(const QString& text, const QString &color)
     {
+        RVIZ_COMMON_LOG_INFO(text.toStdString());
         ui->calibStatus->setText(text);
         ui->calibStatus->setStyleSheet(tr("QLabel { color: #%1; }").arg(color));
     }
