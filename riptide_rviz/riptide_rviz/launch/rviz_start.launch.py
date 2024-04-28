@@ -54,7 +54,7 @@ def generate_launch_description():
                     # prefix=["gdbserver localhost:3000"]
                 ),
 
-                # send the rest into the tempest namespace
+                # send the rest into the robot namespace
                 PushRosNamespace(["/", LC('robot')]),
 
                 # start the thruster wrench visualizer

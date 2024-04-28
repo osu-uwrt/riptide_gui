@@ -25,6 +25,7 @@ find_package(chameleon_tf_msgs REQUIRED)
 find_package(interactive_markers REQUIRED)
 find_package(riptide_meshes REQUIRED)
 
+find_package(zed_interfaces QUIET) #not required because we will handle it if we cant find this. Its only installed on certain computers
 
 # rviz specific deps
 find_package(rviz_common REQUIRED)
@@ -104,6 +105,14 @@ ament_target_dependencies(${PROJECT_NAME}
   interactive_markers
   riptide_meshes
 )
+
+if(zed_interfaces_FOUND)
+  ament_target_dependencies(${PROJECT_NAME}
+    zed_interfaces)
+  
+  target_compile_definitions(${PROJECT_NAME} PUBLIC
+    USE_ZED_INTERFACES)
+endif()
 
 # Link non ament packages
 target_link_libraries(${PROJECT_NAME} 
