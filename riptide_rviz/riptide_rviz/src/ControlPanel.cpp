@@ -422,12 +422,12 @@ namespace riptide_rviz
     {
         // Check for duplicate topics and disable UI if duplicates are found
         if (checkForDuplicateTopics()) {
-            handleDisable();
-            uiPanel->ctrlEnable->setEnabled(false);
-            uiPanel->ctrlDiveInPlace->setEnabled(false);
-            uiPanel->CtrlSendCmd->setEnabled(false);
-            
+
             if (!last_duplicate_state){
+                handleDisable();
+                uiPanel->ctrlEnable->setEnabled(false);
+                uiPanel->ctrlDiveInPlace->setEnabled(false);
+                uiPanel->CtrlSendCmd->setEnabled(false);
                 last_duplicate_state = true;
                 // Display a popup window
                 std::string warningMessage = "Duplicate topics detected!";
