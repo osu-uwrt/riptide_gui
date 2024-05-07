@@ -6,9 +6,11 @@
 #include <riptide_msgs2/msg/kill_switch_report.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
-#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/int8.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_srvs/srv/trigger.hpp>
+#include <std_srvs/srv/set_bool.hpp>
+#include <diagnostic_msgs/msg/diagnostic_array.hpp>
 
 #include <interactive_markers/interactive_marker_server.hpp>
 
@@ -32,7 +34,7 @@
 //
 #define CONTROLLER_CMD (0)
 #define TARGET_POSITION (1)
-#define CONTROLLER_TYPE CONTROLLER_CMD
+#define CONTROLLER_OUTPUT_TYPE CONTROLLER_CMD
 
 namespace riptide_rviz
 {
@@ -40,6 +42,7 @@ namespace riptide_rviz
     class ControlPanel : public rviz_common::Panel
     {
         using Trigger = std_srvs::srv::Trigger;
+        using SetBool = std_srvs::srv::SetBool;
         using CalibrateDrag = riptide_msgs2::action::CalibrateDragNew;
         using CalibrateDragGH = rclcpp_action::ClientGoalHandle<CalibrateDrag>;
 
@@ -53,11 +56,13 @@ namespace riptide_rviz
 
         // ROS Subscriber callbacks
         void odomCallback(const nav_msgs::msg::Odometry &msg);
-        void steadyCallback(const std_msgs::msg::Bool &msg);
+        void diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg);
         void selectedPose(const geometry_msgs::msg::PoseStamped & msg);
 
         // ROS timer callbacks
         void sendKillMsgTimer();
+
+        enum control_modes {DISABLED, FEEDFORWARD, VELOCITY, POSITION, TELEOP = 255};
 
     protected Q_SLOTS:
         // QT slots (function callbacks)
@@ -76,8 +81,7 @@ namespace riptide_rviz
         void handleCommand(bool updateInteractiveMarker);
 
         //slots for parameter relaod buttons
-        void handleReloadSolver();
-        void handleReloadActive();
+        void handleReloadController();
 
         //slots for drag cal buttons
         void handleStartDragCal();
@@ -97,7 +101,9 @@ namespace riptide_rviz
         void setptMarkerFeedback(interactive_markers::InteractiveMarkerServer::FeedbackConstSharedPtr feedback);
         void updateCalStatus(const std::string& status);
         void callTriggerService(rclcpp::Client<Trigger>::SharedPtr client);
+        void callSetBoolService(rclcpp::Client<SetBool>::SharedPtr client, bool value);
         void waitForTriggerResponse(rclcpp::Client<Trigger>::SharedPtr client);
+        void waitForSetBoolResponse(rclcpp::Client<SetBool>::SharedPtr client);
         void setDragCalRunning(bool running);
         void dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle);
         void dragResultCb(const CalibrateDragGH::WrappedResult &result);
@@ -151,15 +157,20 @@ namespace riptide_rviz
 
         // ROS Subscribers
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
-        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr steadySub;
+        rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagSub;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr selectPoseSub;
 
         //service clients
         rclcpp::Client<Trigger>::SharedPtr 
             reloadSolverClient,
-            reloadActiveClient;
+            reloadSmcClient,
+            reloadPidClient,
+            reloadCompleteClient;
+
+        rclcpp::Client<SetBool>::SharedPtr setTeleopClient;
         
         std::shared_future<Trigger::Response::SharedPtr> activeClientFuture;
+        std::shared_future<SetBool::Response::SharedPtr> activeSetBoolClientFuture;
         int64_t srvReqId;
         rclcpp::Time clientSendTime;
 

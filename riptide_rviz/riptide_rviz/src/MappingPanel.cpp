@@ -1,3 +1,5 @@
+#include <QMessageBox>
+
 #include "riptide_rviz/MappingPanel.hpp"
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -50,11 +52,29 @@ namespace riptide_rviz
         ui->worldFrame->setText(QString::fromStdString(getFromConfig(config, "worldFrameName", "world")));
         ui->tagFrame->setText(QString::fromStdString(getFromConfig(config, "tagFrameName", "tag_36h11")));
         ui->numSamples->setValue(std::stoi(getFromConfig(config, "mapCalibNumSamples", "10")));
-
-        std::string fullActionName = robotNs + "/" + CALIB_ACTION_NAME;
+        
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        
+        // initialize tag cal stuff
+        std::string fullActionName = robotNs + "/" + CALIB_ACTION_NAME;
         calibClient = rclcpp_action::create_client<ModelFrame>(node, fullActionName);
         RVIZ_COMMON_LOG_INFO("Created action client for server with name \"" + fullActionName + "\"");
+
+        #if USE_ZED_INTERFACES
+            startSvoClient = std::make_shared<GuiSrvClient<StartSvoRec>>(node, robotNs + "/zed/zed_node/start_svo_rec", 
+                std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::serviceResponseCb<StartSvoRec>, this, _1, _2));
+
+            stopSvoClient = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/zed/zed_node/stop_svo_rec", 
+                std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::serviceResponseCb<Trigger>, this, _1, _2));
+        #endif
+
+        // initialize mapping target stuff
+        mappingTargetInfoSub = node->create_subscription<riptide_msgs2::msg::MappingTargetInfo>(robotNs + "/state/mapping", 10,
+            std::bind(&MappingPanel::mappingStatusCb, this, _1));
+        
+        mappingTargetClient = std::make_shared<GuiSrvClient<MappingTarget>>(node, robotNs + "/mapping_target",
+            std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::mappingTargetResultCb, this, _1, _2));
+
         loaded = true;
     }
 
@@ -80,6 +100,11 @@ namespace riptide_rviz
 
         // Connect UI signals for controlling the riptide vehicle
         connect(ui->calibButton, &QPushButton::clicked, this, &MappingPanel::calibMapFrame);
+        connect(ui->setMappingTargetButton, &QPushButton::clicked, this, &MappingPanel::setMappingTarget);
+        connect(ui->zedSvoStartButton, &QPushButton::clicked, this, &MappingPanel::zedSvoStart);
+        connect(ui->zedSvoStopButton, &QPushButton::clicked, this, &MappingPanel::zedSvoStop);
+        connect(ui->dfcRecordingStartButton, &QPushButton::clicked, this, &MappingPanel::dfcRecordStart);
+        connect(ui->dfcRecordingStopButton, &QPushButton::clicked, this, &MappingPanel::dfcRecordStop);
     }
 
 
@@ -87,7 +112,7 @@ namespace riptide_rviz
     {   
         if(!loaded)
         {
-            setCalibStatus("Panel not loaded! Please save your config and restart RViz.", "FF0000");
+            setStatus("Panel not loaded! Please save your config and restart RViz.", "FF0000");
             return;
         }
 
@@ -95,7 +120,7 @@ namespace riptide_rviz
         if(calibrationInProgress)
         {
             calibClient->async_cancel_all_goals();
-            setCalibStatus("Canceling calibration...", "000000");
+            setStatus("Canceling calibration...", "000000");
             return;
         }
 
@@ -104,7 +129,7 @@ namespace riptide_rviz
         if(!calibClient->wait_for_action_server(1s))
         {
             RVIZ_COMMON_LOG_ERROR("MappingPanel: Map calibration action server not available!");
-            setCalibStatus("Action server not available!", "FF0000");
+            setStatus("Action server not available!", "FF0000");
             return;
         }
 
@@ -121,15 +146,71 @@ namespace riptide_rviz
         options.feedback_callback       = std::bind(&MappingPanel::feedbackCb, this, _1, _2);
         options.result_callback         = std::bind(&MappingPanel::resultCb, this, _1);
 
-        setCalibStatus("Sending goal...", "000000");
+        setStatus("Sending goal...", "000000");
         calibClient->async_send_goal(calibGoal, options);
 
         ui->calibButton->setText("Cancel");
     }
 
 
-    void MappingPanel::setCalibStatus(const QString& text, const QString& color)
+    void MappingPanel::setMappingTarget()
     {
+        std::string desiredTarget = ui->desiredTargetObject->text().toStdString();
+        bool desiredLock = ui->desiredLocked->isChecked();
+
+        MappingTarget::Request::SharedPtr targetReq = std::make_shared<MappingTarget::Request>();
+        targetReq->target_info.target_object = desiredTarget;
+        targetReq->target_info.lock_map = desiredLock;
+
+        mappingTargetClient->callService(targetReq);
+    }
+
+
+    void MappingPanel::zedSvoStart()
+    {
+        #ifdef USE_ZED_INTERFACES
+            QString rec_location = ui->recordDst->text();
+            if(!rec_location.endsWith(".svo"))
+            {
+                rec_location = rec_location + ".svo";
+            }
+
+            setStatus(QString("Recording SVO to %1").arg(rec_location), "000000");
+
+            auto request = std::make_shared<zed_interfaces::srv::StartSvoRec::Request>();
+            request->svo_filename = rec_location.toStdString();
+            startSvoClient->callService(request);
+        #else
+            QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
+        #endif
+    }
+
+
+    void MappingPanel::zedSvoStop()
+    {
+        #ifdef USE_ZED_INTERFACES
+            stopSvoClient->callService(std::make_shared<std_srvs::srv::Trigger::Request>());
+        #else
+            QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
+        #endif
+    }
+
+
+    void MappingPanel::dfcRecordStart()
+    {
+        QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+    }
+
+
+    void MappingPanel::dfcRecordStop()
+    {
+        QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+    }
+
+
+    void MappingPanel::setStatus(const QString& text, const QString &color)
+    {
+        RVIZ_COMMON_LOG_INFO(text.toStdString());
         ui->calibStatus->setText(text);
         ui->calibStatus->setStyleSheet(tr("QLabel { color: #%1; }").arg(color));
     }
@@ -142,18 +223,18 @@ namespace riptide_rviz
             switch(goalHandle->get_status())
             {
                 case GOAL_STATE_ACCEPTED:
-                    setCalibStatus("Calibrating map frame...", "000000");
+                    setStatus("Calibrating map frame...", "000000");
                     break;
                 case GOAL_STATE_CANCELING:
-                    setCalibStatus("Canceling calibration...", "000000");
+                    setStatus("Canceling calibration...", "000000");
                     break;
                 default:
-                    setCalibStatus("Unknown goal state", "000000");
+                    setStatus("Unknown goal state", "000000");
                     break;
             }
         } else
         {
-            setCalibStatus("Calibration request rejected!", "FF0000");
+            setStatus("Calibration request rejected!", "FF0000");
         }   
     }
 
@@ -163,7 +244,7 @@ namespace riptide_rviz
         const std::shared_ptr<const ModelFrame::Feedback> feedback)
     {
         ui->calibProgress->setValue(feedback->sample_count);
-        setCalibStatus(
+        setStatus(
             tr("Calibrating map frame (%1/%2)...").arg(
                 QString::number(feedback->sample_count),
                 QString::number(ui->calibProgress->maximum())),
@@ -179,31 +260,47 @@ namespace riptide_rviz
             case rclcpp_action::ResultCode::SUCCEEDED:
                 if(result.result->success)
                 {
-                    setCalibStatus("Calibration Complete.", "000000");
+                    setStatus("Calibration Complete.", "000000");
                 } else 
                 {
-                    setCalibStatus(
+                    setStatus(
                         tr("Calibration failed (%1)").arg(QString::fromStdString(result.result->err_msg)),
                         "FF0000"
                     );
                 }
                 break;
             case rclcpp_action::ResultCode::ABORTED:
-                setCalibStatus(
+                setStatus(
                         tr("Calibration aborted (%1)").arg(QString::fromStdString(result.result->err_msg)),
                         "FF0000"
                     );
                 break;
             case rclcpp_action::ResultCode::CANCELED:
-                setCalibStatus("Calibration canceled!", "0000FF");
+                setStatus("Calibration canceled!", "0000FF");
                 break;
             case rclcpp_action::ResultCode::UNKNOWN:
-                setCalibStatus("Calibration unknown!", "0000FF");
+                setStatus("Calibration unknown!", "0000FF");
                 break;
         }
 
         calibrationInProgress = false;
         ui->calibButton->setText("Calibrate");
+    }
+
+
+    void MappingPanel::mappingStatusCb(const riptide_msgs2::msg::MappingTargetInfo::SharedPtr msg)
+    {
+        std::string target = (msg->target_object == "" ? "..." : msg->target_object);
+        ui->mappingTargetObject->setText(QString::fromStdString(target));
+        ui->mappingLocked->setChecked(msg->lock_map);
+    }
+
+
+    void MappingPanel::mappingTargetResultCb(const std::string& srvName, rclcpp::Client<MappingTarget>::SharedResponse response)
+    {
+        (void) srvName;
+        (void) response;
+        setStatus("Mapping target updated.", "000000");
     }
 }
 
