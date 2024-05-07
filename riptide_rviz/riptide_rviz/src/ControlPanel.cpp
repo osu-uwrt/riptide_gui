@@ -6,7 +6,6 @@
 #include <chrono>
 #include <algorithm>
 #include <iostream>
-#include <QMessageBox>
 
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
