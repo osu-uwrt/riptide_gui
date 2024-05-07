@@ -146,6 +146,9 @@ namespace riptide_rviz
         connect(uiTimer, &QTimer::timeout, [this](void)
                 { refreshUI(); });
 
+        // setup the last duplicate state
+        last_duplicate_state = false;
+
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
@@ -216,6 +219,7 @@ namespace riptide_rviz
 
     ControlPanel::~ControlPanel()
     {
+
         // master window control removal
         delete uiPanel;
 
@@ -283,6 +287,30 @@ namespace riptide_rviz
 
     void ControlPanel::refreshUI()
     {
+        // Check for duplicate topics and disable UI if duplicates are found
+        if (checkForDuplicateTopics()) {
+            handleDisable();
+            uiPanel->ctrlEnable->setEnabled(false);
+            uiPanel->ctrlDiveInPlace->setEnabled(false);
+            uiPanel->CtrlSendCmd->setEnabled(false);
+            
+            if (!last_duplicate_state){
+                last_duplicate_state = true;
+                // Display a popup window
+                std::string warningMessage = "Duplicate topics detected!";
+                displayPopupWindow(warningMessage, duplicate_topics_list);
+                
+            }
+
+            return; // Early return to prevent further UI updates  
+
+        } else{
+            if (last_duplicate_state){
+                uiPanel->ctrlEnable->setEnabled(true);
+                last_duplicate_state = false;
+            }
+        }
+
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
@@ -322,6 +350,66 @@ namespace riptide_rviz
                 uiPanel->ctrlDiveInPlace->setEnabled(true);
             }
         }
+    }
+
+    bool ControlPanel::checkForDuplicateTopics() {
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        auto topics = node->get_topic_names_and_types();
+        std::map<std::string, int> topic_count;
+        bool anyDuplicates = false;
+        duplicate_topics_list = "";
+
+        // Count each topic's occurrences
+        for (const auto& topic_info : topics) {
+            topic_count[topic_info.first]++;
+        }
+
+        // Check for changes in duplicate status
+        for (const auto& count : topic_count) {
+
+            bool is_duplicate = count.second > 1;
+            anyDuplicates |= is_duplicate;  // If any topic is a duplicate, set to true
+            auto it = topic_duplicate_status.find(count.first);
+
+            if (it == topic_duplicate_status.end() || it->second != is_duplicate) {
+
+                topic_duplicate_status[count.first] = is_duplicate;  // Update the status in the map
+                if (is_duplicate) {
+                    RVIZ_COMMON_LOG_WARNING_STREAM("Duplicate topic detected: " << count.first);
+                    duplicate_topics_list += count.first + "\n";
+                } else if (it != topic_duplicate_status.end()) {
+                    RVIZ_COMMON_LOG_INFO_STREAM("Duplicate resolved: " << count.first);
+                }
+            }
+        }
+
+        // Cleanup map entries for topics no longer present
+        for (auto it = topic_duplicate_status.begin(); it != topic_duplicate_status.end(); ) {
+            
+            if (topic_count.find(it->first) == topic_count.end()) {
+                it = topic_duplicate_status.erase(it);  // Remove from map if topic no longer exists
+            } else {
+                ++it;
+            }
+        }
+
+        return anyDuplicates;
+    }
+
+    void ControlPanel::displayPopupWindow(const std::string& warningMessage, const std::string& text){
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Warning");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText(QString::fromStdString(warningMessage));
+
+        QString informativeText = QString::fromStdString(text);
+        msgBox.setInformativeText(informativeText);
+
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();  
+        
     }
 
     // slots for sending commands to the vehicle
