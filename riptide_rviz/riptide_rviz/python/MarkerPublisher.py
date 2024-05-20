@@ -237,32 +237,6 @@ class MarkerPublisher(Node):
                 marker.mesh_use_embedded_materials = True
             
             array.markers.append(marker)
-            
-        #publish green arrows for recent detections
-        detectionNames = list(self.latestDetections.keys())
-        for i in range(0, len(detectionNames)):
-            pose = self.latestDetections[detectionNames[i]]
-            marker = Marker()
-            marker.header = pose.header
-            marker.ns = "detections"
-            marker.id = i
-            marker.type = Marker.ARROW
-            marker.scale = Vector3(x=1.0, y=0.05, z=0.05)
-            marker.color = ColorRGBA(r=0.0, g=1.0, b=0.0, a=1.0)
-            marker.lifetime = Duration(seconds=STALE_SECONDS, nanoseconds=STALE_NSECONDS).to_msg()
-            
-            current_time = self.get_clock().now()
-            elapsed_nanoseconds = current_time.nanoseconds - (pose.header.stamp.sec * 1e9) - pose.header.stamp.nanosec
-            elapsed_seconds = elapsed_nanoseconds / float(1e9)
-            
-            if elapsed_seconds < STALE_TIME: 
-                marker.action = Marker.MODIFY
-            else:
-                marker.action = Marker.DELETE
-            
-            marker.pose = pose.pose
-            array.markers.append(marker)
-
 
         #publish ghost talos of sim true position
         simGhost = Marker()
