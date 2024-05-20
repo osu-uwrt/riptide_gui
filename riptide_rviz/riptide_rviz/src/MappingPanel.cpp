@@ -1,5 +1,5 @@
 #include <QMessageBox>
-
+#include <QFileInfo>
 #include "riptide_rviz/MappingPanel.hpp"
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -170,20 +170,41 @@ namespace riptide_rviz
     {
         #ifdef USE_ZED_INTERFACES
             QString rec_location = ui->recordDst->text();
-            if(!rec_location.endsWith(".svo"))
+            if (rec_location.startsWith("~")) {
+                rec_location.replace(0, 1, "/home/ros");
+            }
+
+            if (!rec_location.endsWith(".svo"))
             {
                 rec_location = rec_location + ".svo";
             }
 
-            setStatus(QString("Recording SVO to %1").arg(rec_location), "000000");
+            // Extract just the filename
+            QFileInfo fileInfo(rec_location);
+            QString fileName = fileInfo.fileName();
+
+            setStatus(QString("Recording SVO to %1").arg(fileName), "000000");
 
             auto request = std::make_shared<zed_interfaces::srv::StartSvoRec::Request>();
-            request->svo_filename = rec_location.toStdString();
+            request->bitrate = 0;
+            request->compression_mode = 0;  // LOSSLESS = 0
+            request->target_framerate = 0;
+            request->input_transcode = false;
+            request->svo_filename = rec_location.toStdString();  // Use absolute path
+
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Starting SVO recording with parameters:");
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Bitrate: %d", request->bitrate);
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Compression Mode: %d", request->compression_mode);
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Target Framerate: %d", request->target_framerate);
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Input Transcode: %s", request->input_transcode ? "true" : "false");
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "SVO Filename: %s", request->svo_filename.c_str());
+
             startSvoClient->callService(request);
         #else
             QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
         #endif
     }
+
 
 
     void MappingPanel::zedSvoStop()
