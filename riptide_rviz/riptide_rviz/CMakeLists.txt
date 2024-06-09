@@ -25,6 +25,7 @@ find_package(chameleon_tf_msgs REQUIRED)
 find_package(interactive_markers REQUIRED)
 find_package(riptide_meshes REQUIRED)
 
+find_package(zed_interfaces QUIET) #not required because we will handle it if we cant find this. Its only installed on certain computers
 
 # rviz specific deps
 find_package(rviz_common REQUIRED)
@@ -85,7 +86,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNC
 pluginlib_export_plugin_description_file(rviz_common plugins_description.xml)
 
 # Link ament packages
-ament_target_dependencies(${PROJECT_NAME} 
+set(deps
   rclcpp 
   rclcpp_action
   ament_index_cpp
@@ -103,6 +104,20 @@ ament_target_dependencies(${PROJECT_NAME}
   chameleon_tf_msgs
   interactive_markers
   riptide_meshes
+)
+
+if(zed_interfaces_FOUND)
+  set(deps
+    ${deps}
+    zed_interfaces
+  )
+  
+  target_compile_definitions(${PROJECT_NAME} PUBLIC
+    USE_ZED_INTERFACES)
+endif()
+
+ament_target_dependencies(${PROJECT_NAME} 
+  ${deps}
 )
 
 # Link non ament packages

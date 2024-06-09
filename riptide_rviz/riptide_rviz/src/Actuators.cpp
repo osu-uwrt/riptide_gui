@@ -4,7 +4,6 @@
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/logging.hpp>
 
-
 using namespace std::chrono_literals;
 using namespace std::placeholders;
 
@@ -104,18 +103,21 @@ namespace riptide_rviz
         statusSub = node->create_subscription<ActuatorStatus>(robotNs + "/state/actuator/status", rclcpp::SensorDataQoS(),
             std::bind(&Actuators::statusCallback, this, _1));
 
-        //initialize service information
-        srvReqId = -1; //-1 will mean that no srv is active
-        clientSendTime = node->get_clock()->now();
-
         //initialize clients
-        dropperClient = node->create_client<Trigger>(robotNs + "/command/actuator/dropper");
-        torpedoClient = node->create_client<Trigger>(robotNs + "/command/actuator/torpedo");
-        reloadClient = node->create_client<Trigger>(robotNs + "/command/actuator/notify_reload");
-        torpMarkerGoHomeClient = node->create_client<Trigger>(robotNs + "/command/actuator/torpedo_marker/go_home");
-        torpMarkerSetHomeClient = node->create_client<Trigger>(robotNs + "/command/actuator/torpedo_marker/set_home");
-        armClient = node->create_client<SetBool>(robotNs + "/command/actuator/arm");
-        clawClient = node->create_client<SetBool>(robotNs + "/command/actuator/claw");
+        dropperClient           = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/command/actuator/dropper", 
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<Trigger>, this, _1, _2));
+        torpedoClient           = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/command/actuator/torpedo", 
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<Trigger>, this, _1, _2));
+        reloadClient            = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/command/actuator/notify_reload", 
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<Trigger>, this, _1, _2));
+        torpMarkerGoHomeClient  = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/command/actuator/torpedo_marker/go_home", 
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<Trigger>, this, _1, _2));
+        torpMarkerSetHomeClient = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/command/actuator/torpedo_marker/set_home", 
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<Trigger>, this, _1, _2));
+        armClient               = std::make_shared<GuiSrvClient<SetBool>>(node, robotNs + "/command/actuator/arm", 
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<SetBool>, this, _1, _2));
+        clawClient              = std::make_shared<GuiSrvClient<SetBool>>(node, robotNs + "/command/actuator/claw", 
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<SetBool>, this, _1, _2));
     }
 
 
@@ -242,25 +244,26 @@ namespace riptide_rviz
     }
 
 
-    void Actuators::updateStatus(const std::string& status)
+    void Actuators::updateStatus(const QString& status, const QString& color)
     {
-        RVIZ_COMMON_LOG_INFO(status);
-        uiPanel->statusBrowser->setText(QString::fromStdString(status));
+        RVIZ_COMMON_LOG_INFO(status.toStdString());
+        uiPanel->statusBrowser->setText(status);
+        uiPanel->statusBrowser->setStyleSheet(tr("QLabel { color: #%1; }").arg(color));
     }
 
 
-    void Actuators::callTriggerService(rclcpp::Client<Trigger>::SharedPtr client)
+    void Actuators::callTriggerService(GuiSrvClient<Trigger>::SharedPtr client)
     {
         Trigger::Request::SharedPtr request = std::make_shared<Trigger::Request>();
-        callService<Trigger>(client, request, activeTriggerClientFuture);
+        client->callService(request);
     }
 
 
-    void Actuators::callSetBoolService(rclcpp::Client<SetBool>::SharedPtr client, bool value)
+    void Actuators::callSetBoolService(GuiSrvClient<SetBool>::SharedPtr client, bool value)
     {
         SetBool::Request::SharedPtr request = std::make_shared<SetBool::Request>();
         request->data = value;
-        callService<SetBool>(client, request, activeSetBoolClientFuture);
+        client->callService(request);
     }
 } // namespace riptide_rviz
 

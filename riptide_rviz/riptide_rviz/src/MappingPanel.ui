@@ -35,34 +35,66 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="worldFrame"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_2">
+         <item row="14" column="0">
+          <widget class="QLabel" name="label_12">
            <property name="text">
-            <string>Tag Frame</string>
+            <string>Error</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
             <string>Samples</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="tagFrame"/>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
+         <item row="20" column="1" colspan="2">
+          <widget class="QLineEdit" name="recordDst">
            <property name="text">
-            <string>World Frame</string>
+            <string>/home/ros/svos/name_me</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="11" column="0">
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Locked</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Object</string>
+           </property>
+          </widget>
+         </item>
+         <item row="17" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold</string>
+           </property>
+           <property name="text">
+            <string>Recordings</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Distance</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1" colspan="2">
+          <widget class="QProgressBar" name="calibProgress">
+           <property name="value">
+            <number>24</number>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1" colspan="2">
           <widget class="QSpinBox" name="numSamples">
            <property name="minimum">
             <number>1</number>
@@ -72,17 +104,194 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="18" column="2">
+          <widget class="QPushButton" name="zedSvoStopButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="2">
+          <widget class="QLineEdit" name="tagFrame"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>World Frame</string>
+           </property>
+          </widget>
+         </item>
+         <item row="19" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>DFC Recording</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Tag Frame</string>
+           </property>
+          </widget>
+         </item>
+         <item row="18" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>SVO Recording</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <widget class="QLabel" name="mappingTargetDist">
+           <property name="text">
+            <string>3.76 meters</string>
+           </property>
+          </widget>
+         </item>
+         <item row="19" column="1">
+          <widget class="QPushButton" name="dfcRecordingStartButton">
+           <property name="text">
+            <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item row="18" column="1">
+          <widget class="QPushButton" name="zedSvoStartButton">
+           <property name="text">
+            <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QLabel" name="mappingTargetObject">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold</string>
+           </property>
+           <property name="text">
+            <string>Tag Cal</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold</string>
+           </property>
+           <property name="text">
+            <string>Mapping Status</string>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold</string>
+           </property>
+           <property name="text">
+            <string>Set Mapping Target</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1" colspan="2">
+          <widget class="QLineEdit" name="worldFrame"/>
+         </item>
+         <item row="7" column="0">
           <widget class="QPushButton" name="calibButton">
            <property name="text">
             <string>Calibrate</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="QProgressBar" name="calibProgress">
-           <property name="value">
-            <number>24</number>
+         <item row="11" column="1">
+          <widget class="QCheckBox" name="mappingLocked">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="19" column="2">
+          <widget class="QPushButton" name="dfcRecordingStopButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="1">
+          <widget class="QLabel" name="mappingTargetError">
+           <property name="text">
+            <string>0.0046</string>
+           </property>
+          </widget>
+         </item>
+         <item row="20" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Record To</string>
+           </property>
+          </widget>
+         </item>
+         <item row="16" column="0">
+          <widget class="QLineEdit" name="desiredTargetObject">
+           <property name="text">
+            <string>object_name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="16" column="1">
+          <widget class="QCheckBox" name="desiredLocked">
+           <property name="text">
+            <string>Locked</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="16" column="2">
+          <widget class="QPushButton" name="setMappingTargetButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Set</string>
            </property>
           </widget>
          </item>
@@ -102,9 +311,6 @@
           <widget class="QTextBrowser" name="calibStatus">
            <property name="enabled">
             <bool>true</bool>
-           </property>
-           <property name="markdown">
-            <string/>
            </property>
           </widget>
          </item>

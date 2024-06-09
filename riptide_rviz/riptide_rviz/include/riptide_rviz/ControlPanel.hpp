@@ -26,6 +26,8 @@
 
 #include "ui_ControlPanel.h"
 #include <QTimer>
+#include <QMessageBox>
+#include <QString>
 
 //
 // CONTROLLER SELECTION
@@ -60,7 +62,7 @@ namespace riptide_rviz
         // ROS timer callbacks
         void sendKillMsgTimer();
 
-        enum control_modes {DISABLED, FEEDFORWARD, POSITION, VELOCITY, TELEOP = 255};
+        enum control_modes {DISABLED, FEEDFORWARD, VELOCITY, POSITION, TELEOP = 255};
 
     protected Q_SLOTS:
         // QT slots (function callbacks)
@@ -106,6 +108,12 @@ namespace riptide_rviz
         void dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle);
         void dragResultCb(const CalibrateDragGH::WrappedResult &result);
         
+        void displayPopupWindow(const std::string& warningMessage, const std::string& text);
+        bool checkForDuplicateTopics();
+        bool last_duplicate_state;
+        std::map<std::string, bool> topic_duplicate_status;
+        std::string duplicate_topics_list;
+
         // UI Panel instance
         Ui_ControlPanel *uiPanel;
 
