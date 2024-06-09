@@ -1022,6 +1022,23 @@ QPushButton:!enabled{color: white; background: rgb(100, 130, 110);}</string>
          </property>
         </widget>
        </item>
+       <item row="3" column="2">
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>Absolute Distance</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QLineEdit" name="AbsoluteDistance">
+         <property name="alignment">
+          <set>Qt::AlignHCenter|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>

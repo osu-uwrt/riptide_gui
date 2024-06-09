@@ -138,6 +138,9 @@ namespace riptide_rviz
         // QT ui timer for handling data freshness
         QTimer *uiTimer;
 
+        //pid for teleop fork-exec
+        pid_t teleopPID;
+
         // publishers
         #if CONTROLLER_TYPE == CONTROLLER_CMD
             rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;

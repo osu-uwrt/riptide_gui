@@ -6,6 +6,9 @@
 #include <chrono>
 #include <algorithm>
 #include <iostream>
+#include <QMessageBox>
+#include <signal.h>
+
 
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -19,6 +22,7 @@ using std::placeholders::_2;
 #define MAX_HOST_LEN 300
 #define SETPOINT_REPUB_PERIOD 1s
 #define SETPOINT_MARKER_SCALE 1.5
+#define EXPECTED_CONTROLLER_DIAG_KEYS 5 //getting unreliable message size data, so this is hard coded :( - this should be the number of keys in the message not the number that should be accessed
 
 const std::string get_hostname()
 {
@@ -58,6 +62,8 @@ namespace riptide_rviz
         ctrlMode = riptide_rviz::ControlPanel::control_modes::DISABLED;
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Constructed control panel");
+
+        this->teleopPID = -1;
     }
 
     void ControlPanel::onInitialize()
@@ -342,9 +348,17 @@ namespace riptide_rviz
     {
         // check the vehicle is enabled or we are overriding
         if(vehicleEnabled || override) {
+
+            //ensure teleop is killed
+            if(this->teleopPID > 0){
+
+                //because the rocket league node is threaded - kill session leader
+                killpg(teleopPID, SIGINT);
+                this->teleopPID = -1;
+            }
+
             ctrlMode = mode;
             visualization_msgs::msg::InteractiveMarker testMarker;
-
 
             switch (ctrlMode)
             {
@@ -372,7 +386,9 @@ namespace riptide_rviz
                 uiPanel->ctrlModeTele->setEnabled(true);
 
                 callSetBoolService(this->setTeleopClient, false);
+
                 break;
+
             case riptide_rviz::ControlPanel::control_modes::FEEDFORWARD:
                 uiPanel->ctrlModeFFD->setEnabled(false);
                 uiPanel->ctrlModeVel->setEnabled(true);
@@ -380,6 +396,14 @@ namespace riptide_rviz
                 uiPanel->ctrlModeTele->setEnabled(true);
 
                 callSetBoolService(this->setTeleopClient, false);
+
+                //send a default command to move into feed forward
+                this->handleCommand(false);
+
+                //remove setpoint marker
+                setptServer->erase(interactiveSetpointMarker.name);
+                setptServer->applyChanges();
+
                 break;
 
             case riptide_rviz::ControlPanel::control_modes::TELEOP:
@@ -395,6 +419,26 @@ namespace riptide_rviz
 
                 setptServer->erase(interactiveSetpointMarker.name);
                 setptServer->applyChanges();
+
+                //fork-exec call teleop
+                this->teleopPID = fork();
+
+                if(teleopPID == 0){
+                    RVIZ_COMMON_LOG_INFO("Launching RocketLeague Node");
+
+                    //set process group id so this can be killed later
+                    setpgid(0,0);
+
+                    //run rocket leauge node
+                    char* command = "ros2";
+                    char* commandArgList[] = {"ros2", "run", "riptide_controllers2", "RocketLeague.py"};
+
+                    execvp(command, commandArgList);
+
+                } else {
+                    RVIZ_COMMON_LOG_INFO("Spawned Teleop with PID: " + std::to_string(teleopPID));
+                }
+
                 break;
 
             case riptide_rviz::ControlPanel::control_modes::DISABLED:
@@ -631,8 +675,8 @@ namespace riptide_rviz
         geometry_msgs::msg::Quaternion angularPosition;
         // geometry_msgs::msg::Vector3 angularVelocity;
         
-        // if we are in position, we use quat, otherwise use the vector
-        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION)
+        // handle publishing the angular command
+        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION || ctrlMode == riptide_rviz::ControlPanel::control_modes::FEEDFORWARD)
         {
             // check the angle mode button
             if(degreeReadout){
@@ -647,7 +691,7 @@ namespace riptide_rviz
 
             // build the angular quat for message
             angularPosition = tf2::toMsg(quat);
-        } else {
+        }else {
             // // build the vector
             // angularVelocity.x = desiredValues[3];
             // angularVelocity.y = desiredValues[4];
@@ -812,7 +856,7 @@ namespace riptide_rviz
                 }
             }else if(msg.status[0].name.find("Controller") != std::string::npos){
 
-                for(int i = 0; i < (sizeof(msg.status[0].values) / 6); i++){
+                for(int i = 0; i < EXPECTED_CONTROLLER_DIAG_KEYS; i++){
 
                     //active control frequency
                     if(msg.status[0].values[i].key.find("Active Control") != std::string::npos){
@@ -832,6 +876,11 @@ namespace riptide_rviz
                     //individual limit saturation
                     if(msg.status[0].values[i].key.find("Individual Limit") != std::string::npos){
                         uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //individual limit saturation
+                    if(msg.status[0].values[i].key.find("Linear Error") != std::string::npos){
+                        uiPanel->AbsoluteDistance->setText(QString::fromStdString(msg.status[0].values[i].value));
                     }
             
                 }         
