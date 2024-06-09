@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <QMessageBox>
+#include <signal.h>
 
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -60,6 +61,8 @@ namespace riptide_rviz
         ctrlMode = riptide_rviz::ControlPanel::control_modes::DISABLED;
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Constructed control panel");
+
+        this->teleopPID = -1;
     }
 
     void ControlPanel::onInitialize()
@@ -340,9 +343,17 @@ namespace riptide_rviz
     {
         // check the vehicle is enabled or we are overriding
         if(vehicleEnabled || override) {
+
+            //ensure teleop is killed
+            if(this->teleopPID > 0){
+
+                //because the rocket league node is threaded - kill session leader
+                killpg(teleopPID, SIGINT);
+                this->teleopPID = -1;
+            }
+
             ctrlMode = mode;
             visualization_msgs::msg::InteractiveMarker testMarker;
-
 
             switch (ctrlMode)
             {
@@ -370,7 +381,9 @@ namespace riptide_rviz
                 uiPanel->ctrlModeTele->setEnabled(true);
 
                 callSetBoolService(this->setTeleopClient, false);
+
                 break;
+
             case riptide_rviz::ControlPanel::control_modes::FEEDFORWARD:
                 uiPanel->ctrlModeFFD->setEnabled(false);
                 uiPanel->ctrlModeVel->setEnabled(true);
@@ -401,6 +414,26 @@ namespace riptide_rviz
 
                 setptServer->erase(interactiveSetpointMarker.name);
                 setptServer->applyChanges();
+
+                //fork-exec call teleop
+                this->teleopPID = fork();
+
+                if(teleopPID == 0){
+                    RVIZ_COMMON_LOG_INFO("Launching RocketLeague Node");
+
+                    //set process group id so this can be killed later
+                    setpgid(0,0);
+
+                    //run rocket leauge node
+                    char* command = "ros2";
+                    char* commandArgList[] = {"ros2", "run", "riptide_controllers2", "RocketLeague.py"};
+
+                    execvp(command, commandArgList);
+
+                } else {
+                    RVIZ_COMMON_LOG_INFO("Spawned Teleop with PID: " + std::to_string(teleopPID));
+                }
+
                 break;
 
             case riptide_rviz::ControlPanel::control_modes::DISABLED:
