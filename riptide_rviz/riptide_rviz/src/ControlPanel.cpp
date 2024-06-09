@@ -20,6 +20,7 @@ using std::placeholders::_2;
 #define MAX_HOST_LEN 300
 #define SETPOINT_REPUB_PERIOD 1s
 #define SETPOINT_MARKER_SCALE 1.5
+#define EXPECTED_CONTROLLER_DIAG_KEYS 5 //getting unreliable message size data, so this is hard coded :( - this should be the number of keys in the message not the number that should be accessed
 
 const std::string get_hostname()
 {
@@ -728,7 +729,7 @@ namespace riptide_rviz
                 }
             }else if(msg.status[0].name.find("Controller") != std::string::npos){
 
-                for(int i = 0; i < (sizeof(msg.status[0].values) / 6); i++){
+                for(int i = 0; i < EXPECTED_CONTROLLER_DIAG_KEYS; i++){
 
                     //active control frequency
                     if(msg.status[0].values[i].key.find("Active Control") != std::string::npos){
@@ -748,6 +749,11 @@ namespace riptide_rviz
                     //individual limit saturation
                     if(msg.status[0].values[i].key.find("Individual Limit") != std::string::npos){
                         uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    }
+
+                    //individual limit saturation
+                    if(msg.status[0].values[i].key.find("Linear Error") != std::string::npos){
+                        uiPanel->AbsoluteDistance->setText(QString::fromStdString(msg.status[0].values[i].value));
                     }
             
                 }         
