@@ -378,6 +378,14 @@ namespace riptide_rviz
                 uiPanel->ctrlModeTele->setEnabled(true);
 
                 callSetBoolService(this->setTeleopClient, false);
+
+                //send a default command to move into feed forward
+                this->handleCommand(false);
+
+                //remove setpoint marker
+                setptServer->erase(interactiveSetpointMarker.name);
+                setptServer->applyChanges();
+
                 break;
 
             case riptide_rviz::ControlPanel::control_modes::TELEOP:
@@ -548,8 +556,8 @@ namespace riptide_rviz
         geometry_msgs::msg::Quaternion angularPosition;
         // geometry_msgs::msg::Vector3 angularVelocity;
         
-        // if we are in position, we use quat, otherwise use the vector
-        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION)
+        // handle publishing the angular command
+        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION || ctrlMode == riptide_rviz::ControlPanel::control_modes::FEEDFORWARD)
         {
             // check the angle mode button
             if(degreeReadout){
@@ -564,7 +572,7 @@ namespace riptide_rviz
 
             // build the angular quat for message
             angularPosition = tf2::toMsg(quat);
-        } else {
+        }else {
             // // build the vector
             // angularVelocity.x = desiredValues[3];
             // angularVelocity.y = desiredValues[4];
