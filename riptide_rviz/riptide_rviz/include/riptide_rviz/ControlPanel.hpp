@@ -8,6 +8,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <std_msgs/msg/int8.hpp>
 #include <std_msgs/msg/empty.hpp>
+#include <std_msgs/msg/bool.hpp>
 #include <std_srvs/srv/trigger.hpp>
 #include <std_srvs/srv/set_bool.hpp>
 #include <diagnostic_msgs/msg/diagnostic_array.hpp>
@@ -70,6 +71,9 @@ namespace riptide_rviz
         void handleEnable();
         void handleDisable(); // pressing disable asserts kill and clears command
         void switchMode(uint8_t mode, bool override=false);
+
+        void handleAuxDown();
+        void handleAuxUp();
 
         // slots for controlling the UI
         void toggleDegrees();
@@ -148,6 +152,8 @@ namespace riptide_rviz
             rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pidSetptPub;
         #endif
 
+        // ROS Publishers
+        rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auxPub;
         rclcpp::Publisher<riptide_msgs2::msg::KillSwitchReport>::SharedPtr killStatePub;
         rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr dragCalTriggerPub;
 

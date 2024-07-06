@@ -73,6 +73,10 @@ namespace riptide_rviz
         connect(uiPanel->ctrlDisable, &QPushButton::clicked, this, &ControlPanel::handleDisable);
         connect(uiPanel->ctrlDegOrRad, &QPushButton::clicked, this, &ControlPanel::toggleDegrees);
 
+        //aux
+        connect(uiPanel->ctrlAuxTrigger, &QPushButton::pressed, this, &ControlPanel::handleAuxDown);
+        connect(uiPanel->ctrlAuxTrigger, &QPushButton::released, this, &ControlPanel::handleAuxUp);
+
         // mode seting buttons
         connect(uiPanel->ctrlModePos, &QPushButton::clicked,
                 [this](void)
@@ -168,6 +172,7 @@ namespace riptide_rviz
 
         // setup the ROS topics that depend on namespace
         // make publishers
+        auxPub = node->create_publisher<std_msgs::msg::Bool>(robot_ns + "/state/aux", rclcpp::SystemDefaultsQoS());
         killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
         
         //controller setpoint publishers
@@ -459,6 +464,20 @@ namespace riptide_rviz
                 break;
             }
         }
+    }
+
+    void ControlPanel::handleAuxDown()
+    {
+        std_msgs::msg::Bool msg;
+        msg.data = false;
+        auxPub->publish(msg);
+    }
+
+    void ControlPanel::handleAuxUp()
+    {
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        auxPub->publish(msg);
     }
 
     void ControlPanel::refreshUI()
