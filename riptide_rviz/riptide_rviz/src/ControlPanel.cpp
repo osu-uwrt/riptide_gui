@@ -8,6 +8,7 @@
 #include <iostream>
 #include <QMessageBox>
 #include <signal.h>
+#include <string>
 
 
 #include <rviz_common/logging.hpp>
@@ -841,7 +842,8 @@ namespace riptide_rviz
         
         //add in color changing for boxes...
         
-        
+    
+
         if(sizeof(msg.status) != 0 ){
 
             if(msg.status[0].name.find("ekf") != std::string::npos){
@@ -854,33 +856,35 @@ namespace riptide_rviz
                         uiPanel->OdomDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
                 }
-            }else if(msg.status[0].name.find("Controller") != std::string::npos){
+            }else if(msg.status[0].name.find("Controller Status Values Length") != std::string::npos){
 
-                for(int i = 0; i < EXPECTED_CONTROLLER_DIAG_KEYS; i++){
+                int diag_keys = std::stoi(msg.status[0].values[0].value);
+
+                for(int i = 0; i < diag_keys; i++){
 
                     //active control frequency
-                    if(msg.status[0].values[i].key.find("Active Control") != std::string::npos){
-                        uiPanel->ACDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("Active Control") != std::string::npos){
+                        uiPanel->ACDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
 
                     //thruster flip rate
-                    if(msg.status[0].values[i].key.find("Flips Frequency") != std::string::npos){
-                        uiPanel->FlipDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("Flips Frequency") != std::string::npos){
+                        uiPanel->FlipDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
 
                     //system limit saturation
-                    if(msg.status[0].values[i].key.find("System Limit") != std::string::npos){
-                        uiPanel->SLDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("System Limit") != std::string::npos){
+                        uiPanel->SLDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
 
                     //individual limit saturation
-                    if(msg.status[0].values[i].key.find("Individual Limit") != std::string::npos){
-                        uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("Individual Limit") != std::string::npos){
+                        uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
 
                     //individual limit saturation
-                    if(msg.status[0].values[i].key.find("Linear Error") != std::string::npos){
-                        uiPanel->AbsoluteDistance->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("Linear Error") != std::string::npos){
+                        uiPanel->AbsoluteDistance->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
             
                 }         
