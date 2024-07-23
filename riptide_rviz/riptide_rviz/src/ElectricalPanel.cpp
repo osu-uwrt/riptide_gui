@@ -268,6 +268,7 @@ namespace riptide_rviz
         switch(result.code)
         {
             case rclcpp_action::ResultCode::SUCCEEDED:
+                setStatus("Tare succeeded!", false);
                 ui->calibProgress->setValue(100);
                 break;
             case rclcpp_action::ResultCode::ABORTED:
