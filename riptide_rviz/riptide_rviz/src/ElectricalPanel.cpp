@@ -46,7 +46,7 @@ namespace riptide_rviz
 
         // Make client for imu register config
         std::string fullServiceName = robotNs.toStdString() + CONFIG_SERVICE_NAME;
-        imuConfigClient = node->create_client<ImuConfig>(fullServiceName);
+        imuConfigClient = node->create_client<ImuConfig>("/vectornav/config");
 
         loaded = true;
     }
@@ -171,27 +171,7 @@ namespace riptide_rviz
     }
 
     void ElectricalPanel::resultCb(const MagGoalHandle::WrappedResult & result){
-        switch(result.code)  //     auto request = std::make_shared<ImuConfig::Request>();
-    //     request->request = "test";
-
-    //     while (!imuConfigClient->wait_for_service(1s)) {
-    //         if (!rclcpp::ok()) {
-    //             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-    //             return;
-    //         }
-    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
-    //     }
-
-    // auto result = imuConfigClient->async_send_request(request);
-    // // Wait for the result.
-    // if (rclcpp::spin_until_future_complete(this, result) == rclcpp::FutureReturnCode::SUCCESS)
-    // {
-    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sum: %ld", result.get()->sum);
-    // } else {
-    //     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service add_two_ints");
-    // }
-
-    // }
+        switch(result.code)
         {
             case rclcpp_action::ResultCode::SUCCEEDED:
                 ui->calibProgress->setValue(100);
@@ -212,47 +192,6 @@ namespace riptide_rviz
     }
 
     void ElectricalPanel::sendIMUConfigRequest(const std::string& requestStr) {
-    //     if (!imuConfigClient->wait_for_service(1s)) {
-    //         ui->registerData->setText("Config server unavailable");
-    //         RVIZ_COMMON_LOG_ERROR("ElectricalPanel: IMU config server not available");
-    //         return;
-    //     }
-
-    //     auto request = std::make_shared<ImuConfig::Request>();
-    //     request->request = requestStr;
-    //     auto futureFeedback = imuConfigClient->async_send_request(request);
-
-    //     if (futureFeedback.wait_for(1s) != std::future_status::ready) {
-    //         ui->registerData->setText("Config service busy");
-    //         RVIZ_COMMON_LOG_WARNING("ElectricalPanel: IMU config service busy");
-    //         // return;
-    //     }
-
-    //     try {
-    //         // ui->registerData->setText(futureFeedback.get()->response.c_str());
-    //         std::string test = futureFeedback.get()->response;
-    //     }
-    //     catch(...) {
-    //         RVIZ_COMMON_LOG_ERROR("ElectricalPanel: Caught error parsing config feedback");
-    //     }
-
-    //     // ui->registerData->setText(futureFeedback.get()->response.c_str());
-    //     ui->registerData->setText("Service success");
-    // }
-
-    // void ElectricalPanel::readIMU() {
-    //     ui->registerData->setText("Sending IMU read request");
-    //     std::string requestStr = "$VNRRG," + ui->registerNum->text().toStdString();
-    //     sendIMUConfigRequest(requestStr);
-    //     // ui->valuesTxt->setText(imuConfigClient->async_send_request(request).get()->response.c_str());
-    // }
-
-    // void ElectricalPanel::writeIMU() {
-    //     auto request = std::make_shared<ImuConfig::Request>();
-    //     request->request = "$VNWRG," + ui->registerNum->text().toStdString() + "," + ui->registerData->text().toStdString();
-    //     ui->valuesTxt->setText(imuConfigClient->async_send_request(request).get()->response.c_str());
-    // }
-
         // yoink local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
@@ -271,6 +210,19 @@ namespace riptide_rviz
 
         timerTick = 0;
         QTimer::singleShot(250, [this]() { waitForConfig(); });
+    }
+
+    void ElectricalPanel::readIMU() {
+        ui->registerData->setText("Sending IMU read request");
+        std::string requestStr = "$VNRRG," + ui->registerNum->text().toStdString();
+        sendIMUConfigRequest(requestStr);
+        // ui->valuesTxt->setText(imuConfigClient->async_send_request(request).get()->response.c_str());
+    }
+
+    void ElectricalPanel::writeIMU() {
+        auto request = std::make_shared<ImuConfig::Request>();
+        request->request = "$VNWRG," + ui->registerNum->text().toStdString() + "," + ui->registerData->text().toStdString();
+        ui->valuesTxt->setText(imuConfigClient->async_send_request(request).get()->response.c_str());
     }
 
     void ElectricalPanel::waitForConfig() {

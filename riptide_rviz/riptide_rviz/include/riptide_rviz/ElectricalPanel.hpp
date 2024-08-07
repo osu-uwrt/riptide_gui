@@ -37,9 +37,9 @@ namespace riptide_rviz
         private Q_SLOTS:
         void sendCommand();
         void sendMagCal();
-        void handleMagCalMode();
-        void handleMagOutputMode();
-        void handleConvergenceRate();
+        // void handleMagCalMode();
+        // void handleMagOutputMode();
+        // void handleConvergenceRate();
         void writeIMU();
         void readIMU();
 
@@ -49,10 +49,10 @@ namespace riptide_rviz
             MagGoalHandle::SharedPtr,
             const std::shared_ptr<const MagCal::Feedback> feedback);
         void resultCb(const MagGoalHandle::WrappedResult & result);
-        Qt::CheckState processCheckState(bool state);
-        void imuConfigCb(const riptide_msgs2::msg::ImuConfig config);
-        void publishImuConfig();
-        void requestCurrentImuConfig();
+        // Qt::CheckState processCheckState(bool state);
+        // void imuConfigCb(const riptide_msgs2::msg::ImuConfig config);
+        // void publishImuConfig();
+        // void requestCurrentImuConfig();
         void sendIMUConfigRequest(const std::string& request);
         void waitForConfig();
 
