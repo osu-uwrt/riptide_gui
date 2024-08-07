@@ -40,8 +40,7 @@ namespace riptide_rviz
         std::string topicName = robotNs.toStdString() + "/command/electrical";
         pub = node->create_publisher<riptide_msgs2::msg::ElectricalCommand>(topicName, 10);
 
-        //make the 
-        action client for the imu mag cal
+        //make the action client for the imu mag cal
         std::string fullActionName = robotNs.toStdString() + CALIB_ACTION_NAME;
         imuCalClient = rclcpp_action::create_client<MagCal>(node, fullActionName);
 
