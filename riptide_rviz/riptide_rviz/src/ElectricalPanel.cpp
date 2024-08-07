@@ -204,6 +204,8 @@ namespace riptide_rviz
         }
 
         auto request = std::make_shared<ImuConfig::Request>();
+        request->request = requestStr;
+
         auto imuConfigFutureInfo = imuConfigClient->async_send_request(request);
         imuConfigFuture = imuConfigFutureInfo.share();
         imuConfigFutureId = imuConfigFutureInfo.request_id;
@@ -239,7 +241,13 @@ namespace riptide_rviz
         else if (futureStatus != std::future_status::timeout) {
             // Future validated, request returned
             auto response = imuConfigFuture.get();
-            ui->registerData->setText("Got response");
+
+            std::string strResponse = response->response;
+            strResponse = strResponse.substr(strResponse.find(',') + 1);
+            strResponse = strResponse.substr(strResponse.find(',') + 1);
+            strResponse = strResponse.substr(0, strResponse.find('*'));
+
+            ui->registerData->setText(strResponse.c_str());
         }
         else if (timerTick >= 10) {
             ui->registerData->setText("Config service never responded");
