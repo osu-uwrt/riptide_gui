@@ -42,10 +42,16 @@ namespace riptide_rviz
         // backdate timeouts
         lastDiag = node->get_clock()->now() - 1h;
         lastKill = node->get_clock()->now() - 1h;
+        lastZed = node->get_clock()->now() - 1h;
 
         // make the diagnostic subscriber
         diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
+        );
+
+        std::string zedTopic = robotNsProperty->getStdString() + "/zed/zed_node/temperature/imu";
+        zedSub = node->create_subscription<sensor_msgs::msg::Temperature>(
+            zedTopic, rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::zedCallback, this, _1)
         );
 
         // watchdog timers for handling timeouts
@@ -61,6 +67,9 @@ namespace riptide_rviz
         killLedConfig.inner_color_ = QColor(255, 0, 255, 255);
         killLedConfigId = addCircle(killLedConfig);
 
+        zedLedConfig.inner_color_ = QColor(255, 0, 255, 255);
+        zedLedConfigId = addCircle(zedLedConfig);
+
         // add the static design items
         PaintedTextConfig diagLedLabel = {
             6, 20, 0, 0, "Diag",
@@ -72,8 +81,14 @@ namespace riptide_rviz
             fontName, false, 2, 12,
             QColor(255, 255, 255, 255)
         };
+        PaintedTextConfig zedLedLabel = {
+            87, 20, 0, 0, "Zed",
+            fontName, false, 2, 12,
+            QColor(255, 255, 255, 255)
+        };
         addText(diagLedLabel);
         addText(killLedLabel);
+        addText(zedLedLabel);
     }
 
     void DiagnosticOverlay::updateNS(){
@@ -151,6 +166,16 @@ namespace riptide_rviz
         }
     }
 
+    void DiagnosticOverlay::zedCallback(const sensor_msgs::msg::Temperature& msg) {
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
+        zedLedConfig.inner_color_ = QColor(0, 255, 0, 255);
+        updateCircle(zedLedConfigId, zedLedConfig);
+
+        lastZed = node->get_clock()->now();
+    }
+
     void DiagnosticOverlay::killCallback(const std_msgs::msg::Bool & msg){
         // get our local rosnode
         auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
@@ -226,6 +251,17 @@ namespace riptide_rviz
             // diagnostics timed out, reset them
             killLedConfig.inner_color_ = QColor(255, 0, 255, 255);
             updateCircle(killLedConfigId, killLedConfig);
+        }
+
+        duration = node->get_clock()->now() - lastZed;
+        if (duration > std::chrono::duration<double>(1.0f)) {
+            if (!zedTimedOut) {
+                RVIZ_COMMON_LOG_WARNING("DiagnosticsOverlay: Zed connection timed out!");
+                zedTimedOut = true;
+            }
+
+            zedLedConfig.inner_color_ = QColor(255, 0, 0, 255);
+            updateCircle(zedLedConfigId, zedLedConfig);
         }
     }
 
