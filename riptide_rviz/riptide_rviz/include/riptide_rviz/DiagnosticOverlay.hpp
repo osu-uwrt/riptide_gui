@@ -10,6 +10,8 @@
 #include <rviz_common/properties/string_property.hpp>
 #include <rviz_common/properties/float_property.hpp>
 
+#include <riptide_msgs2/msg/battery_status.hpp>
+
 namespace riptide_rviz
 {
     class DiagnosticOverlay : public OverlayDisplay {
@@ -30,6 +32,9 @@ namespace riptide_rviz
         void diagnosticCallback(const diagnostic_msgs::msg::DiagnosticArray & msg);
         void killCallback(const std_msgs::msg::Bool & msg);
 
+        void batteryCallback(const riptide_msgs2::msg::BatteryStatus& msg);
+        float lerp(float a, float b, float f);
+
         void checkTimeout();
 
         protected Q_SLOTS:
@@ -48,6 +53,7 @@ namespace riptide_rviz
 
         // subscription for diagnostics
         rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagSub;
+        rclcpp::Subscription<riptide_msgs2::msg::BatteryStatus>::SharedPtr batterySub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr killSub;
 
         // ids for rendering items so that we can edit them

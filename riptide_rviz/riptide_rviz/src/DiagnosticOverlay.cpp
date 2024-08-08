@@ -48,6 +48,10 @@ namespace riptide_rviz
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
         );
 
+        batterySub = node->create_subscription<riptide_msgs2::msg::BatteryStatus>(
+            "/talos/state/battery", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::batteryCallback, this, _1)
+        );
+
         // watchdog timers for handling timeouts
         checkTimer = node->create_wall_timer(0.25s, std::bind(&DiagnosticOverlay::checkTimeout, this));
 
@@ -99,42 +103,42 @@ namespace riptide_rviz
 
         // look for specific packets
         for(auto diagnostic : msg.status){
-            // handle robot voltage packet
-            if(diagnostic.name == "/Robot Diagnostics/Electronics/Voltages and Currents/V+ Rail Voltage"){
-                bool found = false;
-                voltageConfig.text_ = "00.00 V";
-                voltageConfig.text_color_ = QColor(255, 0, 0, 255);
+            // // handle robot voltage packet
+            // if(diagnostic.name == "/Robot Diagnostics/Electronics/Voltages and Currents/V+ Rail Voltage"){
+            //     bool found = false;
+            //     voltageConfig.text_ = "00.00 V";
+            //     voltageConfig.text_color_ = QColor(255, 0, 0, 255);
                 
-                for(auto pair : diagnostic.values){
-                    if(pair.key == "V+ Rail Voltage"){
-                        found = true;
-                        voltageConfig.text_ = pair.value;
-                    }
-                }
+            //     for(auto pair : diagnostic.values){
+            //         if(pair.key == "V+ Rail Voltage"){
+            //             found = true;
+            //             voltageConfig.text_ = pair.value;
+            //         }
+            //     }
 
-                if(!found){
-                    voltageConfig.text_ = "BAD CONV";
-                }
+            //     if(!found){
+            //         voltageConfig.text_ = "BAD CONV";
+            //     }
 
-                // now we need to look at the status of the voltage to determine color
-                // ok is green, warn is yellow, error is red
-                if(diagnostic.level == diagnostic.ERROR){
-                    voltageConfig.text_color_ = QColor(255, 0, 0, 255);
-                } else if (diagnostic.level == diagnostic.WARN){
-                    voltageConfig.text_color_ = QColor(255, 255, 0, 255);
-                } else if (diagnostic.level == diagnostic.STALE){
-                    diagLedConfig.inner_color_ = QColor(255, 0, 255, 255);
-                } else {
-                    voltageConfig.text_color_ = QColor(0, 255, 0, 255);
-                }
+            //     // now we need to look at the status of the voltage to determine color
+            //     // ok is green, warn is yellow, error is red
+            //     if(diagnostic.level == diagnostic.ERROR){
+            //         voltageConfig.text_color_ = QColor(255, 0, 0, 255);
+            //     } else if (diagnostic.level == diagnostic.WARN){
+            //         voltageConfig.text_color_ = QColor(255, 255, 0, 255);
+            //     } else if (diagnostic.level == diagnostic.STALE){
+            //         diagLedConfig.inner_color_ = QColor(255, 0, 255, 255);
+            //     } else {
+            //         voltageConfig.text_color_ = QColor(0, 255, 0, 255);
+            //     }
                 
 
-                // edit the text
-                updateText(voltageTextId, voltageConfig);
-            }
+            //     // edit the text
+            //     updateText(voltageTextId, voltageConfig);
+            // }
 
             // handle general packet for LED
-            else if(diagnostic.name == "/Robot Diagnostics"){
+            if(diagnostic.name == "/Robot Diagnostics"){
                 // Determine the LED color to use
                 if(diagnostic.level == diagnostic.ERROR){
                     diagLedConfig.inner_color_ = QColor(255, 0, 0, 255);
@@ -149,6 +153,25 @@ namespace riptide_rviz
                 updateCircle(diagLedConfigId, diagLedConfig);
             }
         }
+    }
+
+    void DiagnosticOverlay::batteryCallback(const riptide_msgs2::msg::BatteryStatus& msg) {
+        // TODO: lerp green->red from 100% to 40%
+
+        float redChannel = lerp(255, 0, msg.soc / 100.0f);
+        float greenChannel = lerp(0, 255, msg.soc / 100.0f);
+
+        voltageConfig.text_color_ = QColor(redChannel, greenChannel, 0, 255);
+        voltageConfig.text_ = std::to_string(msg.soc) + "%";
+
+        RVIZ_COMMON_LOG_INFO(std::to_string(redChannel).c_str());
+        RVIZ_COMMON_LOG_INFO(std::to_string(greenChannel).c_str());
+
+        updateText(voltageTextId, voltageConfig);
+    }
+
+    float lerp(float a, float b, float f) {
+        return a * (1.0 - f) + (b * f);
     }
 
     void DiagnosticOverlay::killCallback(const std_msgs::msg::Bool & msg){
