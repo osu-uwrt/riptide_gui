@@ -66,6 +66,7 @@ namespace riptide_rviz
 
         connect(ui->imuRead, &QPushButton::clicked, this, &ElectricalPanel::readIMU);
         connect(ui->imuWrite, &QPushButton::clicked, this, &ElectricalPanel::writeIMU);
+        connect(ui->imuWriteSettings, &QPushButton::clicked, this, &ElectricalPanel::saveImuSettings);
 
         //initial UI state
         ui->calibProgress->setValue(0);
@@ -74,6 +75,7 @@ namespace riptide_rviz
 
         ui->registerNum->setText("");
         ui->registerData->setText("");
+        ui->imuStatusLabel->setText("");
     }
 
 
@@ -191,14 +193,16 @@ namespace riptide_rviz
         ui->magCalSend->setText("Calibrate");
     }
 
-    void ElectricalPanel::sendIMUConfigRequest(const std::string& requestStr) {
+    void ElectricalPanel::sendIMUConfigRequest(const std::string& requestStr, bool extResponseTime) {
+        ui->imuStatusLabel->setText("");
+
         // yoink local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
         auto start = node->get_clock()->now();
         while (!imuConfigClient->wait_for_service(100ms)) {
             if (node->get_clock()->now() - start > 1s || rclcpp::ok()) {
-                ui->registerData->setText("Config server unavailable");
+                ui->imuStatusLabel->setText("Config server unavailable");
                 return;
             }
         }
@@ -211,31 +215,20 @@ namespace riptide_rviz
         imuConfigFutureId = imuConfigFutureInfo.request_id;
 
         timerTick = 0;
-        QTimer::singleShot(250, [this]() { waitForConfig(); });
+        QTimer::singleShot(250, [this, extResponseTime]() { waitForConfig(extResponseTime); });
     }
 
-    void ElectricalPanel::readIMU() {
-        ui->registerData->setText("Sending IMU read request");
-        std::string requestStr = "$VNRRG," + ui->registerNum->text().toStdString();
-        sendIMUConfigRequest(requestStr);
-        // ui->valuesTxt->setText(imuConfigClient->async_send_request(request).get()->response.c_str());
-    }
-
-    void ElectricalPanel::writeIMU() {
-        auto request = std::make_shared<ImuConfig::Request>();
-        request->request = "$VNWRG," + ui->registerNum->text().toStdString() + "," + ui->registerData->text().toStdString();
-        ui->valuesTxt->setText(imuConfigClient->async_send_request(request).get()->response.c_str());
-    }
-
-    void ElectricalPanel::waitForConfig() {
+    void ElectricalPanel::waitForConfig(bool extResponseTime) {
         if (!imuConfigFuture.valid()) {
-            ui->registerData->setText("Future invalidated");
+            ui->imuStatusLabel->setText("Future invalidated");
             return;   
         }
 
+        int maxNumTicks = extResponseTime ? 20 : 10;
+
         auto futureStatus = imuConfigFuture.wait_for(10ms);
         if (futureStatus == std::future_status::timeout && timerTick < 10) {
-            QTimer::singleShot(250, [this]() {waitForConfig();});
+            QTimer::singleShot(250, [this, extResponseTime]() {waitForConfig(extResponseTime);});
             timerTick++;
         }
         else if (futureStatus != std::future_status::timeout) {
@@ -248,11 +241,29 @@ namespace riptide_rviz
             strResponse = strResponse.substr(0, strResponse.find('*'));
 
             ui->registerData->setText(strResponse.c_str());
+
+            if (strResponse.substr(0, strResponse.find('*')) == "$VNWNV")
+                ui->imuStatusLabel->setText("Flashed IMU settings");
         }
-        else if (timerTick >= 10) {
-            ui->registerData->setText("Config service never responded");
+        else if (timerTick >= maxNumTicks) {
+            ui->imuStatusLabel->setText("Config service never responded");
             imuConfigClient->remove_pending_request(imuConfigFutureId);
         }
+    }
+
+    void ElectricalPanel::readIMU() {
+        std::string requestStr = "$VNRRG," + ui->registerNum->text().toStdString();
+        sendIMUConfigRequest(requestStr);
+    }
+
+    void ElectricalPanel::writeIMU() {
+        std::string requestStr = "$VNWRG," + ui->registerNum->text().toStdString() + "," + ui->registerData->text().toStdString();
+        sendIMUConfigRequest(requestStr);
+    }
+
+    void ElectricalPanel::saveImuSettings() {
+        std::string requestStr = "$VNWNV";
+        sendIMUConfigRequest(requestStr, true);
     }
 
 }

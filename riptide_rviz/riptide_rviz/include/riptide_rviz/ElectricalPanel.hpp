@@ -42,6 +42,7 @@ namespace riptide_rviz
         // void handleConvergenceRate();
         void writeIMU();
         void readIMU();
+        void saveImuSettings();
 
         private:
         void goalResponseCb(const MagGoalHandle::SharedPtr & goal_handle);
@@ -53,8 +54,8 @@ namespace riptide_rviz
         // void imuConfigCb(const riptide_msgs2::msg::ImuConfig config);
         // void publishImuConfig();
         // void requestCurrentImuConfig();
-        void sendIMUConfigRequest(const std::string& request);
-        void waitForConfig();
+        void sendIMUConfigRequest(const std::string& request, bool extResponseTime = false);
+        void waitForConfig(bool extResponseTime = false);
 
         // electrical command vars
         bool loaded = false;
