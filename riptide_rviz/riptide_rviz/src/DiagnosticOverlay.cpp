@@ -202,7 +202,6 @@ namespace riptide_rviz
 
         leakTimedOut = false;
 
-        // get our local rosnode
         if (msg.data) {
             if (redFlash) {
                 leakLedConfig.inner_color_ = QColor(255, 0, 0, 255);  // Flash red
@@ -212,7 +211,7 @@ namespace riptide_rviz
                 leakLedConfig.inner_color_ = QColor(252, 126, 0, 255);  // Flash orange
                 redFlash = true;
             }
-            
+
             if (!startedLeaking) {
                 // Pop up an annoying box
                 QMessageBox msgBox;
