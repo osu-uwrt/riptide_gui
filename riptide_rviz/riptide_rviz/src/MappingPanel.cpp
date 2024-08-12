@@ -71,6 +71,9 @@ namespace riptide_rviz
         // initialize mapping target stuff
         mappingTargetInfoSub = node->create_subscription<riptide_msgs2::msg::MappingTargetInfo>(robotNs + "/state/mapping", 10,
             std::bind(&MappingPanel::mappingStatusCb, this, _1));
+
+        mappingObjectSub = node->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(robotNs + "/mapping/torpedo", 10,
+            std::bind(&MappingPanel::mappingObjectCb, this, _1));
         
         mappingTargetClient = std::make_shared<GuiSrvClient<MappingTarget>>(node, robotNs + "/mapping_target",
             std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::mappingTargetResultCb, this, _1, _2));
@@ -314,6 +317,23 @@ namespace riptide_rviz
         std::string target = (msg->target_object == "" ? "..." : msg->target_object);
         ui->mappingTargetObject->setText(QString::fromStdString(target));
         ui->mappingLocked->setChecked(msg->lock_map);
+    }
+
+
+    void MappingPanel::mappingObjectCb(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+    {
+        double error = 0;
+
+        // use sum of sqared errors
+        for(int i = 0; i < 3; i++){
+            error += std::pow(msg.get()->pose.covariance.at((6*i) + i), 2);
+        }
+        for(int i = 3; i < 6; i++){
+            error += std::pow(msg.get()->pose.covariance.at((6*i) + i), 2) / (2 * M_PI);
+        }
+
+        error = std::sqrt(error);
+        ui->mappingTargetError->setText(QString::fromStdString(std::to_string(error)));
     }
 
 

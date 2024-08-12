@@ -12,6 +12,8 @@
 #include <riptide_msgs2/msg/mapping_target_info.hpp>
 #include <riptide_msgs2/srv/mapping_target.hpp>
 
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+
 #include "ui_MappingPanel.h"
 
 #include "riptide_rviz/GuiSrvClient.hpp"
@@ -69,6 +71,7 @@ namespace riptide_rviz
 
         // mappingtarget stuff
         void mappingStatusCb(const riptide_msgs2::msg::MappingTargetInfo::SharedPtr msg);
+        void mappingObjectCb(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
         void mappingTargetResultCb(const std::string& srvName, rclcpp::Client<MappingTarget>::SharedResponse response);
 
         Ui_MappingPanel *ui;
@@ -78,6 +81,7 @@ namespace riptide_rviz
         
         rclcpp_action::Client<chameleon_tf_msgs::action::ModelFrame>::SharedPtr calibClient;
         rclcpp::Subscription<riptide_msgs2::msg::MappingTargetInfo>::SharedPtr mappingTargetInfoSub;
+        rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr mappingObjectSub;
         GuiSrvClient<MappingTarget>::SharedPtr mappingTargetClient;
 
         #ifdef USE_ZED_INTERFACES
