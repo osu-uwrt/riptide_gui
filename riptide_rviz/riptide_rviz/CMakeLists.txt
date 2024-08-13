@@ -86,7 +86,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNC
 pluginlib_export_plugin_description_file(rviz_common plugins_description.xml)
 
 # Link ament packages
-ament_target_dependencies(${PROJECT_NAME} 
+set(deps
   rclcpp 
   rclcpp_action
   ament_index_cpp
@@ -107,12 +107,18 @@ ament_target_dependencies(${PROJECT_NAME}
 )
 
 if(zed_interfaces_FOUND)
-  ament_target_dependencies(${PROJECT_NAME}
-    zed_interfaces)
+  set(deps
+    ${deps}
+    zed_interfaces
+  )
   
   target_compile_definitions(${PROJECT_NAME} PUBLIC
     USE_ZED_INTERFACES)
 endif()
+
+ament_target_dependencies(${PROJECT_NAME} 
+  ${deps}
+)
 
 # Link non ament packages
 target_link_libraries(${PROJECT_NAME} 

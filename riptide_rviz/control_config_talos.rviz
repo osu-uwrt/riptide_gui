@@ -4,10 +4,12 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
+        - /Status1
         - /TF1/Frames1
-        - /MarkerArray1/Namespaces1
-      Splitter Ratio: 0.8388888835906982
-    Tree Height: 298
+        - /Mapping Markers1/Namespaces1
+      Splitter Ratio: 0.5276073813438416
+    Tree Height: 284
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -68,6 +70,40 @@ Visualization Manager:
       Plane Cell Count: 100
       Reference Frame: <Fixed Frame>
       Value: true
+    - Alpha: 0.699999988079071
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: RGB8
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Loc. Point Cloud
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /talos/zed/zed_node/point_cloud/cloud_registered
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
     - Class: riptide_rviz/DiagnosticOverlay
       Enabled: true
       Name: DiagnosticOverlay
@@ -82,217 +118,19 @@ Visualization Manager:
       ver_dist: 0
       width: 128
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        buoy_frame:
-          Value: true
-        buoy_glyph_1_frame:
-          Value: true
-        buoy_glyph_2_frame:
-          Value: true
-        buoy_glyph_3_frame:
-          Value: true
-        buoy_glyph_4_frame:
-          Value: true
-        earth_glyph_frame:
-          Value: false
-        gate_frame:
-          Value: false
-        map:
-          Value: false
-        odom:
-          Value: false
-        offset:
-          Value: false
-        prequal_gate_frame:
-          Value: false
-        prequal_pole_frame:
-          Value: false
-        simulator/buoy:
-          Value: true
-        simulator/gate:
-          Value: true
-        simulator/talos/base_link:
-          Value: true
-        simulator/talos/zed2i/left_optical:
-          Value: true
-        simulator/torpedo:
-          Value: true
-        table_frame:
-          Value: false
-        talos/base_inertia:
-          Value: false
-        talos/base_link:
-          Value: true
-        talos/downwards_camera/left_link:
-          Value: false
-        talos/downwards_camera/left_optical:
-          Value: false
-        talos/downwards_camera/right_link:
-          Value: false
-        talos/downwards_camera/right_optical:
-          Value: false
-        talos/downwards_camera_base_link:
-          Value: false
-        talos/droppers_link:
-          Value: false
-        talos/dvl_link:
-          Value: false
-        talos/imu_link:
-          Value: false
-        talos/imu_revolute_link:
-          Value: false
-        talos/origin:
-          Value: false
-        talos/poker_link:
-          Value: false
-        talos/pose_sensor_link:
-          Value: false
-        talos/pressure_link:
-          Value: false
-        talos/thruster_0:
-          Value: false
-        talos/thruster_1:
-          Value: false
-        talos/thruster_2:
-          Value: false
-        talos/thruster_3:
-          Value: false
-        talos/thruster_4:
-          Value: false
-        talos/thruster_5:
-          Value: false
-        talos/thruster_6:
-          Value: false
-        talos/thruster_7:
-          Value: false
-        talos/torpedo_link:
-          Value: false
-        talos/zed_camera_base_link:
-          Value: false
-        talos/zed_camera_center:
-          Value: false
-        talos/zed_camera_link:
-          Value: false
-        talos/zed_left_camera_frame:
-          Value: false
-        talos/zed_left_camera_optical_frame:
-          Value: false
-        talos/zed_right_camera_frame:
-          Value: false
-        talos/zed_right_camera_optical_frame:
-          Value: false
-        torpedo_closed_frame:
-          Value: true
-        torpedo_closed_hole_frame:
-          Value: true
-        torpedo_open_frame:
-          Value: true
-        torpedo_open_hole_frame:
-          Value: true
-        world:
-          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        world:
-          map:
-            offset:
-              buoy_frame:
-                buoy_glyph_1_frame:
-                  {}
-                buoy_glyph_2_frame:
-                  {}
-                buoy_glyph_3_frame:
-                  {}
-                buoy_glyph_4_frame:
-                  {}
-              gate_frame:
-                earth_glyph_frame:
-                  {}
-              prequal_gate_frame:
-                {}
-              prequal_pole_frame:
-                {}
-              table_frame:
-                {}
-              torpedo_closed_frame:
-                {}
-              torpedo_closed_hole_frame:
-                {}
-              torpedo_open_frame:
-                {}
-              torpedo_open_hole_frame:
-                {}
-          odom:
-            simulator/talos/base_link:
-              simulator/talos/zed2i/left_optical:
-                {}
-            talos/base_link:
-              talos/origin:
-                talos/base_inertia:
-                  {}
-                talos/downwards_camera_base_link:
-                  talos/downwards_camera/left_link:
-                    talos/downwards_camera/left_optical:
-                      {}
-                    talos/downwards_camera/right_link:
-                      talos/downwards_camera/right_optical:
-                        {}
-                talos/droppers_link:
-                  {}
-                talos/dvl_link:
-                  {}
-                talos/imu_link:
-                  {}
-                talos/imu_revolute_link:
-                  {}
-                talos/poker_link:
-                  {}
-                talos/pressure_link:
-                  {}
-                talos/thruster_0:
-                  {}
-                talos/thruster_1:
-                  {}
-                talos/thruster_2:
-                  {}
-                talos/thruster_3:
-                  {}
-                talos/thruster_4:
-                  {}
-                talos/thruster_5:
-                  {}
-                talos/thruster_6:
-                  {}
-                talos/thruster_7:
-                  {}
-                talos/torpedo_link:
-                  {}
-                talos/zed_camera_base_link:
-                  talos/zed_camera_link:
-                    talos/zed_camera_center:
-                      talos/zed_left_camera_frame:
-                        talos/zed_left_camera_optical_frame:
-                          {}
-                      talos/zed_right_camera_frame:
-                        talos/zed_right_camera_optical_frame:
-                          {}
-              talos/pose_sensor_link:
-                {}
-          simulator/buoy:
-            {}
-          simulator/gate:
-            {}
-          simulator/torpedo:
-            {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -419,6 +257,16 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        talos/torpedo_0_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/torpedo_1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         talos/torpedo_link:
           Alpha: 1
           Show Axes: false
@@ -444,7 +292,7 @@ Visualization Manager:
       Visual Enabled: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
-      Name: MarkerArray
+      Name: Mapping Markers
       Namespaces:
         ghost: true
         mapping_markers: true
@@ -490,7 +338,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate
+          Name: Bin
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -500,42 +348,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/gate
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Earth Glyph
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/earth_glyph
+            Value: /talos/mapping/bin
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -595,7 +408,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Buoy Glyph 1
+          Name: Gate
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -605,7 +418,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/buoy_glyph_1
+            Value: /talos/mapping/gate
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -630,7 +443,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Buoy Glyph 2
+          Name: Gate Cold
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -640,7 +453,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/buoy_glyph_2
+            Value: /talos/mapping/gate_cold
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -665,7 +478,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo Open
+          Name: Gate Hot
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -675,112 +488,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_open
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Torpedo Open Hole
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_open_hole
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Torpedo Closed
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_closed
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Torpedo Closed Hole
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/mapping/torpedo_closed_hole
+            Value: /talos/mapping/gate_hot
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -816,6 +524,111 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/table
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Torpedo
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/torpedo
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Torpedo Large Hole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/torpedo_large_hole
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Torpedo Small Hole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/torpedo_small_hole
           Value: true
       Enabled: true
       Name: Mapping Objects
@@ -973,7 +786,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-      Enabled: true
+      Enabled: false
       Name: Thruster Wrenches
     - Class: rviz_common/Group
       Displays:
@@ -981,7 +794,7 @@ Visualization Manager:
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1000,7 +813,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate
+          Name: Bin
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1010,48 +823,13 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/gate
+            Value: /talos/dummydetections/bin
           Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: EarthGlyph
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/dummydetections/earth_glyph
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1086,7 +864,7 @@ Visualization Manager:
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1105,7 +883,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: BuoyGlyph1
+          Name: Gate
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1115,13 +893,13 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/buoy_glyph_1
+            Value: /talos/dummydetections/gate
           Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1140,7 +918,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: BuoyGlyph2
+          Name: Gate Cold
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1150,13 +928,13 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/buoy_glyph_2
+            Value: /talos/dummydetections/gate_cold
           Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1175,7 +953,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoOpen
+          Name: Gate Hot
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1185,13 +963,13 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_open
+            Value: /talos/dummydetections/gate_hot
           Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1210,7 +988,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoOpenHole
+          Name: Table
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1220,13 +998,13 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_open_hole
+            Value: /talos/dummydetections/table
           Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1245,7 +1023,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoClosed
+          Name: Torpedo
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1255,13 +1033,13 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_closed
+            Value: /talos/dummydetections/torpedo
           Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
           Class: rviz_default_plugins/PoseWithCovariance
-          Color: 255; 25; 0
+          Color: 38; 162; 105
           Covariance:
             Orientation:
               Alpha: 0.5
@@ -1280,7 +1058,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: TorpedoClosedHole
+          Name: Torpedo Large Hole
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1290,9 +1068,44 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_closed_hole
+            Value: /talos/dummydetections/torpedo_large_hole
           Value: true
-      Enabled: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Torpedo Small Hole
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/torpedo_small_hole
+          Value: true
+      Enabled: false
       Name: Dummy Detections
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -1330,7 +1143,7 @@ Visualization Manager:
       Value: false
     - Class: rviz_default_plugins/MarkerArray
       Enabled: false
-      Name: MarkerArray
+      Name: Vision Planes
       Namespaces:
         {}
       Topic:
@@ -1386,25 +1199,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 5.057244777679443
+      Distance: 17.872249603271484
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.129817247390747
-        Y: 1.8123334646224976
-        Z: -1.0293995141983032
+        X: 9.222932815551758
+        Y: -1.3210361003875732
+        Z: -1.4098764657974243
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.934795618057251
+      Pitch: 0.47979623079299927
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.444483518600464
+      Yaw: 3.099493980407715
     Saved: ~
 Window Geometry:
   Actuators:
@@ -1428,7 +1241,7 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000003000000000000022f0000035ffc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000035f000003150100001cfa000000000100000002fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000022f00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000017000ffffff000000010000016a0000035ffc0200000002fc0000003d000001d5000001090100001cfa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff000000fd00fffffffc0000021800000184000001840100001cfa000000000100000005fb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a00000039fc0100000001fb0000000800540069006d006501000000000000073a000002fb00ffffff000003950000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000300000000000001fe00000363fc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003b00000363000002f30100001afa000000010100000002fb000000180043006f006e00740072006f006c00500061006e0065006c010000000000000219000001fc00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000016700ffffff00000001000001ba00000363fc0200000002fc0000003b000001eb0000015b0100001afa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000014b00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000011200fffffffc0000022c00000172000001720100001afa000000030100000005fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000007b00fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000012000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff000000fc00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a00000039fc0100000001fb0000000800540069006d006501000000000000073a0000025300ffffff000003760000036300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
     collapsed: false
   Views:

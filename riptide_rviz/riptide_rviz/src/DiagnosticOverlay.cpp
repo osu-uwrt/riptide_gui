@@ -1,6 +1,7 @@
 #include "riptide_rviz/DiagnosticOverlay.hpp"
 
 #include <QFontDatabase>
+#include <QMessageBox>
 
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/logging.hpp>
@@ -20,7 +21,7 @@ namespace riptide_rviz
         }
 
         robotNsProperty = new rviz_common::properties::StringProperty(
-            "robot_namespace", "/tempest", "Robot namespace to attach to", this, SLOT(updateNS()));
+            "robot_namespace", "/talos", "Robot namespace to attach to", this, SLOT(updateNS()));
 
         timeoutProperty = new rviz_common::properties::FloatProperty(
             "diagnostic_timeout", 10.0, "Maximum time between diagnostic packets before default", this);
@@ -42,10 +43,22 @@ namespace riptide_rviz
         // backdate timeouts
         lastDiag = node->get_clock()->now() - 1h;
         lastKill = node->get_clock()->now() - 1h;
+        lastZed = node->get_clock()->now() - 1h;
+        lastLeak = node->get_clock()->now() - 1h;
 
         // make the diagnostic subscriber
         diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
+        );
+
+        std::string zedTopic = robotNsProperty->getStdString() + "/zed/zed_node/temperature/imu";
+        zedSub = node->create_subscription<sensor_msgs::msg::Temperature>(
+            zedTopic, rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::zedCallback, this, _1)
+        );
+
+        std::string leakTopic = robotNsProperty->getStdString() + "/state/leak";
+        leakSub = node->create_subscription<std_msgs::msg::Bool>(
+            leakTopic, rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::leakCallback, this, _1)
         );
 
         // watchdog timers for handling timeouts
@@ -61,6 +74,12 @@ namespace riptide_rviz
         killLedConfig.inner_color_ = QColor(255, 0, 255, 255);
         killLedConfigId = addCircle(killLedConfig);
 
+        zedLedConfig.inner_color_ = QColor(255, 0, 255, 255);
+        zedLedConfigId = addCircle(zedLedConfig);
+
+        leakLedConfig.inner_color_ = QColor(255, 0, 255, 255);
+        leakLedConfigId = addCircle(leakLedConfig);
+
         // add the static design items
         PaintedTextConfig diagLedLabel = {
             6, 20, 0, 0, "Diag",
@@ -72,8 +91,20 @@ namespace riptide_rviz
             fontName, false, 2, 12,
             QColor(255, 255, 255, 255)
         };
+        PaintedTextConfig zedLedLabel = {
+            87, 20, 0, 0, "Zed",
+            fontName, false, 2, 12,
+            QColor(255, 255, 255, 255)
+        };
+        PaintedTextConfig leakLedLabel = {
+            6, 70, 0, 0, "Leak",
+            fontName, false, 2, 12,
+            QColor(255, 255, 255, 255)
+        };
         addText(diagLedLabel);
         addText(killLedLabel);
+        addText(zedLedLabel);
+        addText(leakLedLabel);
     }
 
     void DiagnosticOverlay::updateNS(){
@@ -151,6 +182,60 @@ namespace riptide_rviz
         }
     }
 
+    void DiagnosticOverlay::zedCallback(const sensor_msgs::msg::Temperature& msg) {
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
+        zedTimedOut = false;
+
+        zedLedConfig.inner_color_ = QColor(0, 255, 0, 255);
+        updateCircle(zedLedConfigId, zedLedConfig);
+
+        lastZed = node->get_clock()->now();
+    }
+
+    void DiagnosticOverlay::leakCallback(const std_msgs::msg::Bool& msg) {
+        static bool redFlash = true;
+
+        // get our local rosnode
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
+        leakTimedOut = false;
+
+        if (msg.data) {
+            if (redFlash) {
+                leakLedConfig.inner_color_ = QColor(255, 0, 0, 255);  // Flash red
+                redFlash = false;
+            }
+            else {
+                leakLedConfig.inner_color_ = QColor(252, 126, 0, 255);  // Flash orange
+                redFlash = true;
+            }
+
+            if (!startedLeaking) {
+                // Pop up an annoying box
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("LEAK");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(QString::fromStdString("Water was detected in one of the cages."));
+
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setDefaultButton(QMessageBox::Ok);
+                msgBox.exec();  
+                
+                startedLeaking = true;
+            }
+
+        }
+        else {
+            leakLedConfig.inner_color_ = QColor(0, 255, 0, 255);
+            startedLeaking = false;
+        }
+
+        updateCircle(leakLedConfigId, leakLedConfig);
+        lastLeak = node->get_clock()->now();
+    }
+
     void DiagnosticOverlay::killCallback(const std_msgs::msg::Bool & msg){
         // get our local rosnode
         auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
@@ -226,6 +311,28 @@ namespace riptide_rviz
             // diagnostics timed out, reset them
             killLedConfig.inner_color_ = QColor(255, 0, 255, 255);
             updateCircle(killLedConfigId, killLedConfig);
+        }
+
+        duration = node->get_clock()->now() - lastZed;
+        if (duration > std::chrono::duration<double>(1.0f)) {
+            if (!zedTimedOut) {
+                RVIZ_COMMON_LOG_WARNING("DiagnosticsOverlay: Zed connection timed out!");
+                zedTimedOut = true;
+            }
+
+            zedLedConfig.inner_color_ = QColor(255, 0, 0, 255);
+            updateCircle(zedLedConfigId, zedLedConfig);
+        }
+
+        duration = node->get_clock()->now() - lastLeak;
+        if (duration > std::chrono::duration<double>(2.0s)) {
+            if (!leakTimedOut) {
+                RVIZ_COMMON_LOG_WARNING("DiagnosticsOverlay: Leak sensors timed out!");
+                leakTimedOut = true;
+            }
+
+            leakLedConfig.inner_color_ = QColor(255, 0, 255, 255);
+            updateCircle(leakLedConfigId, leakLedConfig);
         }
     }
 

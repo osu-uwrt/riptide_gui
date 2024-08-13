@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <iostream>
 #include <QMessageBox>
+#include <signal.h>
+#include <string>
+
 
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -20,6 +23,7 @@ using std::placeholders::_2;
 #define MAX_HOST_LEN 300
 #define SETPOINT_REPUB_PERIOD 1s
 #define SETPOINT_MARKER_SCALE 1.5
+#define EXPECTED_CONTROLLER_DIAG_KEYS 5 //getting unreliable message size data, so this is hard coded :( - this should be the number of keys in the message not the number that should be accessed
 
 const std::string get_hostname()
 {
@@ -59,6 +63,8 @@ namespace riptide_rviz
         ctrlMode = riptide_rviz::ControlPanel::control_modes::DISABLED;
 
         RVIZ_COMMON_LOG_INFO("ControlPanel: Constructed control panel");
+
+        this->teleopPID = -1;
     }
 
     void ControlPanel::onInitialize()
@@ -67,6 +73,10 @@ namespace riptide_rviz
         connect(uiPanel->ctrlEnable, &QPushButton::clicked, this, &ControlPanel::handleEnable);
         connect(uiPanel->ctrlDisable, &QPushButton::clicked, this, &ControlPanel::handleDisable);
         connect(uiPanel->ctrlDegOrRad, &QPushButton::clicked, this, &ControlPanel::toggleDegrees);
+
+        //aux
+        connect(uiPanel->ctrlAuxTrigger, &QPushButton::pressed, this, &ControlPanel::handleAuxDown);
+        connect(uiPanel->ctrlAuxTrigger, &QPushButton::released, this, &ControlPanel::handleAuxUp);
 
         // mode seting buttons
         connect(uiPanel->ctrlModePos, &QPushButton::clicked,
@@ -150,6 +160,9 @@ namespace riptide_rviz
         connect(uiTimer, &QTimer::timeout, [this](void)
                 { refreshUI(); });
 
+        // setup the last duplicate state
+        last_duplicate_state = false;
+
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
@@ -160,6 +173,7 @@ namespace riptide_rviz
 
         // setup the ROS topics that depend on namespace
         // make publishers
+        auxPub = node->create_publisher<std_msgs::msg::Bool>(robot_ns + "/state/aux", rclcpp::SystemDefaultsQoS());
         killStatePub = node->create_publisher<riptide_msgs2::msg::KillSwitchReport>(robot_ns + "/command/software_kill", rclcpp::SystemDefaultsQoS());
         
         //controller setpoint publishers
@@ -304,6 +318,7 @@ namespace riptide_rviz
 
     ControlPanel::~ControlPanel()
     {
+
         // master window control removal
         delete uiPanel;
 
@@ -339,9 +354,17 @@ namespace riptide_rviz
     {
         // check the vehicle is enabled or we are overriding
         if(vehicleEnabled || override) {
+
+            //ensure teleop is killed
+            if(this->teleopPID > 0){
+
+                //because the rocket league node is threaded - kill session leader
+                killpg(teleopPID, SIGINT);
+                this->teleopPID = -1;
+            }
+
             ctrlMode = mode;
             visualization_msgs::msg::InteractiveMarker testMarker;
-
 
             switch (ctrlMode)
             {
@@ -369,7 +392,9 @@ namespace riptide_rviz
                 uiPanel->ctrlModeTele->setEnabled(true);
 
                 callSetBoolService(this->setTeleopClient, false);
+
                 break;
+
             case riptide_rviz::ControlPanel::control_modes::FEEDFORWARD:
                 uiPanel->ctrlModeFFD->setEnabled(false);
                 uiPanel->ctrlModeVel->setEnabled(true);
@@ -377,6 +402,14 @@ namespace riptide_rviz
                 uiPanel->ctrlModeTele->setEnabled(true);
 
                 callSetBoolService(this->setTeleopClient, false);
+
+                //send a default command to move into feed forward
+                this->handleCommand(false);
+
+                //remove setpoint marker
+                setptServer->erase(interactiveSetpointMarker.name);
+                setptServer->applyChanges();
+
                 break;
 
             case riptide_rviz::ControlPanel::control_modes::TELEOP:
@@ -392,6 +425,26 @@ namespace riptide_rviz
 
                 setptServer->erase(interactiveSetpointMarker.name);
                 setptServer->applyChanges();
+
+                //fork-exec call teleop
+                this->teleopPID = fork();
+
+                if(teleopPID == 0){
+                    RVIZ_COMMON_LOG_INFO("Launching RocketLeague Node");
+
+                    //set process group id so this can be killed later
+                    setpgid(0,0);
+
+                    //run rocket leauge node
+                    char* command = "ros2";
+                    char* commandArgList[] = {"ros2", "run", "riptide_controllers2", "RocketLeague.py"};
+
+                    execvp(command, commandArgList);
+
+                } else {
+                    RVIZ_COMMON_LOG_INFO("Spawned Teleop with PID: " + std::to_string(teleopPID));
+                }
+
                 break;
 
             case riptide_rviz::ControlPanel::control_modes::DISABLED:
@@ -414,8 +467,46 @@ namespace riptide_rviz
         }
     }
 
+    void ControlPanel::handleAuxDown()
+    {
+        std_msgs::msg::Bool msg;
+        msg.data = false;
+        auxPub->publish(msg);
+    }
+
+    void ControlPanel::handleAuxUp()
+    {
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        auxPub->publish(msg);
+    }
+
     void ControlPanel::refreshUI()
     {
+        // Check for duplicate topics and disable UI if duplicates are found
+        if (checkForDuplicateTopics()) {
+
+            if (!last_duplicate_state){
+                handleDisable();
+                uiPanel->ctrlEnable->setEnabled(false);
+                uiPanel->ctrlDiveInPlace->setEnabled(false);
+                uiPanel->CtrlSendCmd->setEnabled(false);
+                last_duplicate_state = true;
+                // Display a popup window
+                std::string warningMessage = "Duplicate topics detected!";
+                displayPopupWindow(warningMessage, duplicate_topics_list);
+                
+            }
+
+            return; // Early return to prevent further UI updates  
+
+        } else{
+            if (last_duplicate_state){
+                uiPanel->ctrlEnable->setEnabled(true);
+                last_duplicate_state = false;
+            }
+        }
+
         // get our local rosnode
         auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
@@ -452,6 +543,66 @@ namespace riptide_rviz
                 uiPanel->ctrlDiveInPlace->setEnabled(true);
             }
         }
+    }
+
+    bool ControlPanel::checkForDuplicateTopics() {
+        auto node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
+        auto topics = node->get_topic_names_and_types();
+        std::map<std::string, int> topic_count;
+        bool anyDuplicates = false;
+        duplicate_topics_list = "";
+
+        // Count each topic's occurrences
+        for (const auto& topic_info : topics) {
+            topic_count[topic_info.first]++;
+        }
+
+        // Check for changes in duplicate status
+        for (const auto& count : topic_count) {
+
+            bool is_duplicate = count.second > 1;
+            anyDuplicates |= is_duplicate;  // If any topic is a duplicate, set to true
+            auto it = topic_duplicate_status.find(count.first);
+
+            if (it == topic_duplicate_status.end() || it->second != is_duplicate) {
+
+                topic_duplicate_status[count.first] = is_duplicate;  // Update the status in the map
+                if (is_duplicate) {
+                    RVIZ_COMMON_LOG_WARNING_STREAM("Duplicate topic detected: " << count.first);
+                    duplicate_topics_list += count.first + "\n";
+                } else if (it != topic_duplicate_status.end()) {
+                    RVIZ_COMMON_LOG_INFO_STREAM("Duplicate resolved: " << count.first);
+                }
+            }
+        }
+
+        // Cleanup map entries for topics no longer present
+        for (auto it = topic_duplicate_status.begin(); it != topic_duplicate_status.end(); ) {
+            
+            if (topic_count.find(it->first) == topic_count.end()) {
+                it = topic_duplicate_status.erase(it);  // Remove from map if topic no longer exists
+            } else {
+                ++it;
+            }
+        }
+
+        return anyDuplicates;
+    }
+
+    void ControlPanel::displayPopupWindow(const std::string& warningMessage, const std::string& text){
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Warning");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText(QString::fromStdString(warningMessage));
+
+        QString informativeText = QString::fromStdString(text);
+        msgBox.setInformativeText(informativeText);
+
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();  
+        
     }
 
     // slots for sending commands to the vehicle
@@ -544,8 +695,8 @@ namespace riptide_rviz
         geometry_msgs::msg::Quaternion angularPosition;
         // geometry_msgs::msg::Vector3 angularVelocity;
         
-        // if we are in position, we use quat, otherwise use the vector
-        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION)
+        // handle publishing the angular command
+        if (ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION || ctrlMode == riptide_rviz::ControlPanel::control_modes::FEEDFORWARD)
         {
             // check the angle mode button
             if(degreeReadout){
@@ -560,7 +711,7 @@ namespace riptide_rviz
 
             // build the angular quat for message
             angularPosition = tf2::toMsg(quat);
-        } else {
+        }else {
             // // build the vector
             // angularVelocity.x = desiredValues[3];
             // angularVelocity.y = desiredValues[4];
@@ -710,7 +861,8 @@ namespace riptide_rviz
         
         //add in color changing for boxes...
         
-        
+    
+
         if(sizeof(msg.status) != 0 ){
 
             if(msg.status[0].name.find("ekf") != std::string::npos){
@@ -723,28 +875,35 @@ namespace riptide_rviz
                         uiPanel->OdomDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
                 }
-            }else if(msg.status[0].name.find("Controller") != std::string::npos){
+            }else if(msg.status[0].name.find("Controller Status Values Length") != std::string::npos){
 
-                for(int i = 0; i < (sizeof(msg.status[0].values) / 6); i++){
+                int diag_keys = std::stoi(msg.status[0].values[0].value);
+
+                for(int i = 0; i < diag_keys; i++){
 
                     //active control frequency
-                    if(msg.status[0].values[i].key.find("Active Control") != std::string::npos){
-                        uiPanel->ACDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("Active Control") != std::string::npos){
+                        uiPanel->ACDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
 
                     //thruster flip rate
-                    if(msg.status[0].values[i].key.find("Flips Frequency") != std::string::npos){
-                        uiPanel->FlipDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("Flips Frequency") != std::string::npos){
+                        uiPanel->FlipDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
 
                     //system limit saturation
-                    if(msg.status[0].values[i].key.find("System Limit") != std::string::npos){
-                        uiPanel->SLDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("System Limit") != std::string::npos){
+                        uiPanel->SLDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
 
                     //individual limit saturation
-                    if(msg.status[0].values[i].key.find("Individual Limit") != std::string::npos){
-                        uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[0].values[i].value));
+                    if(msg.status[1].values[i].key.find("Individual Limit") != std::string::npos){
+                        uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
+                    }
+
+                    //individual limit saturation
+                    if(msg.status[1].values[i].key.find("Linear Error") != std::string::npos){
+                        uiPanel->AbsoluteDistance->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
             
                 }         

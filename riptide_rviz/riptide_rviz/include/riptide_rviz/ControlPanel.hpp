@@ -8,6 +8,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <std_msgs/msg/int8.hpp>
 #include <std_msgs/msg/empty.hpp>
+#include <std_msgs/msg/bool.hpp>
 #include <std_srvs/srv/trigger.hpp>
 #include <std_srvs/srv/set_bool.hpp>
 #include <diagnostic_msgs/msg/diagnostic_array.hpp>
@@ -26,6 +27,8 @@
 
 #include "ui_ControlPanel.h"
 #include <QTimer>
+#include <QMessageBox>
+#include <QString>
 
 //
 // CONTROLLER SELECTION
@@ -69,6 +72,9 @@ namespace riptide_rviz
         void handleDisable(); // pressing disable asserts kill and clears command
         void switchMode(uint8_t mode, bool override=false);
 
+        void handleAuxDown();
+        void handleAuxUp();
+
         // slots for controlling the UI
         void toggleDegrees();
         void refreshUI();
@@ -106,6 +112,12 @@ namespace riptide_rviz
         void dragGoalResponseCb(const CalibrateDragGH::SharedPtr &goal_handle);
         void dragResultCb(const CalibrateDragGH::WrappedResult &result);
         
+        void displayPopupWindow(const std::string& warningMessage, const std::string& text);
+        bool checkForDuplicateTopics();
+        bool last_duplicate_state;
+        std::map<std::string, bool> topic_duplicate_status;
+        std::string duplicate_topics_list;
+
         // UI Panel instance
         Ui_ControlPanel *uiPanel;
 
@@ -130,6 +142,9 @@ namespace riptide_rviz
         // QT ui timer for handling data freshness
         QTimer *uiTimer;
 
+        //pid for teleop fork-exec
+        pid_t teleopPID;
+
         // publishers
         #if CONTROLLER_TYPE == CONTROLLER_CMD
             rclcpp::Publisher<riptide_msgs2::msg::ControllerCommand>::SharedPtr ctrlCmdLinPub, ctrlCmdAngPub;
@@ -137,6 +152,8 @@ namespace riptide_rviz
             rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pidSetptPub;
         #endif
 
+        // ROS Publishers
+        rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auxPub;
         rclcpp::Publisher<riptide_msgs2::msg::KillSwitchReport>::SharedPtr killStatePub;
         rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr dragCalTriggerPub;
 

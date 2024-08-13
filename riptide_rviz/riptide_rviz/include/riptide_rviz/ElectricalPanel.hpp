@@ -7,19 +7,25 @@
 #include <riptide_msgs2/msg/electrical_command.hpp>
 #include <riptide_msgs2/msg/imu_config.hpp>
 #include <riptide_msgs2/action/mag_cal.hpp>
+#include <riptide_msgs2/action/tare_gyro.hpp>
 
 #include "ui_ElectricalPanel.h"
 
 namespace riptide_rviz
 {
-    const static std::string CALIB_ACTION_NAME = "/vectornav/mag_cal";
+    const static std::string 
+        MAG_CAL_ACTION_NAME = "/vectornav/mag_cal",
+        TARE_GYRO_ACTION_NAME = "/gyro/tare";
 
     class ElectricalPanel : public rviz_common::Panel
     {
         using MagCal = riptide_msgs2::action::MagCal;
         using MagSendGoalOptions = rclcpp_action::Client<MagCal>::SendGoalOptions;
         using MagGoalHandle = rclcpp_action::Client<MagCal>::GoalHandle;
-        
+
+        using TareGyro = riptide_msgs2::action::TareGyro;
+        using TareGyroSendGoalOptions = rclcpp_action::Client<TareGyro>::SendGoalOptions;
+        using TareGyroGoalHandle = rclcpp_action::Client<TareGyro>::GoalHandle;
 
         Q_OBJECT
         public:
@@ -31,18 +37,19 @@ namespace riptide_rviz
         void onInitialize() override;
 
         private Q_SLOTS:
-        void sendCommand();
+        void sendElectricalCommand();
         void sendMagCal();
-        void handleMagCalMode();
-        void handleMagOutputMode();
-        void handleConvergenceRate();
+        void sendTareGyro();
 
         private:
-        void goalResponseCb(const MagGoalHandle::SharedPtr & goal_handle);
-        void feedbackCb(
+        void setStatus(const QString& status, bool error);
+        void magCalGoalResponseCb(const MagGoalHandle::SharedPtr & goal_handle);
+        void magCalFeedbackCb(
             MagGoalHandle::SharedPtr,
             const std::shared_ptr<const MagCal::Feedback> feedback);
-        void resultCb(const MagGoalHandle::WrappedResult & result);
+        void magCalResultCb(const MagGoalHandle::WrappedResult & result);
+        void tareGyroGoalResponseCb(const TareGyroGoalHandle::SharedPtr & goal_handle);
+        void tareGyroResultCb(const TareGyroGoalHandle::WrappedResult & result);
         Qt::CheckState processCheckState(bool state);
         void imuConfigCb(const riptide_msgs2::msg::ImuConfig config);
         void publishImuConfig();
@@ -54,7 +61,10 @@ namespace riptide_rviz
         QString robotNs;
 
         // mag cal vars
-        bool calInProgress = false;
+        bool 
+            imuCalInProgress = false,
+            gyroTareInProgress = false;
+            
         double maxVar = 0.0;
 
         // Continuous mag cal vars
@@ -63,7 +73,8 @@ namespace riptide_rviz
         int imuConvergenceRate = 1; 
 
         rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr pub;
-        rclcpp_action::Client<riptide_msgs2::action::MagCal>::SharedPtr imuCalClient;
+        rclcpp_action::Client<MagCal>::SharedPtr imuCalClient;
+        rclcpp_action::Client<TareGyro>::SharedPtr tareGyroClient;
         
         rclcpp::Publisher<riptide_msgs2::msg::ImuConfig>::SharedPtr writeImuConfig;
         rclcpp::Subscription<riptide_msgs2::msg::ImuConfig>::SharedPtr readImuConfig;

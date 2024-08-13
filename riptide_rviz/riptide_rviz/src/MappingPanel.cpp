@@ -1,5 +1,5 @@
 #include <QMessageBox>
-
+#include <QFileInfo>
 #include "riptide_rviz/MappingPanel.hpp"
 #include <rviz_common/logging.hpp>
 #include <rviz_common/display_context.hpp>
@@ -60,9 +60,20 @@ namespace riptide_rviz
         calibClient = rclcpp_action::create_client<ModelFrame>(node, fullActionName);
         RVIZ_COMMON_LOG_INFO("Created action client for server with name \"" + fullActionName + "\"");
 
+        #if USE_ZED_INTERFACES
+            startSvoClient = std::make_shared<GuiSrvClient<StartSvoRec>>(node, robotNs + "/zed/zed_node/start_svo_rec", 
+                std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::serviceResponseCb<StartSvoRec>, this, _1, _2));
+
+            stopSvoClient = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/zed/zed_node/stop_svo_rec", 
+                std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::serviceResponseCb<Trigger>, this, _1, _2));
+        #endif
+
         // initialize mapping target stuff
         mappingTargetInfoSub = node->create_subscription<riptide_msgs2::msg::MappingTargetInfo>(robotNs + "/state/mapping", 10,
             std::bind(&MappingPanel::mappingStatusCb, this, _1));
+
+        mappingObjectSub = node->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(robotNs + "/mapping/torpedo", 10,
+            std::bind(&MappingPanel::mappingObjectCb, this, _1));
         
         mappingTargetClient = std::make_shared<GuiSrvClient<MappingTarget>>(node, robotNs + "/mapping_target",
             std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::mappingTargetResultCb, this, _1, _2));
@@ -161,17 +172,48 @@ namespace riptide_rviz
     void MappingPanel::zedSvoStart()
     {
         #ifdef USE_ZED_INTERFACES
-            QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+            QString rec_location = ui->recordDst->text();
+            if (rec_location.startsWith("~")) {
+                rec_location.replace(0, 1, "/home/ros");
+            }
+
+            if (!rec_location.endsWith(".svo"))
+            {
+                rec_location = rec_location + ".svo";
+            }
+
+            // Extract just the filename
+            QFileInfo fileInfo(rec_location);
+            QString fileName = fileInfo.fileName();
+
+            setStatus(QString("Recording SVO to %1").arg(fileName), "000000");
+
+            auto request = std::make_shared<zed_interfaces::srv::StartSvoRec::Request>();
+            request->bitrate = 0;
+            request->compression_mode = 0;  // LOSSLESS = 0
+            request->target_framerate = 0;
+            request->input_transcode = false;
+            request->svo_filename = rec_location.toStdString();  // Use absolute path
+
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Starting SVO recording with parameters:");
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Bitrate: %d", request->bitrate);
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Compression Mode: %d", request->compression_mode);
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Target Framerate: %d", request->target_framerate);
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Input Transcode: %s", request->input_transcode ? "true" : "false");
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "SVO Filename: %s", request->svo_filename.c_str());
+
+            startSvoClient->callService(request);
         #else
             QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
         #endif
     }
 
 
+
     void MappingPanel::zedSvoStop()
     {
         #ifdef USE_ZED_INTERFACES
-            QMessageBox::warning(ui->form, "Not Implemented", "This feature is not implemented yet.");
+            stopSvoClient->callService(std::make_shared<std_srvs::srv::Trigger::Request>());
         #else
             QMessageBox::warning(ui->form, "Not Supported", "This feature is not available until you build rviz with zed_interfaces installed.");
         #endif
@@ -192,6 +234,7 @@ namespace riptide_rviz
 
     void MappingPanel::setStatus(const QString& text, const QString &color)
     {
+        RVIZ_COMMON_LOG_INFO(text.toStdString());
         ui->calibStatus->setText(text);
         ui->calibStatus->setStyleSheet(tr("QLabel { color: #%1; }").arg(color));
     }
@@ -274,6 +317,23 @@ namespace riptide_rviz
         std::string target = (msg->target_object == "" ? "..." : msg->target_object);
         ui->mappingTargetObject->setText(QString::fromStdString(target));
         ui->mappingLocked->setChecked(msg->lock_map);
+    }
+
+
+    void MappingPanel::mappingObjectCb(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+    {
+        double error = 0;
+
+        // use sum of sqared errors
+        for(int i = 0; i < 3; i++){
+            error += std::pow(msg.get()->pose.covariance.at((6*i) + i), 2);
+        }
+        for(int i = 3; i < 6; i++){
+            error += std::pow(msg.get()->pose.covariance.at((6*i) + i), 2) / (2 * M_PI);
+        }
+
+        error = std::sqrt(error);
+        ui->mappingTargetError->setText(QString::fromStdString(std::to_string(error)));
     }
 
 
