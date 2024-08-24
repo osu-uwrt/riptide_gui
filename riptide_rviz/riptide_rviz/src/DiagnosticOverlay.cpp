@@ -61,6 +61,11 @@ namespace riptide_rviz
             leakTopic, rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::leakCallback, this, _1)
         );
 
+        std::string batteryKillTopic = robotNsProperty->getStdString() + "/command/electrical";
+        batteryKillPub = node->create_publisher<riptide_msgs2::msg::ElectricalCommand>(
+            batteryKillTopic, 10  // 10 prevents mismatched QoS
+        );
+
         // watchdog timers for handling timeouts
         checkTimer = node->create_wall_timer(0.25s, std::bind(&DiagnosticOverlay::checkTimeout, this));
 
@@ -219,9 +224,19 @@ namespace riptide_rviz
                 msgBox.setIcon(QMessageBox::Warning);
                 msgBox.setText(QString::fromStdString("Water was detected in one of the cages."));
 
+                QPushButton *killButton = msgBox.addButton("Kill Power", QMessageBox::AcceptRole);
                 msgBox.setStandardButtons(QMessageBox::Ok);
-                msgBox.setDefaultButton(QMessageBox::Ok);
+                msgBox.setDefaultButton(killButton);
                 msgBox.exec();  
+
+                if (msgBox.clickedButton() == (QAbstractButton*)killButton) {
+                    // Publish kill
+                    riptide_msgs2::msg::ElectricalCommand killCmd;
+                    killCmd.command = riptide_msgs2::msg::ElectricalCommand::KILL_ROBOT_POWER;
+                    batteryKillPub->publish(killCmd);
+
+                    RVIZ_COMMON_LOG_WARNING("DiagnosticOverlay: Sending battery kill message");
+                }
                 
                 startedLeaking = true;
             }

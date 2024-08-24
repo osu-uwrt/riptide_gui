@@ -8,6 +8,7 @@
 #include <std_msgs/msg/bool.hpp>
 #include <sensor_msgs/msg/temperature.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <riptide_msgs2/msg/electrical_command.hpp>
 
 #include <rviz_common/properties/string_property.hpp>
 #include <rviz_common/properties/float_property.hpp>
@@ -56,6 +57,9 @@ namespace riptide_rviz
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr killSub;
         rclcpp::Subscription<sensor_msgs::msg::Temperature>::SharedPtr zedSub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr leakSub;
+
+        // Battery kill publisher
+        rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr batteryKillPub;
 
         // ids for rendering items so that we can edit them
         int voltageTextId = -1;
