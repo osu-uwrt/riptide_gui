@@ -860,8 +860,6 @@ namespace riptide_rviz
     void ControlPanel::diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg){
         
         //add in color changing for boxes...
-        
-    
 
         if(sizeof(msg.status) != 0 ){
 
@@ -875,6 +873,7 @@ namespace riptide_rviz
                         uiPanel->OdomDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
                 }
+
             }else if(msg.status[0].name.find("Controller Status Values Length") != std::string::npos){
 
                 int diag_keys = std::stoi(msg.status[0].values[0].value);
@@ -905,9 +904,23 @@ namespace riptide_rviz
                     if(msg.status[1].values[i].key.find("Linear Error") != std::string::npos){
                         uiPanel->AbsoluteDistance->setText(QString::fromStdString(msg.status[1].values[i].value));
                     }
+
+                    //auto tune status
+                    if(msg.status[1].values[i].key.find("Auto Tune Status") != std::string::npos){
+                        uiPanel->AutoTuneStatus->setText(QString::fromStdString(msg.status[1].values[i].value));
+                    }
+
+                    //auto tune max ticker
+                    if(msg.status[1].values[i].key.find("Auto Tune Ticker") != std::string::npos){
+                        uiPanel->AutoTuneTickerDisp->setText(QString::fromStdString(msg.status[1].values[i].value));
+                    }
             
+                    //autotune dominant axis
+                    if(msg.status[1].values[i].key.find("Auto Tune Dominant Axis") != std::string::npos){
+                        uiPanel->AutoTuneDominantAxisDisp->setText(QString::fromStdString(msg.status[1].values[i].value));
+                    }
                 }         
-            }         
+            }    
         }
     }
     // ROS timer callbacks

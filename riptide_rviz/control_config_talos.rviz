@@ -9,7 +9,7 @@ Panels:
         - /TF1/Frames1
         - /Mapping Markers1/Namespaces1
       Splitter Ratio: 0.5276073813438416
-    Tree Height: 284
+    Tree Height: 298
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -149,139 +149,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        talos/base_inertia:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/downwards_camera/left_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/downwards_camera/left_optical:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/downwards_camera/right_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/downwards_camera/right_optical:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/downwards_camera_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/droppers_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/dvl_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/imu_revolute_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/origin:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/poker_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/pose_sensor_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/pressure_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_0:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_5:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_6:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/thruster_7:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/torpedo_0_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/torpedo_1_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/torpedo_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/zed_camera_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/zed_camera_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -294,7 +161,6 @@ Visualization Manager:
       Enabled: true
       Name: Mapping Markers
       Namespaces:
-        ghost: true
         mapping_markers: true
         simGhost: true
       Topic:
@@ -1241,7 +1107,7 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000300000000000001fe00000363fc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003b00000363000002f30100001afa000000010100000002fb000000180043006f006e00740072006f006c00500061006e0065006c010000000000000219000001fc00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000016700ffffff00000001000001ba00000363fc0200000002fc0000003b000001eb0000015b0100001afa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000014b00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000011200fffffffc0000022c00000172000001720100001afa000000030100000005fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000007b00fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000012000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff000000fc00fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a00000039fc0100000001fb0000000800540069006d006501000000000000073a0000025300ffffff000003760000036300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000300000000000003840000035ffc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000035f000003150100001cfa000000000100000002fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000022f00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000017000ffffff00000001000001eb0000035ffc0200000002fc0000003d000001d50000016d0100001cfa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000011c00fffffffc0000021800000184000001840100001cfa000000030100000005fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a00000039fc0100000001fb0000000800540069006d006501000000000000073a000002fb00ffffff000001bf0000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
     collapsed: false
   Views:
