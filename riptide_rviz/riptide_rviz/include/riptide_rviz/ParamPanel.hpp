@@ -41,5 +41,8 @@ namespace riptide_rviz
         QPushButton* applyButton;
         QPushButton* refreshButton;
         QString robotNs;
+
+        // Declare the eventFilter method
+        bool eventFilter(QObject* obj, QEvent* event) override;
     };
 }
