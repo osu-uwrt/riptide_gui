@@ -652,7 +652,7 @@ Visualization Manager:
           Torque Arrow Scale: 2
           Torque Color: 204; 204; 51
           Value: true
-      Enabled: false
+      Enabled: true
       Name: Thruster Wrenches
     - Class: rviz_common/Group
       Displays:
@@ -1065,25 +1065,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 17.872249603271484
+      Distance: 12.179436683654785
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 9.222932815551758
-        Y: -1.3210361003875732
-        Z: -1.4098764657974243
+        X: 3.3467891216278076
+        Y: -4.5107622146606445
+        Z: -2.5246071815490723
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.47979623079299927
+      Pitch: 0.44979625940322876
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.099493980407715
+      Yaw: 2.1694912910461426
     Saved: ~
 Window Geometry:
   Actuators:

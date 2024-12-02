@@ -61,6 +61,11 @@ namespace riptide_rviz
             leakTopic, rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::leakCallback, this, _1)
         );
 
+        std::string batteryKillTopic = robotNsProperty->getStdString() + "/command/electrical";
+        batteryKillPub = node->create_publisher<riptide_msgs2::msg::ElectricalCommand>(
+            batteryKillTopic, 10  // 10 prevents mismatched QoS
+        );
+
         // watchdog timers for handling timeouts
         checkTimer = node->create_wall_timer(0.25s, std::bind(&DiagnosticOverlay::checkTimeout, this));
 
@@ -196,10 +201,7 @@ namespace riptide_rviz
 
     void DiagnosticOverlay::leakCallback(const std_msgs::msg::Bool& msg) {
         static bool redFlash = true;
-
-        // get our local rosnode
-        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
-
+        rclcpp::Node::SharedPtr node;
         leakTimedOut = false;
 
         if (msg.data) {
@@ -219,18 +221,35 @@ namespace riptide_rviz
                 msgBox.setIcon(QMessageBox::Warning);
                 msgBox.setText(QString::fromStdString("Water was detected in one of the cages."));
 
+                QPushButton *killButton = msgBox.addButton("Kill Power", QMessageBox::AcceptRole);
                 msgBox.setStandardButtons(QMessageBox::Ok);
-                msgBox.setDefaultButton(QMessageBox::Ok);
+                msgBox.setDefaultButton(killButton);
                 msgBox.exec();  
+
+                // Get our local rosnode
+                // This has to happen after msgBox.exec or it will hang ros pubs while the msgbox is up
+                node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+
+                if (msgBox.clickedButton() == (QAbstractButton*)killButton) {
+                    // Publish kill
+                    riptide_msgs2::msg::ElectricalCommand killCmd;
+                    killCmd.command = riptide_msgs2::msg::ElectricalCommand::KILL_ROBOT_POWER;
+                    batteryKillPub->publish(killCmd);
+
+                    RVIZ_COMMON_LOG_WARNING("DiagnosticOverlay: Sending battery kill message");
+                }
                 
                 startedLeaking = true;
             }
-
         }
         else {
             leakLedConfig.inner_color_ = QColor(0, 255, 0, 255);
             startedLeaking = false;
         }
+
+        // Set node now if it wasn't earlier
+        if (!node)
+            node = context_->getRosNodeAbstraction().lock()->get_raw_node();
 
         updateCircle(leakLedConfigId, leakLedConfig);
         lastLeak = node->get_clock()->now();
