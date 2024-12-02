@@ -16,6 +16,7 @@
 #include <limits.h>
 #include <QScrollArea>
 #include <float.h>
+#include <QEvent>
 
 using namespace std::placeholders;
 using namespace std::chrono_literals;
@@ -67,13 +68,9 @@ namespace riptide_rviz
         
         QGridLayout* scrollLayout = new QGridLayout();
 
-        
-
         QWidget* scrollWidget = new QWidget();
         scrollWidget->setLayout(mainLayout);
         
-        
-
         QScrollArea* scroll = new QScrollArea();
         scroll->setWidget(scrollWidget);
         scroll->setWidgetResizable(true);
@@ -179,6 +176,7 @@ namespace riptide_rviz
                     box->setMaximum(INT_MAX);
                     box->setObjectName(name);
                     box->setValue(param.as_int());
+                    box->installEventFilter(this);  // Disable wheel scroll here
                     hBox->addWidget(box);
                 } break;
 
@@ -194,6 +192,7 @@ namespace riptide_rviz
                         box->setMaximum(INT_MAX);
                         box->setObjectName(name);
                         box->setValue(arr.at(i));
+                        box->installEventFilter(this);  // Disable wheel scroll here
 
                         QHBoxLayout* arrHBox = new QHBoxLayout();
 
@@ -213,6 +212,7 @@ namespace riptide_rviz
                     box->setMaximum(DBL_MAX);
                     box->setObjectName(name);
                     box->setValue(param.as_double());
+                    box->installEventFilter(this);  // Disable wheel scroll here
                     hBox->addWidget(box);
                 } break;
 
@@ -228,6 +228,7 @@ namespace riptide_rviz
                         box->setMaximum(DBL_MAX);
                         box->setObjectName(name);
                         box->setValue(arr.at(i));
+                        box->installEventFilter(this);  // Disable wheel scroll here
 
                         QHBoxLayout* arrHBox = new QHBoxLayout();
 
@@ -320,6 +321,16 @@ namespace riptide_rviz
             this->paramLayout->addLayout(hBox);
 
         } 
+    }
+
+    // Event filter to block scroll events for spin boxes
+    bool ParamPanel::eventFilter(QObject* obj, QEvent* event) {
+        if (event->type() == QEvent::Wheel) {
+            if (dynamic_cast<QDoubleSpinBox*>(obj) || dynamic_cast<QSpinBox*>(obj)) {
+                return true;  // Block the wheel event
+            }
+        }
+        return QObject::eventFilter(obj, event);
     }
 
     // When the Node Combo Box Changes connect to the new node selected
@@ -505,6 +516,10 @@ namespace riptide_rviz
 
                     newParams.push_back(newParam);
 
+                }
+
+                default: {
+                    break;
                 }
 
             }
