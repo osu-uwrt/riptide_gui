@@ -118,6 +118,8 @@ namespace riptide_rviz
                                     std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<SetBool>, this, _1, _2));
         clawClient              = std::make_shared<GuiSrvClient<SetBool>>(node, robotNs + "/command/actuator/claw", 
                                     std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<SetBool>, this, _1, _2));
+        clawSetClosedPosClient  = std::make_shared<GuiSrvClient<Trigger>>(node, robotNs + "/command/actuator/claw/set_closed_pos",
+                                    std::bind(&Actuators::updateStatus, this, _1, _2), std::bind(&Actuators::serviceResponseCb<Trigger>, this, _1, _2));
     }
 
 
@@ -174,13 +176,15 @@ namespace riptide_rviz
 
     void Actuators::handleClawGoHome()
     {
-        QMessageBox::warning(uiPanel->mainWidget, "Not supported", "This action is not supported yet.");
+        // QMessageBox::warning(uiPanel->mainWidget, "Not supported", "This action is not supported yet.");
+        handleCloseClaw();
     }
 
 
     void Actuators::handleClawSetHome()
     {
-        QMessageBox::warning(uiPanel->mainWidget, "Not supported", "This action is not supported yet.");
+        // QMessageBox::warning(uiPanel->mainWidget, "Not supported", "This action is not supported yet.");
+        callTriggerService(clawSetClosedPosClient);
     }
 
 

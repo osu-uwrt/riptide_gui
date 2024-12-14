@@ -73,7 +73,8 @@ namespace riptide_rviz
             torpedoClient,
             reloadClient,
             torpMarkerGoHomeClient,
-            torpMarkerSetHomeClient;
+            torpMarkerSetHomeClient,
+            clawSetClosedPosClient;
 
         GuiSrvClient<SetBool>::SharedPtr
             armClient,
