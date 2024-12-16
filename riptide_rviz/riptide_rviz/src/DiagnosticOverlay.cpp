@@ -51,7 +51,7 @@ namespace riptide_rviz
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
         );
 
-        std::string zedFfcTopic = robotNsProperty->getStdString() + "/zed/ffc/zed_node/temperature/imu";
+        std::string zedTopic = robotNsProperty->getStdString() + "/zed/ffc/zed_node/temperature/imu";
         zedSub = node->create_subscription<sensor_msgs::msg::Temperature>(
             zedTopic, rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::zedCallback, this, _1)
         );
