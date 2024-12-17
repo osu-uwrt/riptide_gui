@@ -128,7 +128,7 @@ namespace riptide_rviz
         };
 
         PaintedTextConfig tempLabel = {
-            50, 70, 0, 0, "Temp",
+            50, 70, 0, 0, "Fog",
             fontName, false, 2, 12,
             QColor(255, 255, 255, 255)
         };

@@ -113,7 +113,7 @@ namespace riptide_rviz
         // Gauge display elements
         PaintedArcConfig tempGaugeArc{
             60, 100,    // x, y pos
-            20,         // radius
+            10,         // radius
             90,         // start angle (degrees)
             -270,       // end angle (degrees)
             2,          // line width
@@ -123,7 +123,7 @@ namespace riptide_rviz
         
         PaintedArcConfig tempGaugeIndicator{
             60, 100,    // x, y pos
-            20,         // radius
+            10,         // radius
             90,         // start angle
             90,         // end angle 
             3,          // line thickness
@@ -132,7 +132,7 @@ namespace riptide_rviz
         int tempGaugeIndicatorId;
 
         PaintedTextConfig tempTextConfig{
-            105, 80,    // x, y pos
+            85, 90,    // x, y pos
             0, 0,       // offset
             "0.0°C",    // default text
             fontName,
