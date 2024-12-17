@@ -45,8 +45,28 @@ namespace riptide_rviz
         lastKill = node->get_clock()->now() - 1h;
         lastZed = node->get_clock()->now() - 1h;
         lastLeak = node->get_clock()->now() - 1h;
+        lastGyro = node->get_clock()->now() - 1h;
 
-        // make the diagnostic subscriber
+        // Get temperature parameters
+        auto paramClient = std::make_shared<rclcpp::SyncParametersClient>(
+            node, robotNsProperty->getStdString() + "/riptide_gyro");
+        if (paramClient->wait_for_service(std::chrono::seconds(1))) {
+            auto params = paramClient->get_parameters({"temp_min", "temp_max"});
+            if (params.size() == 2) {
+                tempMin = params[0].as_double();
+                tempMax = params[1].as_double();
+            }
+        }
+
+        // sub to gyro status
+        std::string gyroTopic = robotNsProperty->getStdString() + "/gyro/status";
+        gyroSub = node->create_subscription<riptide_msgs2::msg::GyroStatus>(
+            gyroTopic,
+            rclcpp::SystemDefaultsQoS(),
+            std::bind(&DiagnosticOverlay::gyroCallback, this, _1)
+        );
+
+        // subs
         diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics_agg", rclcpp::SystemDefaultsQoS(), std::bind(&DiagnosticOverlay::diagnosticCallback, this, _1)
         );
@@ -106,6 +126,20 @@ namespace riptide_rviz
             fontName, false, 2, 12,
             QColor(255, 255, 255, 255)
         };
+
+        PaintedTextConfig tempLabel = {
+            50, 70, 0, 0, "Temp",
+            fontName, false, 2, 12,
+            QColor(255, 255, 255, 255)
+        };
+
+        // init temperature gauge
+        tempGaugeArcId = addArc(tempGaugeArc);
+        tempGaugeIndicatorId = addArc(tempGaugeIndicator);
+        tempTextId = addText(tempTextConfig);
+
+        // Labels
+        addText(tempLabel);
         addText(diagLedLabel);
         addText(killLedLabel);
         addText(zedLedLabel);
@@ -283,6 +317,37 @@ namespace riptide_rviz
 
         require_update_texture_ = true;
     }
+
+    void DiagnosticOverlay::gyroCallback(const riptide_msgs2::msg::GyroStatus& msg) {
+        auto node = context_->getRosNodeAbstraction().lock()->get_raw_node();
+        lastGyro = node->get_clock()->now();
+        gyroTimedOut = false;
+        
+        // Update temp display
+        double temp = msg.temperature;
+        
+        // Update gauge indicator
+        double angleRange = 360.0; // round and round baby
+        double normalizedTemp = std::min(std::max(temp, 0.0), 100.0) / 100.0;  // 0-100 C range
+        double newAngle = 90.0 - (normalizedTemp * angleRange); // Start at top and go cw
+        tempGaugeIndicator.end_angle_ = newAngle;
+        
+        // Update color based on temperature thresholds (according to brach)
+        if (temp > 75.0) {
+            tempGaugeIndicator.line_color_ = QColor(255, 0, 0, 255);    // R
+        } else if (temp > 55.0) {
+            tempGaugeIndicator.line_color_ = QColor(255, 255, 0, 255);  // Y
+        } else {
+            tempGaugeIndicator.line_color_ = QColor(0, 255, 0, 255);    // G
+        }
+        
+        // Update text
+        tempTextConfig.text_ = QString::number(temp, 'f', 1).toStdString() + "°C";
+        
+        updateArc(tempGaugeIndicatorId, tempGaugeIndicator);
+        updateText(tempTextId, tempTextConfig);
+    }
+
     
     void DiagnosticOverlay::onEnable(){
         OverlayDisplay::onEnable();
@@ -352,6 +417,21 @@ namespace riptide_rviz
 
             leakLedConfig.inner_color_ = QColor(255, 0, 255, 255);
             updateCircle(leakLedConfigId, leakLedConfig);
+        }
+
+        // Gyro timeout
+        duration = node->get_clock()->now() - lastGyro;
+        if (duration > std::chrono::duration<double>(2.0)) {
+            if (!gyroTimedOut) {
+                RVIZ_COMMON_LOG_WARNING("DiagnosticsOverlay: Gyro temperature timed out!");
+                gyroTimedOut = true;
+            }
+            
+            tempGaugeIndicator.line_color_ = QColor(255, 0, 255, 255);
+            tempTextConfig.text_ = "-.--°C";
+            
+            updateArc(tempGaugeIndicatorId, tempGaugeIndicator);
+            updateText(tempTextId, tempTextConfig);
         }
     }
 

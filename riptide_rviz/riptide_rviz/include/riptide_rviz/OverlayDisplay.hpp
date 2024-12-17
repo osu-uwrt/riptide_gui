@@ -64,6 +64,14 @@ namespace riptide_rviz {
         QColor inner_color_, outer_color_;
     };
 
+    struct PaintedArcConfig {
+        float x_, y_;
+        float radius_;
+        float start_angle_, end_angle_;
+        float line_width_;
+        QColor line_color_;
+    };
+
     class OverlayDisplay : public rviz_common::Display {
         Q_OBJECT
       public:
@@ -79,10 +87,12 @@ namespace riptide_rviz {
         // methods to add text and shapes to the renderer
         int addText(const PaintedTextConfig & config);
         int addCircle(const PaintedCircleConfig & config);
-
+        int addArc(const PaintedArcConfig& config);
+        
         // methods to update text and shape overlays
         void updateText(int index, const PaintedTextConfig & config);
         void updateCircle(int index, const PaintedCircleConfig & config);
+        void updateArc(int id, const PaintedArcConfig& config);
 
         void clearElements();
 
@@ -90,6 +100,7 @@ namespace riptide_rviz {
         // helper functions for drawing text and other things on the base figure
         void paintText(const PaintedTextConfig & config, QPainter & painter);
         void paintCircle(const PaintedCircleConfig & config, QPainter & painter);
+        void paintArc(const PaintedArcConfig & config, QPainter & painter);
 
         OverlayObject::SharedPtr overlay_;
 
@@ -115,6 +126,7 @@ namespace riptide_rviz {
         // vectors for holding each of the object types
         std::vector<PaintedTextConfig> text_vector_;
         std::vector<PaintedCircleConfig> circle_vector_;
+        std::vector<PaintedArcConfig> arc_vector_;
 
       protected Q_SLOTS:
         void updateHorizontalDistance();

@@ -73,9 +73,9 @@ namespace riptide_rviz {
         ver_alignment_property_->addOption("center", (int)VerticalAlignment::CENTER);
         ver_alignment_property_->addOption("bottom", (int)VerticalAlignment::BOTTOM);
 
-        width_property_ = new rviz_common::properties::IntProperty("width", 128, "width position", this, SLOT(updateWidth()));
+        width_property_ = new rviz_common::properties::IntProperty("width", 400, "width position", this, SLOT(updateWidth()));
         width_property_->setMin(0);
-        height_property_ = new rviz_common::properties::IntProperty("height", 128, "height position", this, SLOT(updateHeight()));
+        height_property_ = new rviz_common::properties::IntProperty("height", 200, "height position", this, SLOT(updateHeight()));
         height_property_->setMin(0);
     }
 
@@ -156,6 +156,10 @@ namespace riptide_rviz {
                 config.width_ = w;
                 config.height_ = h;
                 paintCircle(config, painter);
+            }
+
+            for(auto config : arc_vector_) {
+                paintArc(config, painter);
             }
             
             painter.end();
@@ -246,6 +250,17 @@ namespace riptide_rviz {
         painter.drawEllipse(QPoint(config.x_, config.y_), config.inner_radius_, config.inner_radius_);
     }
 
+    void OverlayDisplay::paintArc(const PaintedArcConfig & config, QPainter & painter) {
+        painter.setPen(QPen(config.line_color_, config.line_width_));
+        QRectF rect(config.x_ - config.radius_,
+                    config.y_ - config.radius_,
+                    config.radius_ * 2,
+                    config.radius_ * 2);
+        painter.drawArc(rect, 
+                        config.start_angle_ * 16,  // Qt uses 1/16th of a degree
+                        (config.end_angle_ - config.start_angle_) * 16);
+    }
+
     // methods to add text and shapes to the renderer
     int OverlayDisplay::addText(const PaintedTextConfig & config){
         text_vector_.push_back(config);
@@ -257,6 +272,17 @@ namespace riptide_rviz {
         circle_vector_.push_back(config);
         require_update_texture_ = true;
         return circle_vector_.size() - 1;
+    }
+
+    int OverlayDisplay::addArc(const PaintedArcConfig& config) {
+        arc_vector_.push_back(config);
+        require_update_texture_ = true;
+        return arc_vector_.size() - 1;
+    }
+
+    void OverlayDisplay::updateArc(int index, const PaintedArcConfig& config) {
+        arc_vector_.at(index) = config;
+        require_update_texture_ = true;
     }
 
     // methods to update text and shape overlays
@@ -273,7 +299,7 @@ namespace riptide_rviz {
     void OverlayDisplay::clearElements(){
         text_vector_.clear();
         circle_vector_.clear();
-
+        arc_vector_.clear();
         require_update_texture_ = true;
     }
 

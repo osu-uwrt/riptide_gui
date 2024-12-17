@@ -9,6 +9,7 @@
 #include <sensor_msgs/msg/temperature.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <riptide_msgs2/msg/electrical_command.hpp>
+#include <riptide_msgs2/msg/gyro_status.hpp>
 
 #include <rviz_common/properties/string_property.hpp>
 #include <rviz_common/properties/float_property.hpp>
@@ -34,6 +35,7 @@ namespace riptide_rviz
         void killCallback(const std_msgs::msg::Bool & msg);
         void zedCallback(const sensor_msgs::msg::Temperature& msg);
         void leakCallback(const std_msgs::msg::Bool& msg);
+        void gyroCallback(const riptide_msgs2::msg::GyroStatus& msg);
 
         void checkTimeout();
 
@@ -47,20 +49,20 @@ namespace riptide_rviz
         rclcpp::TimerBase::SharedPtr checkTimer;
 
         // times for stamping
-        rclcpp::Time lastDiag, lastKill, lastZed, lastLeak;
-        bool diagsTimedOut, killTimedOut, zedTimedOut, leakTimedOut;
+        rclcpp::Time lastDiag, lastKill, lastZed, lastLeak, lastGyro;
+        bool diagsTimedOut, killTimedOut, zedTimedOut, leakTimedOut, gyroTimedOut;
         bool startedLeaking = false;
-
 
         // subscription for diagnostics
         rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagSub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr killSub;
         rclcpp::Subscription<sensor_msgs::msg::Temperature>::SharedPtr zedSub;
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr leakSub;
+        rclcpp::Subscription<riptide_msgs2::msg::GyroStatus>::SharedPtr gyroSub;
 
         // Battery kill publisher
         rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr batteryKillPub;
-
+        
         // ids for rendering items so that we can edit them
         int voltageTextId = -1;
         int diagLedConfigId = -1;
@@ -71,6 +73,10 @@ namespace riptide_rviz
         // font configuration info
         QStringList fontFamilies;
         std::string fontName;
+
+        // Temp vars
+        double tempMin{0.0};
+        double tempMax{100.0};
 
         // Addtional RVIZ settings
         rviz_common::properties::EnumProperty *fontProperty;
@@ -104,5 +110,38 @@ namespace riptide_rviz
             QColor(255, 0, 0, 255)
         };
 
-    };
+        // Gauge display elements
+        PaintedArcConfig tempGaugeArc{
+            60, 100,    // x, y pos
+            20,         // radius
+            90,         // start angle (degrees)
+            -270,       // end angle (degrees)
+            2,          // line width
+            QColor(40, 40, 40, 255) 
+        };
+        int tempGaugeArcId;
+        
+        PaintedArcConfig tempGaugeIndicator{
+            60, 100,    // x, y pos
+            20,         // radius
+            90,         // start angle
+            90,         // end angle 
+            3,          // line thickness
+            QColor(0, 255, 0, 255) 
+        };
+        int tempGaugeIndicatorId;
+
+        PaintedTextConfig tempTextConfig{
+            105, 80,    // x, y pos
+            0, 0,       // offset
+            "0.0°C",    // default text
+            fontName,
+            false,      // not bold
+            2,          // outline width
+            12,         // font size
+            QColor(255, 255, 255, 255)  // white text
+            };
+            int tempTextId;
+
+        };
 } // namespace riptide_rviz
