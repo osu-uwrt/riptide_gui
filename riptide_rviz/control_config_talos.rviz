@@ -10,7 +10,7 @@ Panels:
         - /Mapping Markers1/Namespaces1
         - /Dummy Detections1/Bin1
       Splitter Ratio: 0.5276073813438416
-    Tree Height: 335
+    Tree Height: 298
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -124,17 +124,19 @@ Visualization Manager:
       Frames:
         All Enabled: false
         bin_target_frame:
-          Value: true
+          Value: false
         buoy_frame:
-          Value: true
+          Value: false
+        estimated_origin_frame:
+          Value: false
         gate_cold_frame:
-          Value: true
+          Value: false
         gate_frame:
-          Value: true
+          Value: false
         gate_hot_frame:
-          Value: true
+          Value: false
         map:
-          Value: true
+          Value: false
         odom:
           Value: false
         offset:
@@ -143,21 +145,9 @@ Visualization Manager:
           Value: false
         prequal_pole_frame:
           Value: false
-        simulator/bouy:
-          Value: false
-        simulator/buoy:
-          Value: false
-        simulator/gate:
-          Value: false
-        simulator/path:
-          Value: false
-        simulator/talos/base_link:
-          Value: false
-        simulator/talos/zed2i/left_optical:
-          Value: false
-        simulator/torpedo:
-          Value: false
         table_frame:
+          Value: false
+        tag36h11:0:
           Value: false
         talos/acoustics_port_link:
           Value: false
@@ -166,10 +156,20 @@ Visualization Manager:
         talos/base_inertia:
           Value: false
         talos/base_link:
-          Value: true
+          Value: false
         talos/dfc_base_link:
           Value: false
+        talos/dfc_camera_center:
+          Value: false
         talos/dfc_camera_link:
+          Value: false
+        talos/dfc_left_camera_frame:
+          Value: false
+        talos/dfc_left_camera_optical_frame:
+          Value: false
+        talos/dfc_right_camera_frame:
+          Value: false
+        talos/dfc_right_camera_optical_frame:
           Value: false
         talos/droppers_link:
           Value: false
@@ -177,12 +177,22 @@ Visualization Manager:
           Value: false
         talos/ffc_base_link:
           Value: false
+        talos/ffc_camera_center:
+          Value: false
         talos/ffc_camera_link:
+          Value: false
+        talos/ffc_left_camera_frame:
+          Value: false
+        talos/ffc_left_camera_optical_frame:
+          Value: false
+        talos/ffc_right_camera_frame:
+          Value: false
+        talos/ffc_right_camera_optical_frame:
           Value: false
         talos/fog_link:
           Value: false
         talos/imu_link:
-          Value: false
+          Value: true
         talos/imu_revolute_link:
           Value: false
         talos/origin:
@@ -226,7 +236,7 @@ Visualization Manager:
         torpedo_small_hole_frame:
           Value: false
         world:
-          Value: true
+          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -259,9 +269,6 @@ Visualization Manager:
               torpedo_small_hole_frame:
                 {}
           odom:
-            simulator/talos/base_link:
-              simulator/talos/zed2i/left_optical:
-                {}
             talos/base_link:
               talos/origin:
                 talos/acoustics_port_link:
@@ -272,14 +279,26 @@ Visualization Manager:
                   {}
                 talos/dfc_base_link:
                   talos/dfc_camera_link:
-                    {}
+                    talos/dfc_camera_center:
+                      talos/dfc_left_camera_frame:
+                        talos/dfc_left_camera_optical_frame:
+                          {}
+                      talos/dfc_right_camera_frame:
+                        talos/dfc_right_camera_optical_frame:
+                          {}
                 talos/droppers_link:
                   {}
                 talos/dvl_link:
                   {}
                 talos/ffc_base_link:
                   talos/ffc_camera_link:
-                    {}
+                    talos/ffc_camera_center:
+                      talos/ffc_left_camera_frame:
+                        talos/ffc_left_camera_optical_frame:
+                          {}
+                      talos/ffc_right_camera_frame:
+                        talos/ffc_right_camera_optical_frame:
+                          {}
                 talos/fog_link:
                   {}
                 talos/imu_link:
@@ -313,19 +332,9 @@ Visualization Manager:
                     {}
               talos/pose_sensor_link:
                 {}
-          simulator/bouy:
-            {}
-          simulator/buoy:
-            {}
-          simulator/gate:
-            {}
-          simulator/path:
-            {}
-          simulator/torpedo:
-            {}
       Update Interval: 0
       Value: true
-    - Alpha: 1
+    - Alpha: 0.8999999761581421
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
       Description File: ""
@@ -362,7 +371,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
         talos/dfc_base_link:
-        talos/downwards_camera/left_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -373,32 +381,21 @@ Visualization Manager:
           Show Trail: false
           Value: true
         talos/droppers_link:
-        talos/downwards_camera/left_optical:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/downwards_camera/right_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
         talos/dvl_link:
-        talos/downwards_camera/right_optical:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        talos/downwards_camera_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        talos/droppers_link:
+        talos/ffc_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
         talos/ffc_camera_link:
-        talos/dvl_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -490,16 +487,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        talos/zed_camera_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        talos/zed_camera_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -512,7 +499,6 @@ Visualization Manager:
       Enabled: true
       Name: Mapping Markers
       Namespaces:
-        ghost: true
         mapping_markers: true
         simGhost: true
       Topic:
@@ -1417,27 +1403,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 19.57281494140625
-      Distance: 12.179436683654785
-      Distance: 18.255229949951172
+      Distance: 7.084981918334961
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 4.631208419799805
-        Y: -3.198106527328491
-        Z: -3.27127742767334
+        X: -0.38624098896980286
+        Y: -0.2915613651275635
+        Z: -0.434103399515152
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4147961437702179
+      Pitch: 0.694797158241272
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.2444915771484375
+      Yaw: 4.957632064819336
     Saved: ~
 Window Geometry:
   Actuators:
@@ -1452,7 +1436,7 @@ Window Geometry:
     collapsed: false
   FeedforwardPanel:
     collapsed: false
-  Height: 1016
+  Height: 1044
   Hide Left Dock: false
   Hide Right Dock: false
   MappingPanel:
@@ -1461,8 +1445,7 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000003000000000000022f0000035ffc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000035f000003150100001cfa000000000100000002fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000022f00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000017000ffffff00000001000001eb0000035ffc0200000002fc0000003d000001b00000016d0100001cfa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000011c00fffffffc000001f3000001a9000001840100001cfa000000030100000005fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a00000039fc0100000001fb0000000800540069006d006501000000000000073a000002fb00ffffff000003140000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
-  QMainWindow State: 000000ff00000000fd00000003000000000000029a0000035ffc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000035f000003150100001cfa000000000100000002fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000022f00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000017000ffffff00000001000001eb0000035ffc0200000002fc0000003d000001d50000016d0100001cfa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000011c00fffffffc0000021800000184000001840100001cfa000000030100000005fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a00000039fc0100000001fb0000000800540069006d006501000000000000073a000002fb00ffffff000002a90000035f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000300000000000002180000037bfc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000037b0000037b0100001cfa000000000100000002fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000021800fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000017000ffffff00000001000001ca0000037bfc0200000002fc0000003d000001f10000016d0100001cfa000000000100000003fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000011c00fffffffc0000023400000184000001840100001cfa000000030100000005fb000000140050006100720061006d00500061006e0065006c01000005f2000001480000008500fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000012000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a00000039fc0100000001fb0000000800540069006d006501000000000000073a000002fb00ffffff0000034c0000037b00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
     collapsed: false
   Views:
