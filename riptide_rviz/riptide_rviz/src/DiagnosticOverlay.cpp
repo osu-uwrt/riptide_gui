@@ -328,6 +328,7 @@ namespace riptide_rviz
         //update the pvt text
         std::string pvt_text = std::to_string(msg.data);
         pvtConfig.text_ = pvt_text;
+        updateText(pvtTextId, pvtConfig);
 
         // Set node now if it wasn't earlier
         if (!node)
