@@ -96,7 +96,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="Plane" name="Plane" type="NODE">
-        <matrix sid="transform">-2.62268e-8 2.62268e-8 1 0 0.6 1.14641e-15 4.37114e-8 0 0 0.6 -4.37114e-8 0 0 0 0 1</matrix>
+        <matrix sid="transform">-2.62268e-8 2.62268e-8 1 0 0.3048 1.14641e-15 4.37114e-8 0 0 0.3048 -4.37114e-8 0 0 0 0 1</matrix>
         <instance_geometry url="#Plane-mesh" name="Plane">
           <bind_material>
             <technique_common>
