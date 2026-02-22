@@ -4,10 +4,8 @@ import os
 
 import rclpy
 import enum
-import numpy
-from math import atan2
 from ament_index_python import get_package_share_directory
-from geometry_msgs.msg import Point, Pose, Quaternion, Vector3, PoseStamped, PoseWithCovarianceStamped
+from geometry_msgs.msg import Point, Pose, Quaternion, Vector3, PoseStamped, PoseWithCovarianceStamped, TransformStamped
 from vision_msgs.msg import Detection3DArray
 from nav_msgs.msg import Odometry
 from rclpy.duration import Duration
@@ -16,6 +14,8 @@ from std_msgs.msg import ColorRGBA
 from transforms3d.euler import euler2quat
 from transforms3d.quaternions import qmult
 from visualization_msgs.msg import Marker, MarkerArray
+from tf2_ros import TransformBroadcaster
+import yaml
 
 class ControllerType(enum.Enum):
     CONTROLLER_CMD = 0
@@ -102,6 +102,9 @@ class MarkerPublisher(Node):
         self.odomSub = self.create_subscription(Odometry, ODOMETRY_TOPIC, self.odomCB, 10)
         self.simSub = self.create_subscription(Pose, SIM_TOPIC, self.simCB, 10)
         self.detSub = self.create_subscription(Detection3DArray, DET_TOPIC, self.detectionCB, 10)
+
+        # Tf broadcaster for ghost frames
+        self.tfBroadcaster = TransformBroadcaster(self)
        
         #controller command subs
         if CONTROLLER_TYPE == ControllerType.CONTROLLER_CMD:
@@ -134,6 +137,18 @@ class MarkerPublisher(Node):
         self.meshDir        = self.declareAndReceiveParam("mesh_directory", "")
         self.markerTopic    = self.declareAndReceiveParam("marker_topic", "")
         self.robot          = self.get_namespace()[1:] #namespace with leading '/' removed is name of robot
+
+        self.baseLinkOffset = [0.0, 0.0, 0.0]
+        try:
+            descConfig = os.path.join(get_package_share_directory("riptide_descriptions2"), "config", f"{self.robot}.yaml")
+            with open(descConfig, "r") as f:
+                data = yaml.safe_load(f) or {}
+            if "base_link" in data and isinstance(data["base_link"], (list, tuple)) and len(data["base_link"]) == 3:
+                self.baseLinkOffset = [float(data["base_link"][0]), float(data["base_link"][1]), float(data["base_link"][2])]
+            else:
+                self.get_logger().warn(f"Missing or invalid 'base_link' in {descConfig}. Using [0,0,0].")
+        except Exception as e:
+            self.get_logger().warn(f"Failed to read base_link offset from riptide_descriptions2 config for '{self.robot}': {e}. Using [0,0,0].")
         
         markerIdx = 0
         self.markers: 'list[MarkerInfo]' = [
@@ -284,10 +299,57 @@ class MarkerPublisher(Node):
             ghost.action = Marker.MODIFY
             ghost.pose = self.latestSetpt
         
-        ghost.pose.position.x = ghost.pose.position.x #- 0.148
-        ghost.pose.position.y = ghost.pose.position.y #+ 0.040
-        ghost.pose.position.z = ghost.pose.position.z #- 0.071
+        
+        ghostBaseLinkPose = Pose()
+        ghostBaseLinkPose.position.x = ghost.pose.position.x
+        ghostBaseLinkPose.position.y = ghost.pose.position.y
+        ghostBaseLinkPose.position.z = ghost.pose.position.z
+        ghostBaseLinkPose.orientation.w = ghost.pose.orientation.w
+        ghostBaseLinkPose.orientation.x = ghost.pose.orientation.x
+        ghostBaseLinkPose.orientation.y = ghost.pose.orientation.y
+        ghostBaseLinkPose.orientation.z = ghost.pose.orientation.z
+        
+        # Rotate the base_link offset vector from the robot frame 
+        # into the world frame using the robot’s orientation.
+        q = [ghost.pose.orientation.w, ghost.pose.orientation.x, ghost.pose.orientation.y, ghost.pose.orientation.z]
+        v = [float(self.baseLinkOffset[0]), float(self.baseLinkOffset[1]), float(self.baseLinkOffset[2])]
+        v_as_quat = [0.0, v[0], v[1], v[2]]
+        q_conj = [q[0], -q[1], -q[2], -q[3]]
+        v_world = qmult(qmult(q, v_as_quat), q_conj)
+        
+        # translates the ghost pose so the base_link is correctly positioned relative to origin
+        ghost.pose.position.x = ghost.pose.position.x - v_world[1]
+        ghost.pose.position.y = ghost.pose.position.y - v_world[2]
+        ghost.pose.position.z = ghost.pose.position.z - v_world[3]
         array.markers.append(ghost)
+        
+        # Publish the ghost base_link and origin (screw)
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "world"
+        t.child_frame_id = "ghost/base_link"
+        t.transform.translation.x = ghostBaseLinkPose.position.x
+        t.transform.translation.y = ghostBaseLinkPose.position.y
+        t.transform.translation.z = ghostBaseLinkPose.position.z
+        t.transform.rotation.w = ghostBaseLinkPose.orientation.w
+        t.transform.rotation.x = ghostBaseLinkPose.orientation.x
+        t.transform.rotation.y = ghostBaseLinkPose.orientation.y
+        t.transform.rotation.z = ghostBaseLinkPose.orientation.z
+        self.tfBroadcaster.sendTransform(t)
+        
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "world"
+        t.child_frame_id = "ghost/origin"
+        t.transform.translation.x = ghost.pose.position.x
+        t.transform.translation.y = ghost.pose.position.y
+        t.transform.translation.z = ghost.pose.position.z
+        t.transform.rotation.w = ghost.pose.orientation.w
+        t.transform.rotation.x = ghost.pose.orientation.x
+        t.transform.rotation.y = ghost.pose.orientation.y
+        t.transform.rotation.z = ghost.pose.orientation.z
+        self.tfBroadcaster.sendTransform(t)
+        
         self.markerPub.publish(array)
 
 
