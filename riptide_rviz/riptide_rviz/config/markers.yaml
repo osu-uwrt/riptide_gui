@@ -13,13 +13,13 @@
         color: [0.0, 0.0, 0.0, 0.0]           # rgba
       marker1:
         mesh: reefshark
-        frame: gate_reefshark_frame
+        frame: gate_shark_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
       marker2:
         mesh: sawfish
-        frame: gate_sawfish_frame
+        frame: gate_saw_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]

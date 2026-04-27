@@ -6,9 +6,8 @@ Panels:
       Expanded:
         - /TF1/Frames1
         - /Mapping Markers1/Namespaces1
-        - /Mapping Objects1
       Splitter Ratio: 0.5276073813438416
-    Tree Height: 295
+    Tree Height: 298
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -84,7 +83,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -105,7 +104,7 @@ Visualization Manager:
         Value: /talos/ffc/zed_node/point_cloud/cloud_registered
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Alpha: 0.699999988079071
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -160,14 +159,16 @@ Visualization Manager:
         All Enabled: false
         bin_target_frame:
           Value: false
-        estimated_origin_frame:
-          Value: true
         gate_frame:
           Value: false
-        gate_reefshark_frame:
-          Value: false
-        gate_sawfish_frame:
-          Value: false
+        gate_saw_frame:
+          Value: true
+        gate_shark_frame:
+          Value: true
+        ghost/base_link:
+          Value: true
+        ghost/origin:
+          Value: true
         map:
           Value: true
         odom:
@@ -178,14 +179,18 @@ Visualization Manager:
           Value: false
         prequal_pole_frame:
           Value: false
+        simulator/talos/base_link:
+          Value: true
+        simulator/talos/zed2i/left_optical:
+          Value: true
         slalom_back_frame:
           Value: false
-        slalom_close_frame:
-          Value: true
         slalom_front_frame:
           Value: false
         slalom_middle_frame:
           Value: false
+        slalom_parent_frame:
+          Value: true
         table_basket_pink_frame:
           Value: false
         table_basket_yellow_frame:
@@ -200,8 +205,6 @@ Visualization Manager:
           Value: false
         table_spoon_pink_frame:
           Value: false
-        tag36h11:0:
-          Value: true
         talos/acoustics_port_link:
           Value: false
         talos/acoustics_starboard_link:
@@ -209,6 +212,8 @@ Visualization Manager:
         talos/base_inertia:
           Value: false
         talos/base_link:
+          Value: true
+        talos/claw_link:
           Value: true
         talos/dfc_base_link:
           Value: false
@@ -226,6 +231,8 @@ Visualization Manager:
           Value: false
         talos/droppers_link:
           Value: false
+        talos/dummy_dfc_link:
+          Value: true
         talos/dvl_link:
           Value: false
         talos/ffc_base_link:
@@ -294,52 +301,64 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          offset:
-            bin_target_frame:
-              {}
-            gate_frame:
-              gate_reefshark_frame:
+        world:
+          ghost/base_link:
+            {}
+          ghost/origin:
+            {}
+          map:
+            offset:
+              bin_target_frame:
                 {}
-              gate_sawfish_frame:
+              gate_frame:
+                gate_saw_frame:
+                  {}
+                gate_shark_frame:
+                  {}
+              prequal_gate_frame:
                 {}
-            prequal_gate_frame:
-              {}
-            prequal_pole_frame:
-              {}
-            slalom_front_frame:
-              slalom_close_frame:
+              prequal_pole_frame:
                 {}
-              slalom_middle_frame:
+              slalom_parent_frame:
                 slalom_back_frame:
                   {}
-            table_frame:
-              table_basket_pink_frame:
-                {}
-              table_basket_yellow_frame:
-                {}
-              table_bottle_yellow_frame:
-                {}
-              table_reefshark_frame:
-                {}
-              table_sawfish_frame:
-                {}
-              table_spoon_pink_frame:
-                {}
-            torpedo_frame:
-              torpedo_sawfish_hole_frame:
-                {}
-              torpedo_shark_hole_frame:
-                {}
-        world:
+                slalom_front_frame:
+                  {}
+                slalom_middle_frame:
+                  {}
+              table_frame:
+                table_basket_pink_frame:
+                  {}
+                table_basket_yellow_frame:
+                  {}
+                table_bottle_yellow_frame:
+                  {}
+                table_reefshark_frame:
+                  {}
+                table_sawfish_frame:
+                  {}
+                table_spoon_pink_frame:
+                  {}
+              torpedo_frame:
+                torpedo_sawfish_hole_frame:
+                  {}
+                torpedo_shark_hole_frame:
+                  {}
           odom:
+            simulator/talos/base_link:
+              simulator/talos/zed2i/left_optical:
+                {}
             talos/base_link:
+              talos/dummy_dfc_link:
+                {}
               talos/origin:
                 talos/acoustics_port_link:
                   {}
                 talos/acoustics_starboard_link:
                   {}
                 talos/base_inertia:
+                  {}
+                talos/claw_link:
                   {}
                 talos/dfc_base_link:
                   talos/dfc_camera_link:
@@ -436,6 +455,11 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        talos/claw_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         talos/dfc_base_link:
           Alpha: 1
           Show Axes: false
@@ -570,6 +594,7 @@ Visualization Manager:
       Enabled: true
       Name: Mapping Markers
       Namespaces:
+        ghost: true
         mapping_markers: true
         simGhost: true
       Topic:
@@ -648,7 +673,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate Reefshark
+          Name: Gate Shark
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -658,7 +683,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/gate_reefshark
+            Value: /talos/mapping/gate_shark
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -683,7 +708,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate Sawfish
+          Name: Gate Saw
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -693,7 +718,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/gate_sawfish
+            Value: /talos/mapping/gate_saw
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -750,7 +775,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: false
+          Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Slalom Front
@@ -764,7 +789,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/slalom_front
-          Value: false
+          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -785,7 +810,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: false
+          Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Slalom Middle
@@ -799,7 +824,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/slalom_middle
-          Value: false
+          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -820,7 +845,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: false
+          Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Slalom Back
@@ -834,7 +859,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/slalom_back
-          Value: false
+          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -1508,7 +1533,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate Reefshark
+          Name: Gate Shark
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1518,7 +1543,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/gate_reefshark
+            Value: /talos/dummydetections/gate_shark
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1543,7 +1568,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate Sawfish
+          Name: Gate Saw
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1553,7 +1578,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/gate_sawfish
+            Value: /talos/dummydetections/gate_saw
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1859,25 +1884,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 18.1029052734375
+      Distance: 10.700149536132812
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 7.050704479217529
-        Y: -4.216136932373047
-        Z: -5.945253849029541
+        X: 0.09348101913928986
+        Y: 2.8718345165252686
+        Z: 0.8281176090240479
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7197967767715454
+      Pitch: 0.6347969770431519
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.579575777053833
+      Yaw: 2.8895812034606934
     Saved: ~
 Window Geometry:
   Actuators:
@@ -1894,7 +1919,7 @@ Window Geometry:
     collapsed: false
   FeedforwardPanel:
     collapsed: false
-  Height: 1016
+  Height: 1736
   Hide Left Dock: false
   Hide Right Dock: false
   MappingPanel:
@@ -1903,11 +1928,11 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000300000000000002be0000039afc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003f0000039a000002930100001efa000000000100000003fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000009600fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000001bf00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000023600ffffff00000001000002c50000039afc0200000002fc0000003f0000020e000000fc0100001efa000000000100000002fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000018900fffffffc0000025300000186000001860100001efa000000040100000006fb00000012004100630074007500610074006f007200730100000000ffffffff0000014700fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000012f00fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff000000bc00fffffffb000000140050006100720061006d00500061006e0065006c01000005f200000148000000b000fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015b00fffffffb0000000a005600690065007700730100000000ffffffff000001f900ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a000002ed00ffffff000001ab0000039a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000300000000000002760000066efc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000066e0000028a0100001cfa000000000100000003fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000008a00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000001a500fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000020e00ffffff00000001000002780000066efc0200000002fc0000003d000004e4000001090100001cfa000000000100000002fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffc0000052700000184000001840100001cfa000000040100000006fb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff000000a900fffffffb000000140050006100720061006d00500061006e0065006c01000005f200000148000000b000fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a000002fb00ffffff000006000000066e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1850
+  Width: 2810
   X: 70
   Y: 27
