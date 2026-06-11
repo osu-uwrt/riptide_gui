@@ -157,8 +157,12 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        bin_target_frame:
+        bin_frame:
           Value: false
+        bin_target1_frame:
+          Value: true
+        bin_target2_frame:
+          Value: true
         gate_frame:
           Value: false
         gate_saw_frame:
@@ -179,9 +183,19 @@ Visualization Manager:
           Value: false
         prequal_pole_frame:
           Value: false
+        simulator/bouy:
+          Value: true
+        simulator/buoy:
+          Value: true
+        simulator/gate:
+          Value: true
+        simulator/path:
+          Value: true
         simulator/talos/base_link:
           Value: true
         simulator/talos/zed2i/left_optical:
+          Value: true
+        simulator/torpedo:
           Value: true
         slalom_back_frame:
           Value: false
@@ -217,17 +231,7 @@ Visualization Manager:
           Value: true
         talos/dfc_base_link:
           Value: false
-        talos/dfc_camera_center:
-          Value: false
         talos/dfc_camera_link:
-          Value: false
-        talos/dfc_left_camera_frame:
-          Value: false
-        talos/dfc_left_camera_optical_frame:
-          Value: false
-        talos/dfc_right_camera_frame:
-          Value: false
-        talos/dfc_right_camera_optical_frame:
           Value: false
         talos/droppers_link:
           Value: false
@@ -237,17 +241,7 @@ Visualization Manager:
           Value: false
         talos/ffc_base_link:
           Value: false
-        talos/ffc_camera_center:
-          Value: false
         talos/ffc_camera_link:
-          Value: false
-        talos/ffc_left_camera_frame:
-          Value: false
-        talos/ffc_left_camera_optical_frame:
-          Value: false
-        talos/ffc_right_camera_frame:
-          Value: false
-        talos/ffc_right_camera_optical_frame:
           Value: false
         talos/fog_link:
           Value: false
@@ -308,8 +302,11 @@ Visualization Manager:
             {}
           map:
             offset:
-              bin_target_frame:
-                {}
+              bin_frame:
+                bin_target1_frame:
+                  {}
+                bin_target2_frame:
+                  {}
               gate_frame:
                 gate_saw_frame:
                   {}
@@ -362,26 +359,14 @@ Visualization Manager:
                   {}
                 talos/dfc_base_link:
                   talos/dfc_camera_link:
-                    talos/dfc_camera_center:
-                      talos/dfc_left_camera_frame:
-                        talos/dfc_left_camera_optical_frame:
-                          {}
-                      talos/dfc_right_camera_frame:
-                        talos/dfc_right_camera_optical_frame:
-                          {}
+                    {}
                 talos/droppers_link:
                   {}
                 talos/dvl_link:
                   {}
                 talos/ffc_base_link:
                   talos/ffc_camera_link:
-                    talos/ffc_camera_center:
-                      talos/ffc_left_camera_frame:
-                        talos/ffc_left_camera_optical_frame:
-                          {}
-                      talos/ffc_right_camera_frame:
-                        talos/ffc_right_camera_optical_frame:
-                          {}
+                    {}
                 talos/fog_link:
                   {}
                 talos/hitch_link:
@@ -417,6 +402,16 @@ Visualization Manager:
                     {}
               talos/pose_sensor_link:
                 {}
+          simulator/bouy:
+            {}
+          simulator/buoy:
+            {}
+          simulator/gate:
+            {}
+          simulator/path:
+            {}
+          simulator/torpedo:
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -988,7 +983,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Bin
+          Name: Bin Target 1
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -998,7 +993,42 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/bin_target
+            Value: /talos/mapping/bin_target1
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Bin Target 2
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/bin_target2
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1288,7 +1318,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Bin
+          Name: Blood1
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1298,7 +1328,42 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/bin_target
+            Value: /talos/dummydetections/blood_1
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Blood2
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/blood_2
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1884,25 +1949,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 10.700149536132812
+      Distance: 13.131270408630371
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.09348101913928986
-        Y: 2.8718345165252686
-        Z: 0.8281176090240479
+        X: 4.805555820465088
+        Y: -2.723097801208496
+        Z: -2.566532611846924
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6347969770431519
+      Pitch: 0.5297973155975342
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.8895812034606934
+      Yaw: 1.4945694208145142
     Saved: ~
 Window Geometry:
   Actuators:
@@ -1919,7 +1984,7 @@ Window Geometry:
     collapsed: false
   FeedforwardPanel:
     collapsed: false
-  Height: 1736
+  Height: 1136
   Hide Left Dock: false
   Hide Right Dock: false
   MappingPanel:
@@ -1928,11 +1993,11 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000300000000000002760000066efc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000066e0000028a0100001cfa000000000100000003fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000008a00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000001a500fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000020e00ffffff00000001000002780000066efc0200000002fc0000003d000004e4000001090100001cfa000000000100000002fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffc0000052700000184000001840100001cfa000000040100000006fb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff000000a900fffffffb000000140050006100720061006d00500061006e0065006c01000005f200000148000000b000fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a000002fb00ffffff000006000000066e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000003000000000000027600000416fc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d000004160000028a0100001cfa000000000100000003fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000008a00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000001a500fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000020e00ffffff000000010000027800000416fc0200000002fc0000003d0000028c000001090100001cfa000000000100000002fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000016a00fffffffc000002cf00000184000001840100001cfa000000040100000006fb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff000000a900fffffffb000000140050006100720061006d00500061006e0065006c01000005f200000148000000b000fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a000002fb00ffffff000002400000041600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2810
+  Width: 1850
   X: 70
   Y: 27
