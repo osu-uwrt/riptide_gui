@@ -121,6 +121,11 @@ namespace riptide_rviz
         mappingTargetClient = std::make_shared<GuiSrvClient<MappingTarget>>(node, robotNs + "/mapping_target",
             std::bind(&MappingPanel::setStatus, this, _1, _2), std::bind(&MappingPanel::mappingTargetResultCb, this, _1, _2));
 
+        resetMappingClient = std::make_shared<GuiSrvClient<Trigger>>(
+                node, robotNs + "/mapping/reset_mapping", 
+                std::bind(&MappingPanel::setStatus, this, _1, _2), 
+                std::bind(&MappingPanel::serviceResponseCb<Trigger>, this, _1, _2));
+                
         loaded = true;
     }
 
@@ -146,6 +151,7 @@ namespace riptide_rviz
         // Connect UI signals for controlling the riptide vehicle
         connect(ui->calibButton, &QPushButton::clicked, this, &MappingPanel::calibMapFrame);
         connect(ui->setMappingTargetButton, &QPushButton::clicked, this, &MappingPanel::setMappingTarget);
+        connect(ui->resetMappingButton, &QPushButton::clicked, this, &MappingPanel::resetMapping);
         connect(ui->zedSvoStartButton, &QPushButton::clicked, this, &MappingPanel::zedSvoStart);
         connect(ui->zedSvoStopButton, &QPushButton::clicked, this, &MappingPanel::zedSvoStop);
         connect(ui->dfcRecordingStartButton, &QPushButton::clicked, this, &MappingPanel::dfcRecordStart);
@@ -212,6 +218,11 @@ namespace riptide_rviz
         //     std::bind(&MappingPanel::mappingObjectCb, this, _1));
 
         mappingTargetClient->callService(targetReq);
+    }
+
+    void MappingPanel::resetMapping()
+    {
+        resetMappingClient->callService(std::make_shared<std_srvs::srv::Trigger::Request>());
     }
 
     void MappingPanel::zedSvoStart()

@@ -44,6 +44,7 @@ namespace riptide_rviz
     private Q_SLOTS:
         void calibMapFrame();
         void setMappingTarget();
+        void resetMapping();
         void zedSvoStart();
         void zedSvoStop();
         void dfcRecordStart();
@@ -89,6 +90,7 @@ namespace riptide_rviz
         rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr mappingObjectSub;
         GuiSrvClient<MappingTarget>::SharedPtr mappingTargetClient;
         GuiSrvClient<Trigger>::SharedPtr captureImageClient;
+        GuiSrvClient<Trigger>::SharedPtr resetMappingClient;
         #ifdef USE_ZED_MSGS
             // For ffc camera
             GuiSrvClient<StartSvoRec>::SharedPtr ffcStartSvoClient;

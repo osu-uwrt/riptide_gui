@@ -350,6 +350,13 @@
            </property>
           </widget>
          </item>
+         <item row="10" column="2">
+          <widget class="QPushButton" name="resetMappingButton">
+           <property name="text">
+            <string>Reset Mapping</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
