@@ -77,70 +77,82 @@
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
+      marker12:
+        mesh: bin_magnet
+        frame: magnet_target1_frame
+        scale: [1.0, 1.0, 1.0]
+        pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        color: [0.0, 0.0, 0.0, 0.0]
+      marker13:
+        mesh: bin_magnet
+        frame: magnet_target2_frame
+        scale: [1.0, 1.0, 1.0]
+        pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        color: [0.0, 0.0, 0.0, 0.0]
 
       # Table
-      marker12:
+      marker14:
         mesh: table
         frame: table_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker13:
+      marker15:
         mesh: table_basket_warning
         frame: warning_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker14:
+      marker16:
         mesh: table_basket_helmet
         frame: helmet_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker15:
+      marker17:
         mesh: table_pill
         frame: pill_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker16:
+      marker18:
         mesh: table_plug
         frame: plug_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker17:
+      marker19:
         mesh: table_nut_and_bolt
         frame: nut_and_bolt_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker18:
+      marker20:
         mesh: table_bandage
         frame: bandage_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
       # Octagon
-      marker19:
+      marker21:
         mesh: octagon_buoy
         frame: buoy_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker20:
+      marker22:
         mesh: octagon_sos
         frame: sos_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker21:
+      marker23:
         mesh: octagon_hammer_and_wrench
         frame: hammer_and_wrench_frame
         scale: [1.0, 1.0, 1.0]
         pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         color: [0.0, 0.0, 0.0, 0.0]
-      marker22:
+      marker24:
         mesh: octagon_compass
         frame: compass_frame
         scale: [1.0, 1.0, 1.0]
