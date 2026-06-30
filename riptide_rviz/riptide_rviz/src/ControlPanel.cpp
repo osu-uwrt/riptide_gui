@@ -289,7 +289,12 @@ namespace riptide_rviz
             std::bind(&ControlPanel::odomCallback, this, _1));
         diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::diagCallback, this, _1));        
+            std::bind(&ControlPanel::diagCallback, this, _1));
+
+        // watch the autonomy tree stack so we can hide the interactive setpoint while a tree is running
+        treeStackSub = node->create_subscription<riptide_msgs2::msg::TreeStack>(
+            robot_ns + "/autonomy/tree_stack", rclcpp::SystemDefaultsQoS(),
+            std::bind(&ControlPanel::treeStackCallback, this, _1));
 
         //create service clients
         reloadCompleteClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_complete_controller_params");
@@ -520,12 +525,14 @@ namespace riptide_rviz
                 uiPanel->ctrlModePos->setEnabled(false);
                 uiPanel->ctrlModeTele->setEnabled(true);
 
-                //also enable the interactive marker
-                setptServer->insert(interactiveSetpointMarker,
-                    std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
+                //also enable the interactive marker (unless an autonomy tree currently owns control)
+                if(!autonomyActive){
+                    setptServer->insert(interactiveSetpointMarker,
+                        std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
 
-                syncSetptMarkerToTextboxes(false);
-                setptServer->applyChanges();
+                    syncSetptMarkerToTextboxes(false);
+                    setptServer->applyChanges();
+                }
 
                 callSetBoolService(this->setTeleopClient, false);
                 break;
@@ -1013,7 +1020,30 @@ namespace riptide_rviz
         }
     }
 
-    
+    void ControlPanel::treeStackCallback(const riptide_msgs2::msg::TreeStack &msg)
+    {
+        // a non-empty stack means an autonomy tree is actively running
+        bool nowActive = !msg.stack.empty();
+        if(nowActive == autonomyActive){
+            // no change in autonomy state, nothing to do
+            return;
+        }
+        autonomyActive = nowActive;
+
+        if(autonomyActive){
+            // autonomy has taken over control, hide the interactive setpoint marker
+            setptServer->erase(interactiveSetpointMarker.name);
+            setptServer->applyChanges();
+        } else if(ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION){
+            // tree finished and we are still in position control, restore the marker
+            setptServer->insert(interactiveSetpointMarker,
+                std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
+            syncSetptMarkerToTextboxes(false);
+            setptServer->applyChanges();
+        }
+    }
+
+
     void ControlPanel::diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg)
     {
         // need at least one status to inspect
