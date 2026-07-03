@@ -289,7 +289,12 @@ namespace riptide_rviz
             std::bind(&ControlPanel::odomCallback, this, _1));
         diagSub = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
             "/diagnostics", rclcpp::SystemDefaultsQoS(),
-            std::bind(&ControlPanel::diagCallback, this, _1));        
+            std::bind(&ControlPanel::diagCallback, this, _1));
+
+        // watch the autonomy tree stack so we can hide the interactive setpoint while a tree is running
+        treeStackSub = node->create_subscription<riptide_msgs2::msg::TreeStack>(
+            robot_ns + "/autonomy/tree_stack", rclcpp::SystemDefaultsQoS(),
+            std::bind(&ControlPanel::treeStackCallback, this, _1));
 
         //create service clients
         reloadCompleteClient = node->create_client<Trigger>(robot_ns + "/controller_overseer/update_complete_controller_params");
@@ -520,12 +525,14 @@ namespace riptide_rviz
                 uiPanel->ctrlModePos->setEnabled(false);
                 uiPanel->ctrlModeTele->setEnabled(true);
 
-                //also enable the interactive marker
-                setptServer->insert(interactiveSetpointMarker,
-                    std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
+                //also enable the interactive marker (unless an autonomy tree currently owns control)
+                if(!autonomyActive){
+                    setptServer->insert(interactiveSetpointMarker,
+                        std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
 
-                syncSetptMarkerToTextboxes(false);
-                setptServer->applyChanges();
+                    syncSetptMarkerToTextboxes(false);
+                    setptServer->applyChanges();
+                }
 
                 callSetBoolService(this->setTeleopClient, false);
                 break;
@@ -1013,79 +1020,84 @@ namespace riptide_rviz
         }
     }
 
-    
+    void ControlPanel::treeStackCallback(const riptide_msgs2::msg::TreeStack &msg)
+    {
+        // a non-empty stack means an autonomy tree is actively running
+        bool nowActive = !msg.stack.empty();
+        if(nowActive == autonomyActive){
+            // no change in autonomy state, nothing to do
+            return;
+        }
+        autonomyActive = nowActive;
 
-    void ControlPanel::diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg){
-        
-        //add in color changing for boxes...
-
-        if(sizeof(msg.status) != 0 ){
-
-            if(msg.status[0].name.find("ekf") != std::string::npos){
-                //pull status from ekf message
-
-                // not this time
-                if(msg.status.size() < 2){
-                    return;
-                }
-
-                for(int i = 0; i < (sizeof(msg.status[1].values) / 6); i++){
-
-                    //odom frequency
-                    if(msg.status[1].values[i].key.find("Actual frequency") != std::string::npos){
-                        uiPanel->OdomDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-                }
-
-            }else if(msg.status[0].name.find("Controller Status Values Length") != std::string::npos){
-
-                int diag_keys = std::stoi(msg.status[0].values[0].value);
-
-                for(int i = 0; i < diag_keys; i++){
-
-                    //active control frequency
-                    if(msg.status[1].values[i].key.find("Active Control") != std::string::npos){
-                        uiPanel->ACDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-
-                    //thruster flip rate
-                    if(msg.status[1].values[i].key.find("Flips Frequency") != std::string::npos){
-                        uiPanel->FlipDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-
-                    //system limit saturation
-                    if(msg.status[1].values[i].key.find("System Limit") != std::string::npos){
-                        uiPanel->SLDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-
-                    //individual limit saturation
-                    if(msg.status[1].values[i].key.find("Individual Limit") != std::string::npos){
-                        uiPanel->ILDiagnostics->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-
-                    //individual limit saturation
-                    if(msg.status[1].values[i].key.find("Linear Error") != std::string::npos){
-                        uiPanel->AbsoluteDistance->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-
-                    //auto tune status
-                    if(msg.status[1].values[i].key.find("Auto Tune Status") != std::string::npos){
-                        uiPanel->AutoTuneStatus->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-
-                    //auto tune max ticker
-                    if(msg.status[1].values[i].key.find("Auto Tune Ticker") != std::string::npos){
-                        uiPanel->AutoTuneTickerDisp->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-            
-                    //autotune dominant axis
-                    if(msg.status[1].values[i].key.find("Auto Tune Dominant Axis") != std::string::npos){
-                        uiPanel->AutoTuneDominantAxisDisp->setText(QString::fromStdString(msg.status[1].values[i].value));
-                    }
-                }         
-            }    
+        if(autonomyActive){
+            // autonomy has taken over control, hide the interactive setpoint marker
+            setptServer->erase(interactiveSetpointMarker.name);
+            setptServer->applyChanges();
+        } else if(ctrlMode == riptide_rviz::ControlPanel::control_modes::POSITION){
+            // tree finished and we are still in position control, restore the marker
+            setptServer->insert(interactiveSetpointMarker,
+                std::bind(&ControlPanel::setptMarkerFeedback, this, _1));
+            syncSetptMarkerToTextboxes(false);
+            setptServer->applyChanges();
         }
     }
+
+
+    void ControlPanel::diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg)
+    {
+        // need at least one status to inspect
+        if (msg.status.empty()) {
+            return;
+        }
+
+        if (msg.status[0].name.find("ekf") != std::string::npos) {
+            // ekf branch needs a second status entry
+            if (msg.status.size() < 2) {
+                return;
+            }
+
+            const auto &values = msg.status[1].values;
+            for (size_t i = 0; i < values.size(); i++) {
+                if (values[i].key.find("Actual frequency") != std::string::npos) {
+                    uiPanel->OdomDiagnostics->setText(QString::fromStdString(values[i].value));
+                }
+            }
+
+        } else if (msg.status[0].name.find("Controller Status Values Length") != std::string::npos) {
+            // this branch also reads status[1] and status[0].values[0]
+            if (msg.status.size() < 2 || msg.status[0].values.empty()) {
+                return;
+            }
+
+            int diag_keys = 0;
+            try {
+                diag_keys = std::stoi(msg.status[0].values[0].value);
+            } catch (const std::exception &e) {
+                RVIZ_COMMON_LOG_WARNING("ControlPanel: bad controller diag key count");
+                return;
+            }
+
+            const auto &values = msg.status[1].values;
+            // clamp to what actually exists so we never index past the end
+            size_t limit = std::min(static_cast<size_t>(std::max(diag_keys, 0)), values.size());
+            for (size_t i = 0; i < limit; i++) {
+                const std::string &key = values[i].key;
+                const QString val = QString::fromStdString(values[i].value);
+
+                if (key.find("Active Control") != std::string::npos)        uiPanel->ACDiagnostics->setText(val);
+                if (key.find("Flips Frequency") != std::string::npos)       uiPanel->FlipDiagnostics->setText(val);
+                if (key.find("System Limit") != std::string::npos)          uiPanel->SLDiagnostics->setText(val);
+                if (key.find("Individual Limit") != std::string::npos)      uiPanel->ILDiagnostics->setText(val);
+                if (key.find("Linear Error") != std::string::npos)          uiPanel->AbsoluteDistance->setText(val);
+                if (key.find("Auto Tune Status") != std::string::npos)      uiPanel->AutoTuneStatus->setText(val);
+                if (key.find("Auto Tune Ticker") != std::string::npos)      uiPanel->AutoTuneTickerDisp->setText(val);
+                if (key.find("Auto Tune Dominant Axis") != std::string::npos) uiPanel->AutoTuneDominantAxisDisp->setText(val);
+            }
+        }
+    }
+
+    
     // ROS timer callbacks
     void ControlPanel::sendKillMsgTimer()
     {

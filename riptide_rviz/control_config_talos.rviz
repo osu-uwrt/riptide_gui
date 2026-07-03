@@ -4,11 +4,11 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /DiagnosticOverlay1
         - /TF1/Frames1
         - /Mapping Markers1/Namespaces1
-        - /Mapping Objects1
       Splitter Ratio: 0.5276073813438416
-    Tree Height: 295
+    Tree Height: 657
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -84,7 +84,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -105,7 +105,7 @@ Visualization Manager:
         Value: /talos/ffc/zed_node/point_cloud/cloud_registered
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Alpha: 0.699999988079071
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -158,50 +158,100 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        bin_target_frame:
+        bandage_frame:
+          Value: true
+        bin_cad_geometry_frame:
+          Value: true
+        bin_frame:
           Value: false
-        estimated_origin_frame:
+        bin_target1_frame:
+          Value: true
+        bin_target2_frame:
+          Value: true
+        bin_vinyl1_frame:
+          Value: true
+        bin_vinyl2_frame:
+          Value: true
+        bin_vinyl3_frame:
+          Value: true
+        bin_vinyl4_frame:
+          Value: true
+        blood_hole_large_frame:
+          Value: true
+        blood_hole_small_frame:
+          Value: true
+        buoy_frame:
+          Value: true
+        compass_frame:
+          Value: true
+        fire_hole_large_frame:
+          Value: true
+        fire_hole_small_frame:
           Value: true
         gate_frame:
           Value: false
-        gate_reefshark_frame:
-          Value: false
-        gate_sawfish_frame:
-          Value: false
+        gate_repair_frame:
+          Value: true
+        gate_rescue_frame:
+          Value: true
+        ghost/base_link:
+          Value: true
+        ghost/origin:
+          Value: true
+        hammer_and_wrench_frame:
+          Value: true
+        helmet_frame:
+          Value: true
+        magnet1_frame:
+          Value: true
+        magnet2_frame:
+          Value: true
+        magnet_target1_frame:
+          Value: true
+        magnet_target2_frame:
+          Value: true
         map:
+          Value: true
+        nut_and_bolt_frame:
           Value: true
         odom:
           Value: false
         offset:
           Value: false
+        pill_frame:
+          Value: true
+        plug_frame:
+          Value: true
         prequal_gate_frame:
           Value: false
         prequal_pole_frame:
           Value: false
+        simulator/bouy:
+          Value: true
+        simulator/buoy:
+          Value: true
+        simulator/gate:
+          Value: true
+        simulator/path:
+          Value: true
+        simulator/talos/base_link:
+          Value: true
+        simulator/talos/zed2i/left_optical:
+          Value: true
+        simulator/torpedo:
+          Value: true
         slalom_back_frame:
           Value: false
-        slalom_close_frame:
-          Value: true
         slalom_front_frame:
           Value: false
         slalom_middle_frame:
           Value: false
-        table_basket_pink_frame:
-          Value: false
-        table_basket_yellow_frame:
-          Value: false
-        table_bottle_yellow_frame:
-          Value: false
+        slalom_parent_frame:
+          Value: true
+        sos_frame:
+          Value: true
         table_frame:
           Value: false
-        table_reefshark_frame:
-          Value: false
-        table_sawfish_frame:
-          Value: false
-        table_spoon_pink_frame:
-          Value: false
-        tag36h11:0:
-          Value: true
         talos/acoustics_port_link:
           Value: false
         talos/acoustics_starboard_link:
@@ -210,37 +260,21 @@ Visualization Manager:
           Value: false
         talos/base_link:
           Value: true
+        talos/claw_link:
+          Value: true
         talos/dfc_base_link:
-          Value: false
-        talos/dfc_camera_center:
           Value: false
         talos/dfc_camera_link:
           Value: false
-        talos/dfc_left_camera_frame:
-          Value: false
-        talos/dfc_left_camera_optical_frame:
-          Value: false
-        talos/dfc_right_camera_frame:
-          Value: false
-        talos/dfc_right_camera_optical_frame:
-          Value: false
         talos/droppers_link:
           Value: false
+        talos/dummy_dfc_link:
+          Value: true
         talos/dvl_link:
           Value: false
         talos/ffc_base_link:
           Value: false
-        talos/ffc_camera_center:
-          Value: false
         talos/ffc_camera_link:
-          Value: false
-        talos/ffc_left_camera_frame:
-          Value: false
-        talos/ffc_left_camera_optical_frame:
-          Value: false
-        talos/ffc_right_camera_frame:
-          Value: false
-        talos/ffc_right_camera_optical_frame:
           Value: false
         talos/fog_link:
           Value: false
@@ -282,10 +316,8 @@ Visualization Manager:
           Value: false
         torpedo_frame:
           Value: false
-        torpedo_sawfish_hole_frame:
-          Value: false
-        torpedo_shark_hole_frame:
-          Value: false
+        warning_frame:
+          Value: true
         world:
           Value: true
       Marker Scale: 1
@@ -294,46 +326,88 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          offset:
-            bin_target_frame:
-              {}
-            gate_frame:
-              gate_reefshark_frame:
+        world:
+          ghost/base_link:
+            {}
+          ghost/origin:
+            {}
+          map:
+            offset:
+              bin_frame:
+                bin_cad_geometry_frame:
+                  bin_vinyl1_frame:
+                    {}
+                  bin_vinyl2_frame:
+                    {}
+                  bin_vinyl3_frame:
+                    {}
+                  bin_vinyl4_frame:
+                    {}
+                  magnet1_frame:
+                    {}
+                  magnet2_frame:
+                    {}
+                  magnet_target1_frame:
+                    {}
+                  magnet_target2_frame:
+                    {}
+                bin_target1_frame:
+                  {}
+                bin_target2_frame:
+                  {}
+              gate_frame:
+                gate_repair_frame:
+                  {}
+                gate_rescue_frame:
+                  {}
+              prequal_gate_frame:
                 {}
-              gate_sawfish_frame:
+              prequal_pole_frame:
                 {}
-            prequal_gate_frame:
-              {}
-            prequal_pole_frame:
-              {}
-            slalom_front_frame:
-              slalom_close_frame:
-                {}
-              slalom_middle_frame:
+              slalom_parent_frame:
                 slalom_back_frame:
                   {}
-            table_frame:
-              table_basket_pink_frame:
-                {}
-              table_basket_yellow_frame:
-                {}
-              table_bottle_yellow_frame:
-                {}
-              table_reefshark_frame:
-                {}
-              table_sawfish_frame:
-                {}
-              table_spoon_pink_frame:
-                {}
-            torpedo_frame:
-              torpedo_sawfish_hole_frame:
-                {}
-              torpedo_shark_hole_frame:
-                {}
-        world:
+                slalom_front_frame:
+                  {}
+                slalom_middle_frame:
+                  {}
+              table_frame:
+                bandage_frame:
+                  {}
+                buoy_frame:
+                  {}
+                compass_frame:
+                  {}
+                hammer_and_wrench_frame:
+                  {}
+                helmet_frame:
+                  {}
+                nut_and_bolt_frame:
+                  {}
+                pill_frame:
+                  {}
+                plug_frame:
+                  {}
+                sos_frame:
+                  {}
+                warning_frame:
+                  {}
+              torpedo_frame:
+                blood_hole_large_frame:
+                  {}
+                blood_hole_small_frame:
+                  {}
+                fire_hole_large_frame:
+                  {}
+                fire_hole_small_frame:
+                  {}
           odom:
+            simulator/talos/base_link:
+              simulator/talos/zed2i/left_optical:
+                {}
             talos/base_link:
+              talos/dummy_dfc_link:
+                {}
               talos/origin:
                 talos/acoustics_port_link:
                   {}
@@ -341,28 +415,18 @@ Visualization Manager:
                   {}
                 talos/base_inertia:
                   {}
+                talos/claw_link:
+                  {}
                 talos/dfc_base_link:
                   talos/dfc_camera_link:
-                    talos/dfc_camera_center:
-                      talos/dfc_left_camera_frame:
-                        talos/dfc_left_camera_optical_frame:
-                          {}
-                      talos/dfc_right_camera_frame:
-                        talos/dfc_right_camera_optical_frame:
-                          {}
+                    {}
                 talos/droppers_link:
                   {}
                 talos/dvl_link:
                   {}
                 talos/ffc_base_link:
                   talos/ffc_camera_link:
-                    talos/ffc_camera_center:
-                      talos/ffc_left_camera_frame:
-                        talos/ffc_left_camera_optical_frame:
-                          {}
-                      talos/ffc_right_camera_frame:
-                        talos/ffc_right_camera_optical_frame:
-                          {}
+                    {}
                 talos/fog_link:
                   {}
                 talos/hitch_link:
@@ -398,6 +462,16 @@ Visualization Manager:
                     {}
               talos/pose_sensor_link:
                 {}
+          simulator/bouy:
+            {}
+          simulator/buoy:
+            {}
+          simulator/gate:
+            {}
+          simulator/path:
+            {}
+          simulator/torpedo:
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -436,6 +510,11 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        talos/claw_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         talos/dfc_base_link:
           Alpha: 1
           Show Axes: false
@@ -571,7 +650,7 @@ Visualization Manager:
       Name: Mapping Markers
       Namespaces:
         mapping_markers: true
-        simGhost: true
+        simGhost: false
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -581,13 +660,13 @@ Visualization Manager:
       Value: true
     - Class: rviz_default_plugins/InteractiveMarkers
       Enable Transparency: true
-      Enabled: false
+      Enabled: true
       Interactive Markers Namespace: /interactive_setpoint
       Name: Interactive Setpoint
       Show Axes: false
       Show Descriptions: true
       Show Visual Aids: false
-      Value: false
+      Value: true
     - Class: rviz_common/Group
       Displays:
         - Alpha: 1
@@ -648,7 +727,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate Reefshark
+          Name: Gate Shark
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -658,7 +737,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/gate_reefshark
+            Value: /talos/mapping/gate_shark
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -683,7 +762,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate Sawfish
+          Name: Gate Saw
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -693,7 +772,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/gate_sawfish
+            Value: /talos/mapping/gate_saw
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -750,7 +829,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: false
+          Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Slalom Front
@@ -764,7 +843,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/slalom_front
-          Value: false
+          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -785,7 +864,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: false
+          Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Slalom Middle
@@ -799,7 +878,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/slalom_middle
-          Value: false
+          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -820,7 +899,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: false
+          Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Slalom Back
@@ -834,7 +913,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/slalom_back
-          Value: false
+          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -855,7 +934,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: false
+          Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Torpedo
@@ -869,7 +948,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/mapping/torpedo
-          Value: false
+          Value: true
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -963,7 +1042,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Bin
+          Name: Bin Target 1
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -973,7 +1052,42 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/bin_target
+            Value: /talos/mapping/bin_target1
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Bin Target 2
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/bin_target2
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1008,7 +1122,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/table
+            Value: /talos/dummydetections/table
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1033,7 +1147,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Table Reefshark
+          Name: Pill
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1043,7 +1157,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/table_reefshark
+            Value: /talos/mapping/pill
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1068,7 +1182,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Table Sawfish
+          Name: Plug
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1078,7 +1192,287 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/mapping/table_sawfish
+            Value: /talos/mapping/plug
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Nut and Bolt
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/nut_and_bolt
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Bandage
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/bandage
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Warning
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/warning
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Helmet
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/helmet
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Sos
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/sos
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Hammer and Wrench
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/hammer_and_wrench
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Buoy
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/buoy
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 255; 25; 0
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Compass
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/mapping/compass
           Value: true
       Enabled: true
       Name: Mapping Objects
@@ -1263,7 +1657,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Bin
+          Name: Bin Vinyl1
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1273,7 +1667,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/bin_target
+            Value: /talos/dummydetections/bin_vinyl1
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1298,7 +1692,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Buoy
+          Name: Bin Vinyl2
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1308,7 +1702,147 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/buoy
+            Value: /talos/dummydetections/bin_vinyl2
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Bin Vinyl3
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/bin_vinyl3
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Bin Vinyl4
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/bin_vinyl4
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Magnet 1
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/magnet_1
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Magnet 2
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/magnet_2
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1470,7 +2004,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: true
-          Enabled: true
+          Enabled: false
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Gate
@@ -1484,6 +2018,41 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /talos/dummydetections/gate
+          Value: false
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Gate Repair
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/gate_repair
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1508,7 +2077,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Gate Reefshark
+          Name: Gate Rescue
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1518,42 +2087,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/gate_reefshark
-          Value: true
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.10000000149011612
-          Class: rviz_default_plugins/PoseWithCovariance
-          Color: 38; 162; 105
-          Covariance:
-            Orientation:
-              Alpha: 0.5
-              Color: 255; 255; 127
-              Color Style: Unique
-              Frame: Local
-              Offset: 1
-              Scale: 1
-              Value: true
-            Position:
-              Alpha: 0.30000001192092896
-              Color: 204; 51; 204
-              Scale: 1
-              Value: true
-            Value: true
-          Enabled: true
-          Head Length: 0.30000001192092896
-          Head Radius: 0.10000000149011612
-          Name: Gate Sawfish
-          Shaft Length: 1
-          Shaft Radius: 0.05000000074505806
-          Shape: Arrow
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            Filter size: 10
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /talos/dummydetections/gate_sawfish
+            Value: /talos/dummydetections/gate_rescue
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1613,7 +2147,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Table Sawfish
+          Name: Nut and Bolt
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1623,7 +2157,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/table_sawfish
+            Value: /talos/dummydetections/table_nut_and_bolt
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1648,7 +2182,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Table Reefshark
+          Name: Plug
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1658,7 +2192,287 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/table_reefshark
+            Value: /talos/dummydetections/table_plug
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Pill
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_pill
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Bandage
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_bandage
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Warning
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_warning
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Helmet
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_helmet
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Sos
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_sos
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Compass
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_compass
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Hammer and Wrench
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_hammer_and_wrench
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Buoy
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/table_buoy
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1718,7 +2532,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo Shark Hole
+          Name: Blood Hole Large
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1728,7 +2542,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_shark_hole
+            Value: /talos/dummydetections/torpedo_blood_hole_large
           Value: true
         - Alpha: 1
           Axes Length: 1
@@ -1753,7 +2567,7 @@ Visualization Manager:
           Enabled: true
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
-          Name: Torpedo Sawfish Hole
+          Name: Blood Hole Small
           Shaft Length: 1
           Shaft Radius: 0.05000000074505806
           Shape: Arrow
@@ -1763,10 +2577,92 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /talos/dummydetections/torpedo_sawfish_hole
+            Value: /talos/dummydetections/torpedo_blood_hole_small
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Fire Hole Small
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/torpedo_fire_hole_large
+          Value: true
+        - Alpha: 1
+          Axes Length: 1
+          Axes Radius: 0.10000000149011612
+          Class: rviz_default_plugins/PoseWithCovariance
+          Color: 38; 162; 105
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Head Length: 0.30000001192092896
+          Head Radius: 0.10000000149011612
+          Name: Fire Hole Large
+          Shaft Length: 1
+          Shaft Radius: 0.05000000074505806
+          Shape: Arrow
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /talos/dummydetections/torpedo_fire_hole_large
           Value: true
       Enabled: true
       Name: Dummy Detections
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Vision Markers
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /talos/yolo_orientation/visualization_marker_array
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -1775,18 +2671,18 @@ Visualization Manager:
         Value: true
       Axis: Z
       Channel Name: intensity
-      Class: rviz_default_plugins/PointCloud
+      Class: rviz_default_plugins/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: ""
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: PointCloud
-      Position Transformer: XYZ
+      Name: Vision Pointcloud
+      Position Transformer: ""
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.009999999776482582
@@ -1797,22 +2693,10 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /talos/point_cloud
+        Value: /talos/yolo_orientation/point_cloud
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
-    - Class: rviz_default_plugins/MarkerArray
-      Enabled: false
-      Name: Vision Planes
-      Namespaces:
-        {}
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /talos/visualization_marker_array
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -1859,25 +2743,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 18.1029052734375
+      Distance: 9.201892852783203
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 7.050704479217529
-        Y: -4.216136932373047
-        Z: -5.945253849029541
+        X: 4.164796829223633
+        Y: -2.066781520843506
+        Z: -0.5939229130744934
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7197967767715454
+      Pitch: 1.1397955417633057
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.579575777053833
+      Yaw: 5.411889553070068
     Saved: ~
 Window Geometry:
   Actuators:
@@ -1894,7 +2778,7 @@ Window Geometry:
     collapsed: false
   FeedforwardPanel:
     collapsed: false
-  Height: 1016
+  Height: 2032
   Hide Left Dock: false
   Hide Right Dock: false
   MappingPanel:
@@ -1903,11 +2787,11 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000300000000000002be0000039afc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003f0000039a000002930100001efa000000000100000003fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000009600fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000001bf00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000023600ffffff00000001000002c50000039afc0200000002fc0000003f0000020e000000fc0100001efa000000000100000002fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000018900fffffffc0000025300000186000001860100001efa000000040100000006fb00000012004100630074007500610074006f007200730100000000ffffffff0000014700fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000012f00fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff000000bc00fffffffb000000140050006100720061006d00500061006e0065006c01000005f200000148000000b000fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015b00fffffffb0000000a005600690065007700730100000000ffffffff000001f900ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a000002ed00ffffff000001ab0000039a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000300000000000004ec00000762fc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc00000061000007620000044e01000029fa000000000100000003fb000000180043006f006e00740072006f006c00500061006e0065006c010000000000000219000000e900fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff0000035b00fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff000003cc00ffffff00000001000004cd00000762fc0200000002fc000000610000042f0000019801000029fa000000000100000002fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000022e00fffffffb0000001800420061006700670069006e006700500061006e0065006c0100000000ffffffff0000026600fffffffc000004980000032b000002ab01000029fa000000000100000006fb000000100044006900730070006c0061007900730100000000ffffffff0000028000fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000024800fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff000001b600fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff0000012000fffffffb000000140050006100720061006d00500061006e0065006c01000005f2000001480000014200fffffffb0000000a005600690065007700730100000000ffffffff0000036000ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a0000058700ffffff0000032b0000076200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Time:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1850
-  X: 70
-  Y: 27
+  Width: 3316
+  X: 140
+  Y: 54

@@ -26,6 +26,9 @@ namespace riptide_rviz
         model = new QStandardItemModel();
         uiPanel->btStackView->setModel(model);
 
+        // dont want random highlighting of the tree list
+        uiPanel->btSelect->setFocusPolicy(Qt::NoFocus);
+
         // Connect UI signals for controlling the riptide vehicle
         connect(uiPanel->btSelect, SIGNAL(currentIndexChanged(int)), SLOT(handleSelectTree(int)));
         connect(uiPanel->btStart, &QPushButton::clicked, [this](void)
