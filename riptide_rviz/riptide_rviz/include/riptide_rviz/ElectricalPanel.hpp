@@ -6,12 +6,14 @@
 #include <QTimer>
 
 #include <std_msgs/msg/u_int8.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/float32.hpp>
 
 #include <riptide_msgs2/msg/electrical_command.hpp>
 #include <riptide_msgs2/msg/imu_config.hpp>
 #include <riptide_msgs2/action/mag_cal.hpp>
 #include <riptide_msgs2/action/tare_gyro.hpp>
-#include <riptide_msgs2/action/depressurize.hpp>
 #include <riptide_msgs2/srv/query_imu_serial.hpp>
 #include <riptide_msgs2/msg/u_int8_stamped.hpp>
 
@@ -22,8 +24,10 @@ namespace riptide_rviz
     const static std::string 
         MAG_CAL_ACTION_NAME = "/vectornav/mag_cal",
         TARE_GYRO_ACTION_NAME = "/gyro/tare",
-        DEPRESSURIZE_ACTION_NAME = "/depressurize",
         CONFIG_SERVICE_NAME = "/vectornav/config";
+
+    const static int NUM_PINGER_FREQUENCIES = 4;
+    const static int PINGER_FREQUENCIES[NUM_PINGER_FREQUENCIES] = { 25, 30, 35, 40 };
 
     class ElectricalPanel : public rviz_common::Panel
     {
@@ -35,9 +39,6 @@ namespace riptide_rviz
         using TareGyroSendGoalOptions = rclcpp_action::Client<TareGyro>::SendGoalOptions;
         using TareGyroGoalHandle = rclcpp_action::Client<TareGyro>::GoalHandle;
 
-        using Depressurize = riptide_msgs2::action::Depressurize;
-        using DepressurizeSendGoalOptions = rclcpp_action::Client<Depressurize>::SendGoalOptions;
-        using DepressurizeGoalHandle = rclcpp_action::Client<Depressurize>::GoalHandle;
         using ImuConfig = riptide_msgs2::srv::QueryImuSerial;
         
 
@@ -52,16 +53,17 @@ namespace riptide_rviz
 
         private Q_SLOTS:
         void sendElectricalCommand();
-        void sendDepressurizationCommand();
         void sendMagCal();
         void sendTareGyro();
 
         void sendIvcMsg();
 
-        
         void writeIMU();
         void readIMU();
         void saveImuSettings();
+
+        void setPingerFreq(int freq_khz);
+        void pingerEnabledChanged(QCheckBox* box);
         
         private:
         void setStatus(const QString& status, bool error);
@@ -76,17 +78,14 @@ namespace riptide_rviz
         void ivcTxSuccessCb(const riptide_msgs2::msg::UInt8Stamped::SharedPtr msg);
         void tareGyroGoalResponseCb(const TareGyroGoalHandle::SharedPtr & goal_handle);
         void tareGyroResultCb(const TareGyroGoalHandle::WrappedResult & result);
-        void depressurizeGoalResponseCb(const DepressurizeGoalHandle::SharedPtr & goal_handle);
-        void depressurizeFeedbackCb(DepressurizeGoalHandle::SharedPtr, const std::shared_ptr<const Depressurize::Feedback> feedback);
-        void depressurizeResultCb(const DepressurizeGoalHandle::WrappedResult & result);
-        Qt::CheckState processCheckState(bool state);
 
-
-
-        void resultCb(const MagGoalHandle::WrappedResult & result);
+        void pingerSelectedFreqCb(const std_msgs::msg::Int32::SharedPtr msg);
+        void pingerAmplitudeCb(const std_msgs::msg::Float32::SharedPtr msg);
 
         void sendIMUConfigRequest(const std::string& request, bool extResponseTime = false);
         void waitForConfig(bool extResponseTime = false);
+
+        void uncheckAllPingerButtons();
 
         // electrical command vars
         bool loaded = false;
@@ -96,16 +95,17 @@ namespace riptide_rviz
         // mag cal vars
         bool 
             imuCalInProgress = false,
-            gyroTareInProgress = false,
-            depressurizationInProgress = false;
+            gyroTareInProgress = false;
             
         double maxVar = 0.0;
-        double netDepressurization = 100000;
 
         // Continuous mag cal vars
         bool imuHsiEnable = false;
         bool imuHsiOutput = false;
         int imuConvergenceRate = 1; 
+
+        // Pinger vars
+        std::array<QPushButton *, NUM_PINGER_FREQUENCIES> pingerButtons;
 
         rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr elecPub;
 
@@ -116,9 +116,13 @@ namespace riptide_rviz
 
         rclcpp::Subscription<riptide_msgs2::msg::UInt8Stamped>::SharedPtr ivcSuccessSub;
 
+        rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr pingerSetFreqKHz;
+        rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pingerEnable;
+        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr pingerFreqKHzFeedback;
+        rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr pingerFreqAmplitude;
+
         rclcpp_action::Client<MagCal>::SharedPtr imuCalClient;
         rclcpp_action::Client<TareGyro>::SharedPtr tareGyroClient;
-        rclcpp_action::Client<Depressurize>::SharedPtr depressurizeClient;
         
         rclcpp::Client<ImuConfig>::SharedPtr imuConfigClient;
         std::shared_future<std::shared_ptr<riptide_msgs2::srv::QueryImuSerial_Response>> imuConfigFuture;
