@@ -26,8 +26,8 @@ namespace riptide_rviz
         TARE_GYRO_ACTION_NAME = "/gyro/tare",
         CONFIG_SERVICE_NAME = "/vectornav/config";
 
-    const static int NUM_PINGER_FREQUENCIES = 4;
-    const static int PINGER_FREQUENCIES[NUM_PINGER_FREQUENCIES] = { 25, 30, 35, 40 };
+    const static int NUM_PINGER_FREQUENCIES = 5;
+    const static int PINGER_FREQUENCIES[NUM_PINGER_FREQUENCIES] = { 25, 30, 35, 40, 37 };
 
     class ElectricalPanel : public rviz_common::Panel
     {
@@ -82,6 +82,8 @@ namespace riptide_rviz
         void pingerSelectedFreqCb(const std_msgs::msg::Int32::SharedPtr msg);
         void pingerAmplitudeCb(const std_msgs::msg::Float32::SharedPtr msg);
 
+        void pingerEnabledTimerCb();
+
         void sendIMUConfigRequest(const std::string& request, bool extResponseTime = false);
         void waitForConfig(bool extResponseTime = false);
 
@@ -106,6 +108,7 @@ namespace riptide_rviz
 
         // Pinger vars
         std::array<QPushButton *, NUM_PINGER_FREQUENCIES> pingerButtons;
+        bool pingerEnabled = true;
 
         rclcpp::Publisher<riptide_msgs2::msg::ElectricalCommand>::SharedPtr elecPub;
 
@@ -120,6 +123,8 @@ namespace riptide_rviz
         rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pingerEnable;
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr pingerFreqKHzFeedback;
         rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr pingerFreqAmplitude;
+
+        rclcpp::TimerBase::SharedPtr pingerEnabledTimer;
 
         rclcpp_action::Client<MagCal>::SharedPtr imuCalClient;
         rclcpp_action::Client<TareGyro>::SharedPtr tareGyroClient;

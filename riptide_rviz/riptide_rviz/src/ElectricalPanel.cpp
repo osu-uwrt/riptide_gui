@@ -52,6 +52,9 @@ namespace riptide_rviz
         pingerFreqKHzFeedback = node->create_subscription<std_msgs::msg::Int32>(robotNs.toStdString() + "/ivc/pinger/selected_freq_khz", 10, std::bind(&ElectricalPanel::pingerSelectedFreqCb, this, _1));
         pingerFreqAmplitude = node->create_subscription<std_msgs::msg::Float32>(robotNs.toStdString() + "/ivc/pinger/selected_freq_amp_stream", 10, std::bind(&ElectricalPanel::pingerAmplitudeCb, this, _1));
 
+        // pinger timer
+        pingerEnabledTimer = node->create_wall_timer(1s, std::bind(&ElectricalPanel::pingerEnabledTimerCb, this));
+
         //make the action client for the imu mag cal
         std::string 
             fullMagCalActionName = robotNs.toStdString() + MAG_CAL_ACTION_NAME,
@@ -86,7 +89,7 @@ namespace riptide_rviz
         connect(ui->imuWriteSettings_2, &QPushButton::clicked, this, &ElectricalPanel::saveImuSettings);
         connect(ui->commandTareFog, &QPushButton::clicked, this, &ElectricalPanel::sendTareGyro);
 
-        pingerButtons = { ui->pingerFreq1, ui->pingerFreq2, ui->pingerFreq3, ui->pingerFreq4 };
+        pingerButtons = { ui->pingerFreq1, ui->pingerFreq2, ui->pingerFreq3, ui->pingerFreq4, ui->pingerFreq5 };
 
         for (int i = 0; i < NUM_PINGER_FREQUENCIES; i++) {
             connect(pingerButtons[i], &QPushButton::clicked, this, std::bind(&ElectricalPanel::setPingerFreq, this, PINGER_FREQUENCIES[i]));
@@ -234,6 +237,8 @@ namespace riptide_rviz
         std_msgs::msg::Bool msg;
         msg.data = box->isChecked();
         pingerEnable->publish(msg);
+
+        pingerEnabled = box->isChecked();
     }
 
     void ElectricalPanel::setStatus(const QString& status, bool error)
@@ -363,6 +368,13 @@ namespace riptide_rviz
 
     void ElectricalPanel::pingerAmplitudeCb(const std_msgs::msg::Float32::SharedPtr msg) {
         ui->pingerValue->setText(QString::number(msg->data));
+    }
+
+    // Also pub on a timer so board gets put in a good state on reboot
+    void ElectricalPanel::pingerEnabledTimerCb() {
+        std_msgs::msg::Bool msg;
+        msg.data = pingerEnabled;
+        pingerEnable->publish(msg);
     }
 
     void ElectricalPanel::tareGyroGoalResponseCb(const TareGyroGoalHandle::SharedPtr & goal_handle){
