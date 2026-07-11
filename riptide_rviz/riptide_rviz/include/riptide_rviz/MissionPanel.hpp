@@ -57,6 +57,8 @@ namespace riptide_rviz
         // timer callabck for refresh future
         void waitForRefresh(void);
 
+        void clearTreeStack();
+
     private:
         void updateLedReadout(void);
 
@@ -74,6 +76,7 @@ namespace riptide_rviz
 
         rclcpp::Subscription<riptide_msgs2::msg::TreeStack>::SharedPtr stackSub;
         rclcpp::Subscription<riptide_msgs2::msg::LedCommand>::SharedPtr ledSub;
+        rclcpp::Publisher<riptide_msgs2::msg::TreeStack>::SharedPtr stackPub;
 
         // refresh request info
         rclcpp::Client<riptide_msgs2::srv::ListTrees>::SharedPtr refreshClient;

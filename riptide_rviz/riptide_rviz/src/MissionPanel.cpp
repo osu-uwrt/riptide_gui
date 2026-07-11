@@ -72,12 +72,22 @@ namespace riptide_rviz
             robot_ns + "/command/led", 10,
             std::bind(&MissionPanel::ledCb, this, _1));
 
+        stackPub = node->create_publisher<riptide_msgs2::msg::TreeStack>(robot_ns + "/autonomy/tree_stack", rclcpp::SystemDefaultsQoS());
+
         refreshClient = node->create_client<riptide_msgs2::srv::ListTrees>(robot_ns + "/autonomy/list_trees");
 
         delete str;
 
         // refresh the UI
         refresh();
+    }
+
+    void MissionPanel::clearTreeStack()
+    {
+        riptide_msgs2::msg::TreeStack treeStack;
+        treeStack.stack = std::vector<std::string>();
+        treeStack.node_id = (uint32_t)1;
+        stackPub->publish(treeStack);
     }
 
     void MissionPanel::save(rviz_common::Config config) const
@@ -266,6 +276,8 @@ namespace riptide_rviz
             QTimer::singleShot(1000, [this](void)
                                { uiPanel->btStackView->setStyleSheet(""); });
         }
+
+        clearTreeStack();
     }
 
     void MissionPanel::taskFeedbackCb(GHExecuteTree::SharedPtr goalHandle,
