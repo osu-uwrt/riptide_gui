@@ -1,0 +1,24 @@
+# Rosbag recording presets for the riptide_rviz RosbagPanel.
+#
+# Each entry under "presets" is a named set of topics. Selecting a preset in the
+# panel checks exactly those topics; you can still freely add/remove topics or use
+# "Record all topics" afterwards.
+#
+# Topic names:
+#   - relative (no leading slash) are prefixed with the panel's robot namespace,
+#     e.g. "odometry/filtered" -> "/talos/odometry/filtered"
+#   - absolute (leading slash) are used verbatim, e.g. "/tf"
+#
+# Topics that are not currently being published can still be listed - ros2 bag
+# record will start capturing them as soon as they appear.
+#
+# Edit this file to add your own presets. After editing, rebuild/reinstall (or use
+# colcon --symlink-install) and restart RViz, or just re-add the panel.
+
+presets:
+  Test:
+    - /talos/odometry/filtered
+    # - /talos/ffc/zed_node/rgb/image_rect_color
+    # - /talos/ffc/zed_node/depth/depth_registered
+    # - /talos/ffc/zed_node/rgb/camera_info
+    - /tf_static
