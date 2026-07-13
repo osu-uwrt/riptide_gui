@@ -22,3 +22,11 @@ presets:
     # - /talos/ffc/zed_node/depth/depth_registered
     # - /talos/ffc/zed_node/rgb/camera_info
     - /tf_static
+
+  Random Pinger:
+    - /tf
+    - /tf_static
+    - /talos/mapping/torpedo
+    - /talos/mapping/table
+    - /talos/odometry/filtered
+    - /talos/ivc/pinger/selected_freq_amp_stream
