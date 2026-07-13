@@ -53,5 +53,15 @@
         <description>
             RVIZ Plugin for displaying robot diagnostics.
         </description>
-  </class>
+    </class>
+    <class name="riptide_rviz/RosbagPanel" type="riptide_rviz::RosbagPanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ Plugin for recording rosbags.
+        </description>
+    </class>
+    <class name="riptide_rviz/ServicePanel" type="riptide_rviz::ServicePanel" base_class_type="rviz_common::Panel">
+        <description>
+            RVIZ Plugin for calling services.
+        </description>
+    </class>
 </library>
