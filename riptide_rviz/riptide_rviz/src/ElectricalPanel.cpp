@@ -47,7 +47,7 @@ namespace riptide_rviz
         ivcSuccessSub = node->create_subscription<riptide_msgs2::msg::UInt8Stamped>(robotNs.toStdString() + "/ivc/tx_success", 10, std::bind(&ElectricalPanel::ivcTxSuccessCb, this, _1));
 
         // pinger pubs and subs
-        pingerSetFreqKHz = node->create_publisher<std_msgs::msg::Int32>(robotNs.toStdString() + "/ivc/pinger/set_freq_khz", 10);
+        pingerSetFreqKHz = node->create_publisher<std_msgs::msg::Int32>(robotNs.toStdString() + "/ivc/pinger/set_freq_broker_khz", 10);
         pingerEnable = node->create_publisher<std_msgs::msg::Bool>(robotNs.toStdString() + "/ivc/pinger/enable", 10);
         pingerFreqKHzFeedback = node->create_subscription<std_msgs::msg::Int32>(robotNs.toStdString() + "/ivc/pinger/selected_freq_khz", 10, std::bind(&ElectricalPanel::pingerSelectedFreqCb, this, _1));
         pingerFreqAmplitude = node->create_subscription<std_msgs::msg::Float32>(robotNs.toStdString() + "/ivc/pinger/selected_freq_amp_stream", 10, std::bind(&ElectricalPanel::pingerAmplitudeCb, this, _1));
