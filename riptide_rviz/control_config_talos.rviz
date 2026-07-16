@@ -4,9 +4,12 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
+        - /TF1/Frames1
+        - /Mapping Markers1
         - /Mapping Markers1/Namespaces1
       Splitter Ratio: 0.5276073813438416
-    Tree Height: 414
+    Tree Height: 442
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -16,7 +19,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: FFC Point Cloud
   - Class: riptide_rviz/ControlPanel
     Name: ControlPanel
     max_depth_in_place: -0.5
@@ -51,10 +54,10 @@ Panels:
     robot_namespace: /talos
   - Class: riptide_rviz/RosbagPanel
     Name: RosbagPanel
-    robot_namespace: ""
+    robot_namespace: /talos
   - Class: riptide_rviz/ServicePanel
     Name: ServicePanel
-    robot_namespace: ""
+    robot_namespace: /talos
 Visualization Manager:
   Class: ""
   Displays:
@@ -161,11 +164,187 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: false
-        ghost/base_link:
-          Value: false
-        ghost/origin:
-          Value: false
+        All Enabled: true
+        bandage_frame:
+          Value: true
+        bin_cad_geometry_frame:
+          Value: true
+        bin_frame:
+          Value: true
+        bin_target1_frame:
+          Value: true
+        bin_target2_frame:
+          Value: true
+        bin_vinyl1_frame:
+          Value: true
+        bin_vinyl2_frame:
+          Value: true
+        bin_vinyl3_frame:
+          Value: true
+        bin_vinyl4_frame:
+          Value: true
+        blood_hole_large_frame:
+          Value: true
+        blood_hole_small_frame:
+          Value: true
+        buoy_frame:
+          Value: true
+        compass_frame:
+          Value: true
+        estimated_origin_frame:
+          Value: true
+        fire_hole_large_frame:
+          Value: true
+        fire_hole_small_frame:
+          Value: true
+        gate_frame:
+          Value: true
+        gate_repair_frame:
+          Value: true
+        gate_rescue_frame:
+          Value: true
+        hammer_and_wrench_frame:
+          Value: true
+        helmet_frame:
+          Value: true
+        magnet1_frame:
+          Value: true
+        magnet2_frame:
+          Value: true
+        magnet_target1_frame:
+          Value: true
+        magnet_target2_frame:
+          Value: true
+        map:
+          Value: true
+        nut_and_bolt_frame:
+          Value: true
+        octagon_frame:
+          Value: true
+        odom:
+          Value: true
+        offset:
+          Value: true
+        pill_frame:
+          Value: true
+        plug_frame:
+          Value: true
+        post_bin_pose_frame:
+          Value: true
+        post_table_pose_frame:
+          Value: true
+        pre_bin_pose_frame:
+          Value: true
+        pre_return_home_frame:
+          Value: true
+        pre_table_pose_frame:
+          Value: true
+        pre_torpedo_pose_frame:
+          Value: true
+        prequal_gate_frame:
+          Value: true
+        prequal_pole_frame:
+          Value: true
+        slalom_back_frame:
+          Value: true
+        slalom_front_frame:
+          Value: true
+        slalom_middle_frame:
+          Value: true
+        slalom_parent_frame:
+          Value: true
+        sos_frame:
+          Value: true
+        table_frame:
+          Value: true
+        tag36h11:0:
+          Value: true
+        talos/acoustics_port_link:
+          Value: true
+        talos/acoustics_starboard_link:
+          Value: true
+        talos/base_inertia:
+          Value: true
+        talos/base_link:
+          Value: true
+        talos/claw_link:
+          Value: true
+        talos/dfc_base_link:
+          Value: true
+        talos/dfc_camera_center:
+          Value: true
+        talos/dfc_camera_link:
+          Value: true
+        talos/dfc_left_camera_frame:
+          Value: true
+        talos/dfc_left_camera_optical_frame:
+          Value: true
+        talos/dfc_right_camera_frame:
+          Value: true
+        talos/dfc_right_camera_optical_frame:
+          Value: true
+        talos/droppers_link:
+          Value: true
+        talos/dvl_link:
+          Value: true
+        talos/ffc_base_link:
+          Value: true
+        talos/ffc_camera_center:
+          Value: true
+        talos/ffc_camera_link:
+          Value: true
+        talos/ffc_left_camera_frame:
+          Value: true
+        talos/ffc_left_camera_optical_frame:
+          Value: true
+        talos/ffc_right_camera_frame:
+          Value: true
+        talos/ffc_right_camera_optical_frame:
+          Value: true
+        talos/fog_link:
+          Value: true
+        talos/hitch_link:
+          Value: true
+        talos/imu_link:
+          Value: true
+        talos/imu_revolute_link:
+          Value: true
+        talos/magnet_link:
+          Value: true
+        talos/origin:
+          Value: true
+        talos/poker_link:
+          Value: true
+        talos/pose_sensor_link:
+          Value: true
+        talos/pressure_link:
+          Value: true
+        talos/thruster_0:
+          Value: true
+        talos/thruster_1:
+          Value: true
+        talos/thruster_2:
+          Value: true
+        talos/thruster_3:
+          Value: true
+        talos/thruster_4:
+          Value: true
+        talos/thruster_5:
+          Value: true
+        talos/thruster_6:
+          Value: true
+        talos/thruster_7:
+          Value: true
+        talos/torpedo_0_link:
+          Value: true
+        talos/torpedo_1_link:
+          Value: true
+        talos/torpedo_link:
+          Value: true
+        torpedo_frame:
+          Value: true
+        warning_frame:
+          Value: true
         world:
           Value: true
       Marker Scale: 1
@@ -174,7 +353,159 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        world:
+          map:
+            offset:
+              bin_frame:
+                bin_cad_geometry_frame:
+                  bin_vinyl1_frame:
+                    {}
+                  bin_vinyl2_frame:
+                    {}
+                  bin_vinyl3_frame:
+                    {}
+                  bin_vinyl4_frame:
+                    {}
+                  magnet1_frame:
+                    {}
+                  magnet2_frame:
+                    {}
+                  magnet_target1_frame:
+                    {}
+                  magnet_target2_frame:
+                    {}
+                bin_target1_frame:
+                  {}
+                bin_target2_frame:
+                  {}
+              gate_frame:
+                gate_repair_frame:
+                  {}
+                gate_rescue_frame:
+                  {}
+              pre_bin_pose_frame:
+                post_bin_pose_frame:
+                  {}
+              pre_return_home_frame:
+                {}
+              pre_table_pose_frame:
+                post_table_pose_frame:
+                  {}
+              pre_torpedo_pose_frame:
+                {}
+              prequal_gate_frame:
+                {}
+              prequal_pole_frame:
+                {}
+              slalom_parent_frame:
+                slalom_front_frame:
+                  slalom_back_frame:
+                    {}
+                  slalom_middle_frame:
+                    {}
+              table_frame:
+                bandage_frame:
+                  {}
+                helmet_frame:
+                  {}
+                nut_and_bolt_frame:
+                  {}
+                octagon_frame:
+                  buoy_frame:
+                    {}
+                  compass_frame:
+                    {}
+                  hammer_and_wrench_frame:
+                    {}
+                  sos_frame:
+                    {}
+                pill_frame:
+                  {}
+                plug_frame:
+                  {}
+                warning_frame:
+                  {}
+              torpedo_frame:
+                blood_hole_large_frame:
+                  {}
+                blood_hole_small_frame:
+                  {}
+                fire_hole_large_frame:
+                  {}
+                fire_hole_small_frame:
+                  {}
+          odom:
+            talos/base_link:
+              talos/origin:
+                talos/acoustics_port_link:
+                  {}
+                talos/acoustics_starboard_link:
+                  {}
+                talos/base_inertia:
+                  {}
+                talos/claw_link:
+                  {}
+                talos/dfc_base_link:
+                  talos/dfc_camera_link:
+                    talos/dfc_camera_center:
+                      talos/dfc_left_camera_frame:
+                        talos/dfc_left_camera_optical_frame:
+                          {}
+                      talos/dfc_right_camera_frame:
+                        talos/dfc_right_camera_optical_frame:
+                          {}
+                talos/droppers_link:
+                  {}
+                talos/dvl_link:
+                  {}
+                talos/ffc_base_link:
+                  talos/ffc_camera_link:
+                    talos/ffc_camera_center:
+                      talos/ffc_left_camera_frame:
+                        talos/ffc_left_camera_optical_frame:
+                          tag36h11:0:
+                            estimated_origin_frame:
+                              {}
+                      talos/ffc_right_camera_frame:
+                        talos/ffc_right_camera_optical_frame:
+                          {}
+                talos/fog_link:
+                  {}
+                talos/hitch_link:
+                  {}
+                talos/imu_link:
+                  {}
+                talos/imu_revolute_link:
+                  {}
+                talos/magnet_link:
+                  {}
+                talos/poker_link:
+                  {}
+                talos/pressure_link:
+                  {}
+                talos/thruster_0:
+                  {}
+                talos/thruster_1:
+                  {}
+                talos/thruster_2:
+                  {}
+                talos/thruster_3:
+                  {}
+                talos/thruster_4:
+                  {}
+                talos/thruster_5:
+                  {}
+                talos/thruster_6:
+                  {}
+                talos/thruster_7:
+                  {}
+                talos/torpedo_link:
+                  talos/torpedo_0_link:
+                    {}
+                  talos/torpedo_1_link:
+                    {}
+              talos/pose_sensor_link:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -195,6 +526,156 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        talos/acoustics_port_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/acoustics_starboard_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/base_inertia:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/claw_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/dfc_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/dfc_camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/droppers_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/dvl_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/ffc_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/ffc_camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/fog_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/hitch_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/imu_revolute_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/magnet_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/origin:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/poker_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/pose_sensor_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        talos/pressure_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/thruster_7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/torpedo_0_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/torpedo_1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        talos/torpedo_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -207,8 +688,7 @@ Visualization Manager:
       Enabled: true
       Name: Mapping Markers
       Namespaces:
-        mapping_markers: true
-        simGhost: false
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -1032,7 +1512,7 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /talos/mapping/compass
           Value: true
-      Enabled: true
+      Enabled: false
       Name: Mapping Objects
     - Class: rviz_common/Group
       Displays:
@@ -2210,7 +2690,7 @@ Visualization Manager:
       Enabled: true
       Name: Dummy Detections
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: true
+      Enabled: false
       Name: Vision Markers
       Namespaces:
         {}
@@ -2220,7 +2700,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /talos/yolo_orientation/visualization_marker_array
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -2231,7 +2711,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz_default_plugins/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: ""
+      Color Transformer: RGB8
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -2240,7 +2720,7 @@ Visualization Manager:
       Min Color: 0; 0; 0
       Min Intensity: 0
       Name: Vision Pointcloud
-      Position Transformer: ""
+      Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.009999999776482582
@@ -2301,25 +2781,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 18.823566436767578
+      Distance: 12.85350227355957
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 11.15415096282959
-        Y: -0.14535005390644073
-        Z: -3.1407835483551025
+        X: 4.588930606842041
+        Y: 1.5722440481185913
+        Z: -2.28347110748291
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.33210813999176025
+      Pitch: 0.5264918208122253
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.155125379562378
+      Yaw: 3.5454201698303223
     Saved: ~
 Window Geometry:
   Actuators:
@@ -2345,7 +2825,7 @@ Window Geometry:
     collapsed: false
   ParamPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000300000000000002760000066efc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000066e000002c70100001cfa000000000100000003fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000008a00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000001c300fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000020e00ffffff00000001000002780000066efc0200000002fc0000003d00000470000001e60100001cfa000000000100000004fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb000000160052006f007300620061006700500061006e0065006c0100000000ffffffff0000012e00fffffffb0000001800420061006700670069006e006700500061006e0065006c0000000000ffffffff0000016a00fffffffb00000018005300650072007600690063006500500061006e0065006c0100000000ffffffff0000016b00fffffffc000004b3000001f8000001840100001cfa000000000100000006fb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000013000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff000000a900fffffffb000000140050006100720061006d00500061006e0065006c01000005f200000148000000b000fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a000002fb00ffffff000006000000066e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000300000000000002760000066efc0200000003fb0000001200530065006c0065006300740069006f006e010000003d0000039e0000000000000000fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000003d0000039e0000000000000000fc0000003d0000066e000002c70100001cfa000000010100000003fb000000180043006f006e00740072006f006c00500061006e0065006c0100000000000002190000008a00fffffffb00000018004d0061007000700069006e006700500061006e0065006c0100000000ffffffff000001c300fffffffb0000001e0045006c0065006300740072006900630061006c00500061006e0065006c0100000000ffffffff0000020e00ffffff00000001000002780000066efc0200000002fc0000003d00000454000001e60100001cfa000000000100000004fb00000018004d0069007300730069006f006e00500061006e0065006c0100000000ffffffff0000012600fffffffb000000160052006f007300620061006700500061006e0065006c0100000000ffffffff0000012e00fffffffb0000001800420061006700670069006e006700500061006e0065006c0000000000ffffffff000000be00fffffffb00000018005300650072007600690063006500500061006e0065006c0100000000ffffffff0000016b00fffffffc0000049700000214000001840100001cfa000000000100000006fb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb00000012004100630074007500610074006f007200730100000000ffffffff0000012000fffffffb0000002000460065006500640066006f0072007700610072006400500061006e0065006c0100000000ffffffff0000010800fffffffb000000200044006900610067006e006f0073007400690063007300500061006e0065006c0100000000ffffffff000000a900fffffffb000000140050006100720061006d00500061006e0065006c01000005f200000148000000b000fffffffb0000000a005600690065007700730100000000ffffffff0000010000ffffff000000030000073a0000003afc0100000001fb0000000800540069006d006500000000000000073a000002fb00ffffff000006000000066e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RosbagPanel:
     collapsed: false
   ServicePanel:
