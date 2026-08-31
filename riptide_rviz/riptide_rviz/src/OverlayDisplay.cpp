@@ -39,6 +39,8 @@
 #include <OgreHardwarePixelBuffer.h>
 #include <OgreMaterialManager.h>
 #include <OgreTexture.h>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QFontDatabase>
 #include <QPainter>
 #include <QStaticText>
@@ -49,6 +51,8 @@
 #include <rviz_common/logging.hpp>
 #include <rviz_rendering/render_system.hpp>
 #include <sstream>
+#include <algorithm>
+#include <cmath>
 
 namespace riptide_rviz {
     OverlayDisplay::OverlayDisplay() :
@@ -95,6 +99,38 @@ namespace riptide_rviz {
         }
     }
 
+    // For high dpi displays
+    static float getUiScaleFactor()
+    {
+        QScreen* screen = QGuiApplication::primaryScreen();
+        if (!screen) return 1.0f;
+
+        const float dpr = static_cast<float>(screen->devicePixelRatio());
+        const float dpi = static_cast<float>(screen->logicalDotsPerInch() / 96.0);
+
+        const float s = std::max(dpr, dpi);
+        return std::max(1.0f, s);
+    }
+
+    // JLog info about the ui scaling
+    static void logUiScale()
+    {
+        QScreen* screen = QGuiApplication::primaryScreen();
+        if (!screen) {
+            RVIZ_COMMON_LOG_ERROR("OverlayDisplay DPI: no primary screen");
+            return;
+        }
+
+        RVIZ_COMMON_LOG_INFO_STREAM(
+            "OverlayDisplay DPI Info:"
+            << "\n  devicePixelRatio = " << screen->devicePixelRatio()
+            << "\n  logicalDPI       = " << screen->logicalDotsPerInch()
+            << "\n  physicalDPI      = " << screen->physicalDotsPerInch()
+            << "\n  geometry         = " << screen->geometry().width()
+            << "x" << screen->geometry().height()
+        );
+    }
+
     // only the first time
     void OverlayDisplay::onInitialize() {
         rviz_rendering::RenderSystem::get()->prepareOverlays(scene_manager_);
@@ -107,6 +143,8 @@ namespace riptide_rviz {
             overlay_.reset(new riptide_rviz::OverlayObject(ss.str()));
             overlay_->show();
         }
+
+        logUiScale();
 
         onEnable();
         updateHorizontalDistance();
@@ -190,7 +228,7 @@ namespace riptide_rviz {
         if (config.font_size_ != 0) {
             // QFont font = painter.font();
             QFont font(config.font_name_.length() > 0 ? config.font_name_.c_str() : "Liberation Sans");
-            font.setPointSize(config.font_size_);
+            font.setPixelSize(std::max(config.font_size_, 1));
             font.setBold(true);
             painter.setFont(font);
         }
@@ -227,8 +265,6 @@ namespace riptide_rviz {
 
             QStaticText only_wrapped_text(color_wrapped_text.c_str());
             QFontMetrics fm(painter.fontMetrics());
-            QRect text_rect = fm.boundingRect(0, 0, config.width_, config.height_, Qt::TextWordWrap | Qt::AlignLeft | Qt::AlignTop,
-                                                only_wrapped_text.text().remove(QRegExp("<[^>]*>")));
             painter.drawStaticText(config.x_ + 1, config.y_ + 1, static_shadow);
             painter.drawStaticText(config.x_, config.y_, static_text);
         }
@@ -330,12 +366,14 @@ namespace riptide_rviz {
     }
 
     void OverlayDisplay::updateWidth() {
-        texture_width_ = width_property_->getInt();
+        const float s = getUiScaleFactor();
+        texture_width_ = std::max(1, static_cast<int>(std::lround(width_property_->getInt() * s)));
         require_update_texture_ = true;
     }
 
     void OverlayDisplay::updateHeight() {
-        texture_height_ = height_property_->getInt();
+        const float s = getUiScaleFactor();
+        texture_height_ = std::max(1, static_cast<int>(std::lround(height_property_->getInt() * s)));
         require_update_texture_ = true;
     }
 

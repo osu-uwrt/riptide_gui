@@ -46,15 +46,22 @@ namespace riptide_rviz
         ivcRxSub = node->create_subscription<std_msgs::msg::UInt8>(robotNs.toStdString() + "/ivc/rx", 10, std::bind(&ElectricalPanel::ivcRxCb, this, _1));
         ivcSuccessSub = node->create_subscription<riptide_msgs2::msg::UInt8Stamped>(robotNs.toStdString() + "/ivc/tx_success", 10, std::bind(&ElectricalPanel::ivcTxSuccessCb, this, _1));
 
+        // pinger pubs and subs
+        pingerSetFreqKHz = node->create_publisher<std_msgs::msg::Int32>(robotNs.toStdString() + "/ivc/pinger/set_freq_broker_khz", 10);
+        pingerEnable = node->create_publisher<std_msgs::msg::Bool>(robotNs.toStdString() + "/ivc/pinger/enable", 10);
+        pingerFreqKHzFeedback = node->create_subscription<std_msgs::msg::Int32>(robotNs.toStdString() + "/ivc/pinger/selected_freq_khz", 10, std::bind(&ElectricalPanel::pingerSelectedFreqCb, this, _1));
+        pingerFreqAmplitude = node->create_subscription<std_msgs::msg::Float32>(robotNs.toStdString() + "/ivc/pinger/selected_freq_amp_stream", 10, std::bind(&ElectricalPanel::pingerAmplitudeCb, this, _1));
+
+        // pinger timer
+        pingerEnabledTimer = node->create_wall_timer(1s, std::bind(&ElectricalPanel::pingerEnabledTimerCb, this));
+
         //make the action client for the imu mag cal
         std::string 
             fullMagCalActionName = robotNs.toStdString() + MAG_CAL_ACTION_NAME,
-            fullTareGyroActionName = robotNs.toStdString() + TARE_GYRO_ACTION_NAME,
-            fullDepressurizeActionName = robotNs.toStdString() + DEPRESSURIZE_ACTION_NAME;
+            fullTareGyroActionName = robotNs.toStdString() + TARE_GYRO_ACTION_NAME;
 
         imuCalClient = rclcpp_action::create_client<MagCal>(node, fullMagCalActionName);
         tareGyroClient = rclcpp_action::create_client<TareGyro>(node, fullTareGyroActionName);
-        depressurizeClient = rclcpp_action::create_client<Depressurize>(node, fullDepressurizeActionName);
 
         // Make client for imu register config
         std::string fullServiceName = robotNs.toStdString() + CONFIG_SERVICE_NAME;
@@ -81,7 +88,15 @@ namespace riptide_rviz
         connect(ui->imuWrite_2, &QPushButton::clicked, this, &ElectricalPanel::writeIMU);
         connect(ui->imuWriteSettings_2, &QPushButton::clicked, this, &ElectricalPanel::saveImuSettings);
         connect(ui->commandTareFog, &QPushButton::clicked, this, &ElectricalPanel::sendTareGyro);
-        connect(ui->PVTButton, &QPushButton::clicked, this, &ElectricalPanel::sendDepressurizationCommand);
+
+        pingerButtons = { ui->pingerFreq1, ui->pingerFreq2, ui->pingerFreq3, ui->pingerFreq4, ui->pingerFreq5 };
+
+        for (int i = 0; i < NUM_PINGER_FREQUENCIES; i++) {
+            connect(pingerButtons[i], &QPushButton::clicked, this, std::bind(&ElectricalPanel::setPingerFreq, this, PINGER_FREQUENCIES[i]));
+            pingerButtons[i]->setText(QString::fromStdString(std::to_string(PINGER_FREQUENCIES[i]) + "kHz"));
+        }
+
+        connect(ui->pingerEnabled, &QCheckBox::stateChanged, this, std::bind(&ElectricalPanel::pingerEnabledChanged, this, ui->pingerEnabled));
 
         //initial UI state
         ui->calibProgress->setValue(0);
@@ -92,99 +107,6 @@ namespace riptide_rviz
         ui->registerData_2->setText("");
 
         ui->ivcConsole->setTabStopWidth(7);
-    }
-
-
-    void ElectricalPanel::sendDepressurizationCommand(){
-        if(!loaded)
-        {
-            setStatus("Panel not loaded! Please save your config and restart RViz", true);
-            return;
-        }
-
-        if(depressurizationInProgress){
-            depressurizeClient->async_cancel_all_goals();
-            setStatus("Cancelling Depressurization - Please allow air back into AUV before restarting!", true);
-            return;
-        }
-        depressurizationInProgress = true;
-
-
-        if(imuCalInProgress || imuCalInProgress){
-            setStatus("Already running a different calibration! Not doin it chief...", true);
-            return;
-        }
-
-        // make sure the depressurization server is online
-        if(!depressurizeClient->wait_for_action_server(1s)){
-            setStatus("Pressure Server Unavailable!", true);
-            return;
-        }
-
-        //set UI to zero percent complete
-        ui->calibProgress->setValue(0);
-
-        //get values from samples
-        double sampleTime = ui->PVTSampleTime->value();
-        netDepressurization = ui->PVTDepressurization->value();
-
-        if(netDepressurization > .3){
-            setStatus("You gonna break Talos! Cancelling! P.S. If for whatever cursed reason you do in fact need to lower the pressure this far, get send the action from the command line! But, be carefull, the electronics should be exposed to a pressure no less than .7bar", true);
-            return;
-        }
-
-        Depressurize::Goal depressurize_goal;
-        depressurize_goal.sampling_time = sampleTime;
-        depressurize_goal.net_depressuization = netDepressurization;
-
-        DepressurizeSendGoalOptions options;
-        options.goal_response_callback  = std::bind(&ElectricalPanel::depressurizeGoalResponseCb, this, _1);
-        options.feedback_callback       = std::bind(&ElectricalPanel::depressurizeFeedbackCb, this, _1, _2);
-        options.result_callback         = std::bind(&ElectricalPanel::depressurizeResultCb, this, _1);
-
-        depressurizeClient->async_send_goal(depressurize_goal, options);
-        setStatus("Sent goal!", true);
-
-        ui->PVTButton->setText("Cancel");
-    }
-
-    void ElectricalPanel::depressurizeGoalResponseCb(const DepressurizeGoalHandle::SharedPtr & goal_handle){
-
-    }
-
-    void ElectricalPanel::depressurizeFeedbackCb(DepressurizeGoalHandle::SharedPtr, const std::shared_ptr<const Depressurize::Feedback> feedback){
-        double percent_depressurized = 100* feedback->current_pressure / netDepressurization;
-        
-        ui->calibProgress->setValue((int) percent_depressurized);
-
-        if( percent_depressurized > 99.999){
-            //if fully depressurized, show message to have user pull pump
-
-            setStatus("Please remove the pump and replace the plug. Rather quickly if you will!", true);
-        }
-    }
-
-    void ElectricalPanel::depressurizeResultCb(const DepressurizeGoalHandle::WrappedResult & result){
-        switch(result.code)
-        {
-            case rclcpp_action::ResultCode::SUCCEEDED:
-                ui->calibProgress->setValue(100);
-                setStatus("Pressue Lowered", true);
-
-                break;
-            case rclcpp_action::ResultCode::ABORTED:
-                setStatus("Depressurization aborted", true);
-                break;
-            case rclcpp_action::ResultCode::CANCELED:
-                setStatus("Depressurization canceled!", false);
-                break;
-            case rclcpp_action::ResultCode::UNKNOWN:
-                setStatus("Uknown depressurization result recieved???", true);
-                break;
-        }
-
-        depressurizationInProgress = false;
-        ui->PVTButton->setText("Start PVT");
     }
 
     void ElectricalPanel::sendElectricalCommand()
@@ -212,11 +134,6 @@ namespace riptide_rviz
         if(imuCalInProgress){
             imuCalClient->async_cancel_all_goals();
             setStatus("Cancelling calibration request", false);
-            return;
-        }
-
-        if(depressurizationInProgress || gyroTareInProgress){
-            setStatus("Already running a different calibration! Not doin it chief...", true);
             return;
         }
 
@@ -253,11 +170,6 @@ namespace riptide_rviz
         if(gyroTareInProgress){
             tareGyroClient->async_cancel_all_goals();
             setStatus("Cancelling tare request", false);
-            return;
-        }
-                
-        if(depressurizationInProgress || imuCalInProgress){
-            setStatus("Already running a different calibration! Not doin it chief...", true);
             return;
         }
         
@@ -314,6 +226,20 @@ namespace riptide_rviz
         ivcTxPub->publish(msg);
     }
 
+    void ElectricalPanel::setPingerFreq(int freq_khz) {
+        std_msgs::msg::Int32 msg;
+        msg.data = freq_khz;
+
+        pingerSetFreqKHz->publish(msg);
+    }
+
+    void ElectricalPanel::pingerEnabledChanged(QCheckBox *box) {
+        std_msgs::msg::Bool msg;
+        msg.data = box->isChecked();
+        pingerEnable->publish(msg);
+
+        pingerEnabled = box->isChecked();
+    }
 
     void ElectricalPanel::setStatus(const QString& status, bool error)
     {
@@ -427,6 +353,29 @@ namespace riptide_rviz
         appendIvcConsole("\t[ CONFIRM ]", msg->data);
     }
 
+    void ElectricalPanel::pingerSelectedFreqCb(const std_msgs::msg::Int32::SharedPtr msg) {
+        uncheckAllPingerButtons();
+        
+        int i = 0;
+        for (; i < NUM_PINGER_FREQUENCIES; i++) {
+            if (msg->data == PINGER_FREQUENCIES[i])
+                break;
+        }
+
+        if (i < NUM_PINGER_FREQUENCIES)
+            pingerButtons[i]->setChecked(true);
+    }
+
+    void ElectricalPanel::pingerAmplitudeCb(const std_msgs::msg::Float32::SharedPtr msg) {
+        ui->pingerValue->setText(QString::number(msg->data));
+    }
+
+    // Also pub on a timer so board gets put in a good state on reboot
+    void ElectricalPanel::pingerEnabledTimerCb() {
+        std_msgs::msg::Bool msg;
+        msg.data = pingerEnabled;
+        pingerEnable->publish(msg);
+    }
 
     void ElectricalPanel::tareGyroGoalResponseCb(const TareGyroGoalHandle::SharedPtr & goal_handle){
         if(goal_handle)
@@ -542,6 +491,11 @@ namespace riptide_rviz
     void ElectricalPanel::saveImuSettings() {
         std::string requestStr = "$VNWNV";
         sendIMUConfigRequest(requestStr, true);
+    }
+
+    void ElectricalPanel::uncheckAllPingerButtons() {
+        for (int i = 0; i < NUM_PINGER_FREQUENCIES; i++) 
+            pingerButtons[i]->setChecked(false);
     }
 
 }

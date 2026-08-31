@@ -290,6 +290,7 @@ namespace riptide_rviz
                         box->setMaximum(INT_MAX);
                         box->setObjectName(name);
                         box->setValue(arr.at(i));
+                        box->setProperty("orig", static_cast<qlonglong>(arr.at(i))); // Store per element in array
                         box->installEventFilter(this);  // Disable wheel scroll here
                         connect(box, QOverload<int>::of(&QSpinBox::valueChanged), this, &ParamPanel::parameterValueChanged);
 
@@ -297,11 +298,15 @@ namespace riptide_rviz
 
                         arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
                         arrHBox->addWidget(box);
+                        arrHBox->setStretch(0, 0); // tighten inner label column
+                        arrHBox->setStretch(1, 1); // let value take remaining space
 
                         arrVBox->addLayout(arrHBox);
                     }
 
                     hBox->addLayout(arrVBox);
+                    hBox->setStretch(0, 0); // tighten param name column
+                    hBox->setStretch(1, 1); // let array side take remaining space
 
                 } break;
 
@@ -329,6 +334,7 @@ namespace riptide_rviz
                         box->setMaximum(DBL_MAX);
                         box->setObjectName(name);
                         box->setValue(arr.at(i));
+                        box->setProperty("orig", arr.at(i)); // Store per element in array
                         box->installEventFilter(this);  // Disable wheel scroll here
                         connect(box, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &ParamPanel::parameterValueChanged);
 
@@ -336,11 +342,15 @@ namespace riptide_rviz
 
                         arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
                         arrHBox->addWidget(box);
+                        arrHBox->setStretch(0, 0); // tighten inner label column
+                        arrHBox->setStretch(1, 1); // let value take remaining space
 
                         arrVBox->addLayout(arrHBox);
                     }
 
                     hBox->addLayout(arrVBox);
+                    hBox->setStretch(0, 0); // tighten param name column
+                    hBox->setStretch(1, 1); // let array side take remaining space
 
                 } break;
 
@@ -368,17 +378,22 @@ namespace riptide_rviz
 
                         box->setObjectName(name);
                         box->setChecked(arr.at(i));
+                        box->setProperty("orig", static_cast<bool>(arr.at(i))); // Store per element in array
                         connect(box, &QCheckBox::stateChanged, this, &ParamPanel::parameterValueChanged);
 
                         QHBoxLayout* arrHBox = new QHBoxLayout();
 
                         arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
                         arrHBox->addWidget(box);
+                        arrHBox->setStretch(0, 0); // tighten inner label column
+                        arrHBox->setStretch(1, 1); // let value take remaining space
 
                         arrVBox->addLayout(arrHBox);
                     }
 
                     hBox->addLayout(arrVBox);
+                    hBox->setStretch(0, 0); // tighten param name column
+                    hBox->setStretch(1, 1); // let array side take remaining space
 
                 } break;
 
@@ -405,15 +420,20 @@ namespace riptide_rviz
                         QTextEdit* box = new QTextEdit();
                         box->setObjectName(name);
                         box->setPlainText(QString::fromStdString(arr.at(i)));
+                        box->setProperty("orig", QString::fromStdString(arr.at(i))); // Store per element in array
                         connect(box, &QTextEdit::textChanged, this, &ParamPanel::parameterValueChanged);
 
                         arrHBox->addWidget(new QLabel(QString::fromStdString(std::to_string(i) + ":")));
                         arrHBox->addWidget(box);
+                        arrHBox->setStretch(0, 0);
+                        arrHBox->setStretch(1, 1);
 
                         arrVBox->addLayout(arrHBox);
                     }
 
                     hBox->addLayout(arrVBox);
+                    hBox->setStretch(0, 0);
+                    hBox->setStretch(1, 1);
 
                 } break;
 
@@ -541,6 +561,7 @@ namespace riptide_rviz
         showStatusMessage("Applying modified parameters...");
         
         std::vector<rclcpp::Parameter> modifiedParams;
+        std::vector<std::string> arrayParamsChanged; // Trakcing arrays that got changed (they're special)
         
         // Iterate through all visible parameters to find modified ones
         for(int i = 0; i < this->paramLayout->count(); i++) {
@@ -617,16 +638,16 @@ namespace riptide_rviz
                                 QSpinBox* box = dynamic_cast<QSpinBox*>(arrHBox->itemAt(1)->widget());
                                 if (box) {
                                     values.push_back(box->value());
-                                    // Check if any array element has a different style (indicating modification)
-                                    if (!box->styleSheet().isEmpty()) {
+                                    QVariant orig = box->property("orig");
+                                    if (!orig.isValid() || orig.toLongLong() != static_cast<qlonglong>(box->value())) {
                                         isModified = true;
-                                        box->setStyleSheet("");
                                     }
                                 }
                             }
                         }
                         if (isModified) {
                             modifiedParams.push_back(rclcpp::Parameter(paramNameStr, values));
+                            arrayParamsChanged.push_back(paramNameStr);
                         }
                     } break;
                     
@@ -638,15 +659,16 @@ namespace riptide_rviz
                                 QDoubleSpinBox* box = dynamic_cast<QDoubleSpinBox*>(arrHBox->itemAt(1)->widget());
                                 if (box) {
                                     values.push_back(box->value());
-                                    if (!box->styleSheet().isEmpty()) {
+                                    QVariant orig = box->property("orig");
+                                    if (!orig.isValid() || orig.toDouble() != box->value()) {
                                         isModified = true;
-                                        box->setStyleSheet("");
                                     }
                                 }
                             }
                         }
                         if (isModified) {
                             modifiedParams.push_back(rclcpp::Parameter(paramNameStr, values));
+                            arrayParamsChanged.push_back(paramNameStr);
                         }
                     } break;
                     
@@ -658,15 +680,16 @@ namespace riptide_rviz
                                 QCheckBox* box = dynamic_cast<QCheckBox*>(arrHBox->itemAt(1)->widget());
                                 if (box) {
                                     values.push_back(box->isChecked());
-                                    if (!box->styleSheet().isEmpty()) {
+                                    QVariant orig = box->property("orig");
+                                    if (!orig.isValid() || orig.toBool() != box->isChecked()) {
                                         isModified = true;
-                                        box->setStyleSheet("");
                                     }
                                 }
                             }
                         }
                         if (isModified) {
                             modifiedParams.push_back(rclcpp::Parameter(paramNameStr, values));
+                            arrayParamsChanged.push_back(paramNameStr);
                         }
                     } break;
                     
@@ -678,15 +701,16 @@ namespace riptide_rviz
                                 QTextEdit* box = dynamic_cast<QTextEdit*>(arrHBox->itemAt(1)->widget());
                                 if (box) {
                                     values.push_back(box->toPlainText().toStdString());
-                                    if (!box->styleSheet().isEmpty()) {
+                                    QVariant orig = box->property("orig");
+                                    if (!orig.isValid() || orig.toString() != box->toPlainText()) {
                                         isModified = true;
-                                        box->setStyleSheet("");
                                     }
                                 }
                             }
                         }
                         if (isModified) {
                             modifiedParams.push_back(rclcpp::Parameter(paramNameStr, values));
+                            arrayParamsChanged.push_back(paramNameStr);
                         }
                     } break;
                     
@@ -718,6 +742,42 @@ namespace riptide_rviz
                     RVIZ_COMMON_LOG_ERROR(errorMessage.toStdString());
                     showStatusMessage(errorMessage, 5000);
                 } else {
+                    // Update per-element baselines for arrays we changed
+                    if (!arrayParamsChanged.empty()) {
+                        // Build a quick lookup
+                        std::unordered_set<std::string> changedSet(arrayParamsChanged.begin(), arrayParamsChanged.end());
+                        for (int i = 0; i < this->paramLayout->count(); i++) {
+                            QLayoutItem* item = this->paramLayout->itemAt(i);
+                            if (!item->widget()) continue;
+                            QWidget* container = item->widget();
+                            QLayout* containerLayout = container->layout();
+                            if (!containerLayout || containerLayout->count() < 2) continue;
+                            QLabel* label = dynamic_cast<QLabel*>(containerLayout->itemAt(0)->widget());
+                            if (!label) continue;
+                            std::string name = label->text().toStdString();
+                            if (changedSet.find(name) == changedSet.end()) continue;
+
+                            if (auto* arrLayout = dynamic_cast<QVBoxLayout*>(containerLayout->itemAt(1)->layout())) {
+                                // Update each element's "orig" to its current value
+                                for (int j = 0; j < arrLayout->count(); j++) {
+                                    if (auto* arrHBox = dynamic_cast<QHBoxLayout*>(arrLayout->itemAt(j)->layout())) {
+                                        if (arrHBox->count() > 1) {
+                                            if (auto* sb = dynamic_cast<QSpinBox*>(arrHBox->itemAt(1)->widget())) {
+                                                sb->setProperty("orig", static_cast<qlonglong>(sb->value()));
+                                            } else if (auto* dsb = dynamic_cast<QDoubleSpinBox*>(arrHBox->itemAt(1)->widget())) {
+                                                dsb->setProperty("orig", dsb->value());
+                                            } else if (auto* cb = dynamic_cast<QCheckBox*>(arrHBox->itemAt(1)->widget())) {
+                                                cb->setProperty("orig", cb->isChecked());
+                                            } else if (auto* te = dynamic_cast<QTextEdit*>(arrHBox->itemAt(1)->widget())) {
+                                                te->setProperty("orig", te->toPlainText());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     showStatusMessage(QString("Successfully applied %1 modified parameters").arg(modifiedParams.size()), 3000);
                 }
             } catch (const std::exception& e) {

@@ -4,6 +4,7 @@
 
 #include <riptide_msgs2/msg/controller_command.hpp>
 #include <riptide_msgs2/msg/kill_switch_report.hpp>
+#include <riptide_msgs2/msg/tree_stack.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <std_msgs/msg/int8.hpp>
@@ -78,6 +79,7 @@ namespace riptide_rviz
         void odomCallback(const nav_msgs::msg::Odometry &msg);
         void diagCallback(const diagnostic_msgs::msg::DiagnosticArray &msg);
         void selectedPose(const geometry_msgs::msg::PoseStamped & msg);
+        void treeStackCallback(const riptide_msgs2::msg::TreeStack &msg);
 
         // ROS timer callbacks
         void sendKillMsgTimer();
@@ -183,6 +185,9 @@ namespace riptide_rviz
         // internal flags
         bool vehicleEnabled = false;
         bool degreeReadout = true;
+
+        // true while an autonomy tree is running (setpoint marker is hidden in this state)
+        bool autonomyActive = false;
         
         //buoyancy parameters
         bool activeBallastEnabled = false;
@@ -230,6 +235,7 @@ namespace riptide_rviz
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
         rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagSub;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr selectPoseSub;
+        rclcpp::Subscription<riptide_msgs2::msg::TreeStack>::SharedPtr treeStackSub;
 
         rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr
             exaustSolenoidSub,
