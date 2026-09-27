@@ -40,6 +40,12 @@ def generate_launch_description():
                     "control_config_file",
                     default_value=["control_config_", LC("robot"), ".rviz"]
                 ),
+                DeclareLaunchArgument(
+                    "use_sim_time",
+                    default_value="false",
+                    choices=["true", "false"],
+                    description="Use the ROS /clock topic",
+                ),
 
                 DeclareLaunchArgument('robot_yaml', default_value=[LC("robot"), '.yaml']),
 
@@ -84,7 +90,8 @@ def generate_launch_description():
                     name="marker_publisher",
                     output="screen",
                     parameters = [
-                        os.path.join(get_package_share_directory("riptide_rviz"), "config", "markers.yaml")
+                        os.path.join(get_package_share_directory("riptide_rviz"), "config", "markers.yaml"),
+                        {"use_sim_time": True}
                     ]
                 )
             ]
